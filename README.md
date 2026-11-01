@@ -1,1 +1,3 @@
-# liquid-fight-club
+# Liquid in Rust
+
+See [TASK.md](TASK.md).

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Build the implementation (bin/build), then run every in-scope suite and
+# print one summary line per suite. This is the definition of "done":
+# every suite must report "Complexity level cleared: 1000 of 1000".
+# Extra arguments are passed to each suite run (e.g. --timeout=10).
+set -uo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+if [ ! -x bin/build ]; then echo "bin/build is missing (see TASK.md)"; exit 2; fi
+bin/build >&2 || { echo "BUILD FAILED"; exit 1; }
+[ -x build/liquid-server ] || { echo "build/liquid-server was not produced by bin/build"; exit 1; }
+status=0
+for suite in default parser_errors partials benchmarks; do
+  if [ "$suite" = default ]; then args=(); else args=(-s "$suite"); fi
+  out="$(harness/liquid-spec run harness/adapter.rb "${args[@]}" "$@" 2>&1)"
+  line="$(printf '%s\n' "$out" | grep -E 'Complexity level cleared' | tail -1)"
+  [ -n "$line" ] || line="(no summary - last output: $(printf '%s\n' "$out" | tail -1))"
+  printf '%-14s %s\n' "$suite" "$line"
+  case "$line" in *"cleared: 1000 of 1000"*" 0 failures"*) ;; *) status=1 ;; esac
+done
+exit $status

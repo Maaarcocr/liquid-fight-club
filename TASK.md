@@ -1,0 +1,67 @@
+# Task: Liquid in Rust
+
+Build a complete, production-quality implementation of the
+[Liquid](https://shopify.github.io/liquid/) template language in **Rust**,
+as a standalone library.
+
+You are working alone and unattended. Nobody will answer questions: make
+reasonable decisions, write them down in `NOTES.md`, and keep going.
+
+## Definition of done
+
+1. `harness/spec` reports `Complexity level cleared: 1000 of 1000` with
+   0 failures for every suite (default, parser_errors, partials, benchmarks).
+2. The library is production quality: correct, robust against hostile
+   templates and data (no crashes, memory errors, hangs, or unbounded
+   stack/memory growth), and efficient.
+3. `NOTES.md` describes the architecture, notable decisions, and known
+   limitations.
+
+When all three hold, stop.
+
+## Deliverables
+
+- The Liquid engine, as a library written in Rust.
+- `bin/build`: one command that builds everything in release mode from a
+  clean checkout and produces:
+  - `build/liquid-server`: the JSON-RPC server liquid-spec talks to
+    (protocol: `harness/liquid-spec docs json-rpc-protocol`).
+  - `build/libliquid_fc.a`: a static library exporting the C ABI declared in
+    `harness/liquid_fc.h`. External benchmark and fuzzing tools link
+    against it.
+- Keep the JSON-RPC server and the C ABI glue as thin wrappers around the
+  library.
+
+## Language and dependencies
+
+- Stable Rust, edition 2024, built with `cargo`.
+- Standard library only: no crates, and no calling C libraries (no
+  `extern "C"` imports). Exporting the C ABI is the only FFI.
+- No third-party code of any kind: no packages, no vendored or copied
+  libraries. That includes JSON: write your own.
+
+## Rules
+
+- Don't modify `harness/`.
+- Never special-case a spec (no matching on spec names, templates, or
+  expected outputs), and never edit specs. Implement the general rule.
+- You may read liquid-spec (specs, docs, `QUIRKS.md`) and Shopify's Ruby
+  Liquid source, the reference implementation. Find them with
+  `BUNDLE_GEMFILE=harness/Gemfile bundle info liquid-spec --path` and
+  `... bundle info liquid --path`.
+- Don't look at other Liquid implementations (liquid-c, liquid-rust,
+  liquidjs, ...), at the C source of Ruby or of Ruby gems, or at the web.
+- Commit after every meaningful improvement (at least whenever the pass count
+  goes up), with the `harness/spec` summary in the commit message.
+
+## Getting started
+
+Read `harness/LIQUID_SPEC_GUIDE.md` (liquid-spec's implementer guide) and
+follow its loop. Useful commands:
+
+- `harness/spec`: build, then run every suite and print one summary line each.
+- `harness/liquid-spec run harness/adapter.rb [-s SUITE] [-n PATTERN]`: the
+  detailed loop, with the next failures and their hints.
+- `cat spec.yml | harness/liquid-spec tools eval harness/adapter.rb --compare`:
+  run a scratch spec and compare with the reference implementation.
+- `harness/liquid-spec docs curriculum`: the learning path.
