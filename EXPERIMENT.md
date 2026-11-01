@@ -62,6 +62,8 @@ cd liquid-rust && claude     cd liquid-c && claude
 ## Caveats
 
 - One run per language, so differences may be noise.
-- C gets date/time formatting from libc. Rust gets only its standard
-  library (no libc calls), so it has to write its own.
+- Each side gets only its own standard library, and they cover different
+  ground. Rust has vectors, hash maps, strings and sorting built in, which C
+  must write itself. C has date/time formatting in libc, which Rust must
+  write. That gap is part of what's being compared.
 - The shared C ABI is free for C and extra glue for Rust.
