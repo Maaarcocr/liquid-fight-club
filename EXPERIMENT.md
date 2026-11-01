@@ -20,23 +20,16 @@ build Liquid in, on **token efficiency**, **correctness**, **performance** and
 
 ## Running it
 
+A manager agent runs the whole thing by following [MANAGER.md](MANAGER.md):
+
+- start both implementers as headless `claude -p` processes, each driven by
+  the same `/goal` (Claude keeps working until a check confirms the goal is
+  met);
+- resume them with the same goal if they stop early;
+- archive the transcripts;
+- score both implementations and write `REPORT.md`.
+
 Prerequisites: Ruby 3.x with bundler, Rust (stable), gcc, clang, make.
-
-```bash
-git clone --single-branch -b impl/rust https://github.com/Maaarcocr/liquid-fight-club liquid-rust
-git clone --single-branch -b impl/c    https://github.com/Maaarcocr/liquid-fight-club liquid-c
-# terminal 1                 # terminal 2
-cd liquid-rust && claude     cd liquid-c && claude
-```
-
-- Use the same permission mode in both, then send the same first message:
-  `Read TASK.md and complete it.`
-- If a session stops before `harness/spec` is fully green, send exactly:
-  `Continue working on TASK.md until its definition of done is met.`
-- Stop a session after 3 nudges in a row with no new commit.
-- Keep the transcripts: `~/.claude/projects/<checkout-path>/*.jsonl`. Copy
-  them somewhere safe once the runs end, because Claude Code deletes old
-  transcripts after `cleanupPeriodDays` (default 30).
 
 ## Measuring
 
