@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Run the pinned liquid-spec CLI (installs it on first use).
+# e.g. harness/liquid-spec run harness/adapter.rb -n assign
+#      harness/liquid-spec docs curriculum
+set -euo pipefail
+export BUNDLE_GEMFILE="$(cd "$(dirname "$0")" && pwd)/Gemfile"
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
+bundle check >/dev/null 2>&1 || bundle install >&2
+exec bundle exec liquid-spec "$@"

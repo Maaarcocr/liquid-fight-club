@@ -1,0 +1,6 @@
+# Test harness dependencies (pinned). Do not edit.
+source "https://rubygems.org"
+
+gem "liquid-spec", git: "https://github.com/Shopify/liquid-spec", ref: "84bf25e0edbca5f7e530574788b0f875ab331f50"
+gem "liquid", git: "https://github.com/Shopify/liquid", tag: "v5.13.0"
+gem "bigdecimal", "~> 4.0"

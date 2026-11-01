@@ -1,1 +1,3 @@
-# liquid-fight-club
+# Liquid in C
+
+See [TASK.md](TASK.md).
