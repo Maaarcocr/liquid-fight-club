@@ -40,27 +40,17 @@ When all three hold, stop.
 
 ## Rules
 
-- Do not modify anything in `harness/` (it is checksummed), and do not change
-  the adapter's scope.
-- Never special-case a spec: no matching on spec names, template strings, or
-  expected outputs. Implement the general rule. Never edit or delete specs.
-- Allowed references:
-  - liquid-spec: its specs, `harness/liquid-spec docs ...`, and its
-    `QUIRKS.md`. Find it with
-    `BUNDLE_GEMFILE=harness/Gemfile bundle info liquid-spec --path`.
-  - Shopify's Ruby Liquid source code (the reference implementation). Find it
-    with `BUNDLE_GEMFILE=harness/Gemfile bundle info liquid --path`.
-  - Your language's own documentation.
-- Off limits:
-  - any other Liquid implementation, in any language (for example liquid-c,
-    liquid-rust, liquidjs);
-  - the C source code of Ruby itself or of any Ruby gem;
-  - the internet in general (no web search, no downloads);
-  - other branches of this repository.
-- Work in this repository, on the current branch only. Do not use sub-agents.
-- Commit after every meaningful improvement (at minimum whenever the pass
-  count goes up) and push. Include the `harness/spec` summary in the commit
-  message when you have one.
+- Don't modify `harness/`.
+- Never special-case a spec (no matching on spec names, templates, or
+  expected outputs), and never edit specs. Implement the general rule.
+- You may read liquid-spec (specs, docs, `QUIRKS.md`) and Shopify's Ruby
+  Liquid source, the reference implementation. Find them with
+  `BUNDLE_GEMFILE=harness/Gemfile bundle info liquid-spec --path` and
+  `... bundle info liquid --path`.
+- Don't look at other Liquid implementations (liquid-c, liquid-rust,
+  liquidjs, ...), at the C source of Ruby or of Ruby gems, or at the web.
+- Commit after every meaningful improvement (at least whenever the pass count
+  goes up), with the `harness/spec` summary in the commit message.
 
 ## Getting started
 

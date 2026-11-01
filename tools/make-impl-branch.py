@@ -4,15 +4,11 @@ Usage: tools/make-impl-branch.py <rust|c> <dest-dir>"""
 import shutil, sys, pathlib
 
 RULES = {
-    "rust": ("Rust", """- Stable Rust (rustc 1.97, edition 2024), built with `cargo`.
-- Rust standard library only (`std`, `core`, `alloc`): no crates from
-  crates.io or anywhere else. Path dependencies on crates inside this
-  repository are fine.
-- You may call the platform C library (glibc) through your own `extern "C"`
-  declarations, as a C program could."""),
-    "c": ("C", """- C17, built with `make`. The code must compile cleanly with both gcc and
-  clang.
-- C standard library, libm, and POSIX (glibc on Linux) only."""),
+    "rust": ("Rust", """- Stable Rust, edition 2024, built with `cargo`.
+- Standard library only: no crates. You may call the platform C library
+  through your own `extern "C"` declarations, as a C program could."""),
+    "c": ("C", """- C17, built with `make`; must compile cleanly with gcc and clang.
+- C standard library, libm, and POSIX only."""),
 }
 
 lang, dest = sys.argv[1], pathlib.Path(sys.argv[2])
