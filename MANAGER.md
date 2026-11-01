@@ -10,21 +10,17 @@ You are the manager of the Rust vs C experiment (see `EXPERIMENT.md`). You:
 
 You never help either implementer, and you treat both identically.
 
-The implementers are separate headless Claude Code processes (`claude -p`),
-not in-session sub-agents. That way:
-
-- each can use `/goal`;
-- each keeps its own transcript (token data);
-- neither sees the other.
-
-Everything runs on this PC under the user's Claude subscription.
+The implementers are two normal Claude Code sessions in the Claude desktop
+app on this PC, each in its own folder, each driven by `/goal`. Everything
+runs under the user's Claude subscription.
 
 ## Fairness rules
 
-- Same command, same goal text, same restart policy for both. Launch them
-  within a minute of each other.
-- The only thing you ever send an implementer is the goal command below.
-- Don't touch an implementer's checkout while its process is running. That
+- Same settings, same kickoff message, same restart policy for both. Start
+  them within a minute of each other.
+- The only things an implementer ever receives are the kickoff below and the
+  fixed "continue" message in step 4.
+- Don't touch an implementer's folder while its session is working. That
   includes running `harness/spec` there, which writes to its `build/`.
 - Keep state in files (`logs/`), not in your context, so you can recover
   after compaction or a restart.
@@ -40,67 +36,70 @@ mkdir -p logs results
 ```
 
 - Check that these exist: `ruby`, `bundle`, `cargo`, `gcc`, `clang`, `make`,
-  `git`, `claude`.
+  `git`.
 - Install the spec harness once, before launch, so the two agents don't race
   on `bundle install`: `(cd liquid-rust && harness/liquid-spec docs >/dev/null)`.
-- Generate one session UUID per arm and save them in `logs/sessions.env`:
-
-  ```bash
-  echo "RUST_ID=$(uuidgen | tr A-Z a-z)" >> logs/sessions.env
-  echo "C_ID=$(uuidgen | tr A-Z a-z)"    >> logs/sessions.env
-  ```
 
 ## 2. Launch
 
-The goal text is identical for both arms:
+Create two new Claude Code sessions in the app. If you have a tool for
+creating sessions, use it; otherwise ask the user to create them.
 
-```bash
-GOAL="Everything TASK.md asks for is done: harness/spec shows all four suites at 'Complexity level cleared: 1000 of 1000' with 0 failures, NOTES.md is written, and all work is committed."
+| Session | Folder |
+|---|---|
+| Liquid in Rust | `~/lfc/liquid-rust` |
+| Liquid in C | `~/lfc/liquid-c` |
+
+Both sessions get:
+
+- model Opus 5.5 and effort high (also pinned in each folder's
+  `.claude/settings.json`);
+- the same permission mode, so they never stall on a prompt: auto, or
+  bypassPermissions if auto isn't available.
+
+The kickoff is the first message, identical for both:
+
+```
+/goal Everything TASK.md asks for is done: harness/spec shows all four suites at 'Complexity level cleared: 1000 of 1000' with 0 failures, NOTES.md is written, and all work is committed.
 ```
 
-Model (Opus 5.5) and effort (high) are pinned by each checkout's
-`.claude/settings.json`. Don't pass `--model` or `--effort`.
-
-Start both detached, so they outlive your shell command:
+About 5 minutes after launch, check that each session's transcript exists
+and is configured right:
 
 ```bash
-source logs/sessions.env
-cd ~/lfc/liquid-rust && nohup claude -p "/goal $GOAL" --session-id "$RUST_ID" \
-  --permission-mode auto --output-format stream-json --verbose \
-  > ~/lfc/logs/rust-1.jsonl 2> ~/lfc/logs/rust-1.err & echo $! > ~/lfc/logs/rust.pid
-cd ~/lfc/liquid-c && nohup claude -p "/goal $GOAL" --session-id "$C_ID" \
-  --permission-mode auto --output-format stream-json --verbose \
-  > ~/lfc/logs/c-1.jsonl 2> ~/lfc/logs/c-1.err & echo $! > ~/lfc/logs/c.pid
+T=$(ls -d ~/.claude/projects/*liquid-rust*)   # same for liquid-c
+grep -o '"effort":"[a-z]*"' $T/*.jsonl | sort | uniq -c   # expect only high
+grep -o '"model":"claude-[a-z0-9-]*"' $T/*.jsonl | sort | uniq -c
 ```
 
-If auto mode isn't available on this account, use
-`--permission-mode bypassPermissions` for both.
+If either session is wrong, stop both and restart both.
 
-Log the launch times in `logs/events.tsv`.
+Log session names and start times in `logs/events.tsv`.
 
 ## 3. Monitor (about every 30 minutes)
 
-Use whatever scheduling your harness offers (for example a wakeup or loop,
-or waiting on a background `sleep 1800`). For each arm:
+Use whatever scheduling your harness offers (for example a wakeup or loop).
+For each session:
 
-- Alive? `kill -0 $(cat logs/<arm>.pid)`.
-- Progress: number of commits and the last commit message
+- **State:** working, idle or paused. Check the app or your agent-listing
+  tool, plus the transcript's last-modified time.
+- **Progress:** number of commits and the last commit message
   (`git -C liquid-<arm> log --oneline | wc -l`, `git -C liquid-<arm> log -1 --format=%s`).
   The agents put their `harness/spec` summary in commit messages.
-- Tokens:
-  `python3 experiment/tools/usage.py "$(dirname ~/.claude/projects/*/$<ARM>_ID.jsonl)"`
+- **Tokens:** `python3 experiment/tools/usage.py ~/.claude/projects/*liquid-<arm>*`
   (total line only).
-- Append one row per arm to `logs/progress.tsv`: time, arm, alive, commits,
+- Append one row per arm to `logs/progress.tsv`: time, arm, state, commits,
   last commit subject, total tokens.
 
 Don't read their code or transcripts in detail while they run.
 
-## 4. When an implementer process exits
+## 4. When a session stops
 
-1. Read the final `result` line of its latest `logs/<arm>-N.jsonl` (subtype,
-   `is_error`, result text). Record the exit and the reason in
-   `logs/events.tsv`.
-2. Verify for yourself:
+A `/goal` session only stops when its check says the goal is met, or when the
+goal pauses (an error, a usage limit, repeated failed checks).
+
+1. Record the stop and the reason in `logs/events.tsv`.
+2. Verify for yourself, now that it is idle:
 
    ```bash
    cd liquid-<arm> && harness/spec && test -s NOTES.md && test -z "$(git status --porcelain)"
@@ -108,16 +107,11 @@ Don't read their code or transcripts in detail while they run.
 
    If all three pass, the arm is **DONE**. Record its finish time and final
    commit.
-3. Otherwise, resume the same session with the same goal:
-
-   ```bash
-   cd ~/lfc/liquid-<arm> && nohup claude -p "/goal $GOAL" --resume "$<ARM>_ID" \
-     --permission-mode auto --output-format stream-json --verbose \
-     > ~/lfc/logs/<arm>-<N+1>.jsonl 2> ~/lfc/logs/<arm>-<N+1>.err & echo $! > ~/lfc/logs/<arm>.pid
-   ```
-
-   - **Usage limit hit:** wait until the limit resets, then resume. Both arms
-     share the subscription, so the other one is probably waiting too.
+3. Otherwise, send exactly `Continue working toward the goal.`, through
+   your messaging tool or by asking the user to type it. If the goal was
+   cleared rather than paused, send the `/goal` kickoff again instead.
+   - **Usage limit hit:** wait until it resets first. Both sessions share
+     the subscription, so the other one is probably waiting too.
    - **Stalled:** 3 restarts in a row with no new commit. Stop the arm and
      mark it **STALLED**.
 
@@ -127,9 +121,8 @@ Don't read their code or transcripts in detail while they run.
 - Push the implementations: `git -C liquid-rust push origin impl/rust`, and
   the same for C.
 - Archive the transcripts (they get auto-deleted after 30 days otherwise):
-  copy `dirname ~/.claude/projects/*/$RUST_ID.jsonl` to
-  `results/transcripts/rust/`, and the same for C. Also copy `logs/`
-  to `results/logs/`.
+  copy `~/.claude/projects/*liquid-rust*` to `results/transcripts/rust/`, and
+  the same for C. Also copy `logs/` to `results/logs/`.
 - Token data:
   `python3 experiment/tools/usage.py results/transcripts/<arm> --repo liquid-<arm> --csv results/usage-<arm>.csv`
 

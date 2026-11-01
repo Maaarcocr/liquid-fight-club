@@ -22,10 +22,10 @@ build Liquid in, on **token efficiency**, **correctness**, **performance** and
 
 A manager agent runs the whole thing by following [MANAGER.md](MANAGER.md):
 
-- start both implementers as headless `claude -p` processes, each driven by
-  the same `/goal` (Claude keeps working until a check confirms the goal is
-  met);
-- resume them with the same goal if they stop early;
+- start the two implementers as normal Claude Code sessions in the desktop
+  app, each in its own folder and kicked off with the same `/goal` (Claude
+  keeps working until a check confirms the goal is met);
+- nudge them with the same message if they stop early;
 - archive the transcripts;
 - score both implementations and write `REPORT.md`.
 
