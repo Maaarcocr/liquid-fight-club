@@ -62,6 +62,6 @@ cd liquid-rust && claude     cd liquid-c && claude
 ## Caveats
 
 - One run per language, so differences may be noise.
-- C gets date/time formatting from libc. Rust can call the same libc
-  functions, but only through `unsafe` code.
+- C gets date/time formatting from libc. Rust gets only its standard
+  library (no libc calls), so it has to write its own.
 - The shared C ABI is free for C and extra glue for Rust.

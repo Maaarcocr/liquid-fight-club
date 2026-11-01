@@ -5,8 +5,8 @@ import shutil, sys, pathlib
 
 RULES = {
     "rust": ("Rust", """- Stable Rust, edition 2024, built with `cargo`.
-- Standard library only: no crates. You may call the platform C library
-  through your own `extern "C"` declarations, as a C program could."""),
+- Standard library only: no crates, and no calling C libraries (no
+  `extern "C"` imports). Exporting the C ABI is the only FFI."""),
     "c": ("C", """- C17, built with `make`; must compile cleanly with gcc and clang.
 - C standard library, libm, and POSIX only."""),
 }
