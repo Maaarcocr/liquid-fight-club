@@ -4,7 +4,7 @@
 use liquid::{Hash, MemoryFileSystem, RenderOptions, Template, Value};
 use std::time::{Duration, Instant};
 
-const STACK: usize = 4 * 1024 * 1024;
+const STACK: usize = 512 * 1024;
 
 fn run_with(src: String, partials: Vec<(&'static str, String)>, assigns_json: &'static str) -> (String, Duration) {
     let h = std::thread::Builder::new()

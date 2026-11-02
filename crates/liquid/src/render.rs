@@ -308,7 +308,7 @@ pub(crate) struct Context<'a> {
 }
 
 /// Maximum nesting of rendered block bodies across partials.
-pub const MAX_RENDER_DEPTH: usize = 600;
+pub const MAX_RENDER_DEPTH: usize = 300;
 
 pub struct RenderResult {
     pub output: String,
