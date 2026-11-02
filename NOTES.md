@@ -144,7 +144,7 @@ Hostile templates and data cannot crash, hang, or grow memory without bound:
   second. All string searches are linear-time (KMP for long patterns);
   `uniq` hashes; hashing is seeded per process (ASLR); partial lookups are
   indexed.
-* **Memory:** output and any single string are capped (default 256 MiB),
+* **Memory:** output and any single string are capped (default 64 MiB),
   ranges are iterated lazily and only materialized up to 10 million elements,
   the server keeps at most 4096 compiled templates.
 * Ruby's own resource limits (`render_score_limit`, `assign_score_limit`,
@@ -165,11 +165,14 @@ Testing beyond the spec suites:
   deterministic and chained), `gengrammar.rb` (random filter chains,
   conditions and loops over values of every type), `gentags.rb` (loops,
   counters, cycle, capture, partials, whitespace control, interrupts) and
-  `gensyntax.rb` (random broken markup, comparing parse errors). On the
-  latest runs: 30,000 mutated and 30,000 chained-mutation cases, 40,000
-  grammar cases, 10,000 tag cases and 15,000 syntax cases show only the
-  known differences listed under limitations (bignum timestamps, a few
-  `Date._parse` heuristics on garbage strings, binary-string comparisons).
+  `gensyntax.rb` (random broken markup, comparing parse errors). Across
+  about 200,000 generated cases (including 8,000 in raised-error mode) the
+  only remaining differences are the known ones listed under limitations
+  (bignum timestamps, a few `Date._parse` heuristics on garbage strings,
+  binary-string encodings).
+* Large-input checks: a 1M-element array, a 10 MB string and a 200k-key hash
+  render in tens of milliseconds per filter; every operation is linear or
+  n log n.
 * `tests/api_test.c` (`make test`): unit tests of the public API and C ABI.
 * The JSON-RPC drop callbacks (`drop_get`, `drop_iterate`) were exercised
   end to end, including nested drops.
@@ -205,6 +208,8 @@ range iteration, partial caching).
   to U+1FFFF.
 * **Unknown filters are no-ops** at render time (reference behaviour without
   `strict_filters`); their arguments are still evaluated.
+* **No global state.** All library symbols are prefixed (`lq_`, `liquid_`,
+  `lfc_`) and the library keeps no mutable globals.
 * **File system lookups** use ASCII case folding and an optional `.liquid`
   extension, like the harness's file system. Without a file system the
   message is "Could not find asset NAME" (configurable through
@@ -229,5 +234,3 @@ range iteration, partial caching).
   computed to 40 digits before conversion to a float.
 * Allocation failure aborts the process (out-of-memory is not recoverable);
   the resource limits keep hostile input far away from that point.
-* All library symbols are prefixed (`lq_`, `liquid_`, `lfc_`); the library
-  keeps no mutable global state.
