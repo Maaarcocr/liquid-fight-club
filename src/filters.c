@@ -528,7 +528,7 @@ static lq_value f_url_decode(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     size_t len = s.u.s->len;
     for (size_t i = 0; i < len; i++) {
         if (p[i] == '+') lq_buf_putc(&b, ' ');
-        else if (p[i] == '%' && i + 2 < len + 0 && i + 2 <= len - 1 + 0 && hexval(p[i + 1]) >= 0 && hexval(p[i + 2]) >= 0) {
+        else if (p[i] == '%' && i + 2 < len && hexval(p[i + 1]) >= 0 && hexval(p[i + 2]) >= 0) {
             lq_buf_putc(&b, (char)(hexval(p[i + 1]) * 16 + hexval(p[i + 2])));
             i += 2;
         } else lq_buf_putc(&b, p[i]);
@@ -734,8 +734,6 @@ static lq_value f_truncatewords(lq_ctx *ctx, lq_value in, lq_value *a, size_t n)
     size_t len = s.u.s->len, i = 0;
     /* split(" ", words + 1): collect up to `words` words; see if more remain */
     int64_t count = 0;
-    size_t starts[1] = {0};
-    (void)starts;
     lq_buf b;
     lq_buf_init(&b);
     bool more = false;

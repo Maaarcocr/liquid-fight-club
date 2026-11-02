@@ -610,9 +610,7 @@ static sv sv_concat(P *p, sv *parts, size_t np) {
 static sv parse_expression_text(P *p);
 
 static sv variable_lookups_text(P *p) {
-    lq_buf b;
-    lq_buf_init(&b);
-    /* collect pieces; use scratch arena to avoid leaking on error */
+    /* pieces live in the scratch arena, so unwinding cannot leak */
     sv acc = {"", 0};
     for (;;) {
         if (look(p, T_OPEN_SQ, 0)) {
@@ -628,7 +626,6 @@ static sv variable_lookups_text(P *p) {
             acc = sv_concat(p, parts, 3);
         } else break;
     }
-    lq_buf_free(&b);
     return acc;
 }
 
@@ -1770,11 +1767,6 @@ static lq_node *parse_ifchanged(P *p, tokenizer *t, int line) {
     return node;
 }
 
-static lq_node *parse_simple_block(P *p, tokenizer *t, sv tag, int line) {
-    (void)tag;
-    return parse_ifchanged(p, t, line);
-}
-
 /* Parse a known tag; returns NULL if the tag name is not registered. */
 static lq_node *parse_tag(P *p, tokenizer *t, sv name, sv markup) {
     int line = p->line;
@@ -1801,7 +1793,7 @@ static lq_node *parse_tag(P *p, tokenizer *t, sv name, sv markup) {
     if (sv_eq(name.s, name.n, "doc")) return parse_verbatim(p, t, markup, line, true);
     if (sv_eq(name.s, name.n, "comment")) return parse_comment(p, t, line);
     if (sv_eq(name.s, name.n, "#")) return parse_inline_comment(p, markup, line);
-    if (sv_eq(name.s, name.n, "ifchanged")) return parse_simple_block(p, t, name, line);
+    if (sv_eq(name.s, name.n, "ifchanged")) return parse_ifchanged(p, t, line);
     if (sv_eq(name.s, name.n, "break")) return new_node(p, N_BREAK, line);
     if (sv_eq(name.s, name.n, "continue")) return new_node(p, N_CONTINUE, line);
     return NULL;
