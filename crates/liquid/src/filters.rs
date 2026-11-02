@@ -39,8 +39,25 @@ fn arg(args: &[Value], i: usize) -> Option<&Value> {
     args.get(i)
 }
 
+/// A rough size of a value for work accounting.
+fn weight(v: &Value) -> u64 {
+    match v {
+        Value::Str(s) => s.len() as u64 / 16 + 1,
+        Value::Array(a) => a.len() as u64 + 1,
+        Value::Hash(h) => h.len() as u64 + 1,
+        _ => 1,
+    }
+}
+
 /// Invokes a filter. Unknown filters return the input unchanged.
 pub(crate) fn invoke(ctx: &mut Context, name: &str, input: Value, args: &[Value]) -> Result<Value> {
+    crate::budget::charge(weight(&input) + args.iter().map(weight).sum::<u64>());
+    let r = invoke_inner(ctx, name, input, args)?;
+    crate::budget::charge(weight(&r));
+    Ok(r)
+}
+
+fn invoke_inner(ctx: &mut Context, name: &str, input: Value, args: &[Value]) -> Result<Value> {
     let Some((req, opt)) = arity(name) else {
         return Ok(input);
     };
@@ -63,15 +80,24 @@ pub(crate) fn invoke(ctx: &mut Context, name: &str, input: Value, args: &[Value]
             if input.is_nil() {
                 Value::Nil
             } else {
-                Value::from(escape_html(&to_s(&input)))
+                let s = to_s(&input);
+                check_len(escaped_len(&s))?;
+                Value::from(escape_html(&s))
             }
         }
-        "escape_once" => Value::from(escape_once(&to_s(&input))),
+        "escape_once" => {
+            let s = to_s(&input);
+            check_len(escaped_len(&s))?;
+            Value::from(escape_once(&s))
+        }
         "url_encode" => {
             if input.is_nil() {
                 Value::Nil
             } else {
-                Value::from(url_encode(&to_s(&input)))
+                let s = to_s(&input);
+                let extra = s.bytes().filter(|b| !(b.is_ascii_alphanumeric() || b"_.-~ ".contains(b))).count();
+                check_len(s.len() + 2 * extra)?;
+                Value::from(url_encode(&s))
             }
         }
         "url_decode" => {
@@ -85,8 +111,11 @@ pub(crate) fn invoke(ctx: &mut Context, name: &str, input: Value, args: &[Value]
                 }
             }
         }
-        "base64_encode" => Value::from(base64_encode(to_s(&input).as_bytes(), false)),
-        "base64_url_safe_encode" => Value::from(base64_encode(to_s(&input).as_bytes(), true)),
+        "base64_encode" | "base64_url_safe_encode" => {
+            let s = to_s(&input);
+            check_len(s.len().saturating_mul(2))?;
+            Value::from(base64_encode(s.as_bytes(), name == "base64_url_safe_encode"))
+        }
         "base64_decode" => match base64_decode(&to_s(&input), false) {
             Some(b) => Value::from(String::from_utf8_lossy(&b).into_owned()),
             None => return Err(Error::argument("invalid base64 provided to base64_decode")),
@@ -349,6 +378,19 @@ fn capitalize(s: &str) -> String {
         out.extend(c.to_lowercase());
     }
     out
+}
+
+/// An upper bound of the HTML-escaped length.
+fn escaped_len(s: &str) -> usize {
+    s.len()
+        + s.bytes()
+            .map(|b| match b {
+                b'&' | b'\'' => 4,
+                b'<' | b'>' => 3,
+                b'"' => 5,
+                _ => 0,
+            })
+            .sum::<usize>()
 }
 
 fn escape_html(s: &str) -> String {
@@ -640,6 +682,17 @@ fn truncatewords(s: &str, words: i64, ts: &str) -> Value {
 }
 
 fn split(s: &str, pat: &str) -> Result<Vec<Value>> {
+    let count = if pat == " " {
+        0
+    } else if pat.is_empty() {
+        s.chars().count()
+    } else {
+        s.matches(pat).count() + 1
+    };
+    if count > MAX_ARRAY_LEN {
+        return Err(too_long());
+    }
+    crate::budget::charge(count as u64 + s.len() as u64 / 16);
     let mut parts: Vec<Value> = if pat == " " {
         awk_split(s, None).into_iter().map(Value::str).collect()
     } else if pat.is_empty() {
@@ -858,6 +911,7 @@ fn input_iterator(v: &Value) -> Result<Vec<Value>> {
         Value::Array(a) => {
             let mut out = Vec::with_capacity(a.len());
             flatten(a, &mut out, 0)?;
+            crate::budget::charge(out.len() as u64);
             out
         }
         Value::Nil => Vec::new(),

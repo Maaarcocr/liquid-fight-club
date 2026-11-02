@@ -73,11 +73,16 @@ pub enum CondOp {
 }
 
 #[derive(Debug)]
-pub struct Condition {
+pub struct Comparison {
     pub left: Expr,
     pub op: Option<(CondOp, Expr)>,
-    /// `and` (true) / `or` (false) chained condition.
-    pub child: Option<(bool, Box<Condition>)>,
+}
+
+/// A chain of comparisons joined by `and`/`or`, evaluated right-associatively:
+/// each item stores the relation to the next one (true = `and`).
+#[derive(Debug)]
+pub struct Condition {
+    pub items: Vec<(Comparison, Option<bool>)>,
 }
 
 #[derive(Debug)]
@@ -208,11 +213,13 @@ fn tokenize(src: &str) -> Vec<&str> {
     let n = b.len();
     let mut out = Vec::new();
     let mut pos = 0;
+    // Searches for "%}" only move forward; once one fails, every later one does.
+    let mut finder = TagEndFinder { fail_from: usize::MAX };
     while pos < n {
         if b[pos] == b'{' && pos + 1 < n && (b[pos + 1] == b'%' || b[pos + 1] == b'{') {
             let start = pos;
             if b[pos + 1] == b'%' {
-                match find(b, pos + 2, b"%}") {
+                match finder.find(b, pos + 2) {
                     Some(e) => {
                         out.push(&src[start..e + 2]);
                         pos = e + 2;
@@ -223,7 +230,7 @@ fn tokenize(src: &str) -> Vec<&str> {
                     }
                 }
             } else {
-                let (tok, newpos) = next_variable_token(src, start);
+                let (tok, newpos) = next_variable_token(src, start, &mut finder);
                 out.push(tok);
                 pos = newpos;
             }
@@ -253,15 +260,26 @@ fn tokenize(src: &str) -> Vec<&str> {
     out
 }
 
-fn find(b: &[u8], from: usize, pat: &[u8]) -> Option<usize> {
-    if from > b.len() {
-        return None;
+struct TagEndFinder {
+    fail_from: usize,
+}
+
+impl TagEndFinder {
+    /// Position of the next "%}" at or after `from`.
+    fn find(&mut self, b: &[u8], from: usize) -> Option<usize> {
+        if from >= self.fail_from || from > b.len() {
+            return None;
+        }
+        let r = b[from..].windows(2).position(|w| w == b"%}").map(|p| p + from);
+        if r.is_none() {
+            self.fail_from = from;
+        }
+        r
     }
-    b[from..].windows(pat.len()).position(|w| w == pat).map(|p| p + from)
 }
 
 /// `Tokenizer#next_variable_token`. `start` points at `{{`.
-fn next_variable_token(src: &str, start: usize) -> (&str, usize) {
+fn next_variable_token<'s>(src: &'s str, start: usize, finder: &mut TagEndFinder) -> (&'s str, usize) {
     let b = src.as_bytes();
     let n = b.len();
     let mut pos = start + 2;
@@ -296,7 +314,7 @@ fn next_variable_token(src: &str, start: usize) -> (&str, usize) {
             return (&src[start..pos], pos);
         } else if a == b'{' && byte_b == Some(b'%') {
             // next_tag_token_with_start
-            return match find(b, pos, b"%}") {
+            return match finder.find(b, pos) {
                 Some(e) => (&src[start..e + 2], e + 2),
                 None => (&src[start..pos], pos),
             };
@@ -1048,7 +1066,7 @@ fn condition_operand(markup: &str) -> Result<Expr> {
 fn parse_condition(markup: &str) -> Result<Condition> {
     let mut p = Parser::new(markup)?;
     // Parse a flat list then link it (right-associative evaluation).
-    let mut items: Vec<(Condition, Option<bool>)> = Vec::new();
+    let mut items: Vec<(Comparison, Option<bool>)> = Vec::new();
     loop {
         let left = condition_operand(&p.expression()?)?;
         let op = if let Some(op) = p.consume_if(Tok::Comparison) {
@@ -1073,23 +1091,13 @@ fn parse_condition(markup: &str) -> Result<Condition> {
         } else {
             None
         };
-        items.push((Condition { left, op, child: None }, rel));
+        items.push((Comparison { left, op }, rel));
         if rel.is_none() {
             break;
         }
-        if items.len() > 10_000 {
-            return Err(Error::nesting());
-        }
     }
     p.consume(Tok::Eos)?;
-    let mut cond: Option<Condition> = None;
-    while let Some((mut c, rel)) = items.pop() {
-        if let (Some(child), Some(r)) = (cond.take(), rel) {
-            c.child = Some((r, Box::new(child)));
-        }
-        cond = Some(c);
-    }
-    Ok(cond.expect("at least one condition"))
+    Ok(Condition { items })
 }
 
 /// Strict2 output markup: `expr (| filter (: args)?)*`.
@@ -1174,7 +1182,8 @@ fn assign_syntax(markup: &str) -> Option<(&str, &str)> {
                 return Some((&markup[start..i], &markup[k..]));
             }
         }
-        start += 1;
+        // Every start inside this run ends at the same place and fails too.
+        start = (start + 1).max(i);
         while start < n && !markup.is_char_boundary(start) {
             start += 1;
         }

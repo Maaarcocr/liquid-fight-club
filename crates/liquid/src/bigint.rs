@@ -7,8 +7,8 @@
 
 use std::cmp::Ordering;
 
-/// Upper bound on the number of 32-bit limbs (~40k decimal digits).
-pub const MAX_LIMBS: usize = 4096;
+/// Upper bound on the number of 32-bit limbs (~9.8k decimal digits).
+pub const MAX_LIMBS: usize = 1024;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BigInt {
@@ -200,6 +200,7 @@ impl BigInt {
         if self.mag.len() + other.mag.len() > MAX_LIMBS + 1 {
             return Err(TooLarge);
         }
+        crate::budget::charge((self.mag.len() * other.mag.len()) as u64 / 16);
         let mut out = vec![0u32; self.mag.len() + other.mag.len()];
         for (i, &a) in self.mag.iter().enumerate() {
             let mut carry = 0u64;
@@ -243,6 +244,7 @@ impl BigInt {
         }
         // Long division, one bit at a time. Inputs are bounded, so this is fine.
         let total_bits = a.len() * 32;
+        crate::budget::charge((total_bits * b.len()) as u64 / 16);
         let mut q = vec![0u32; a.len()];
         let mut r: Vec<u32> = Vec::new();
         for bit in (0..total_bits).rev() {
@@ -331,6 +333,7 @@ impl std::fmt::Display for BigInt {
         }
         let mut chunks = Vec::new();
         let mut cur = self.mag.clone();
+        crate::budget::charge((self.mag.len() * self.mag.len()) as u64 / 16);
         while !cur.is_empty() {
             let (q, r) = Self::divmod_small(&cur, 1_000_000_000);
             chunks.push(r);

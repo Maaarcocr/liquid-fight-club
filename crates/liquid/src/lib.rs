@@ -11,6 +11,7 @@
 //! ```
 
 pub mod bigint;
+mod budget;
 pub mod convert;
 pub mod date;
 pub mod drop;

@@ -7,7 +7,7 @@ use crate::expression::{Expr, Lookup, VarLookup, VarName};
 use crate::filters;
 use crate::num;
 use crate::parse::{
-    parse_template, Body, CaseArm, CondOp, Condition, CycleKey, ForTag, Node, PartialTag, TableRowTag, Tag, TagKind,
+    parse_template, Body, CaseArm, Comparison, CondOp, Condition, CycleKey, ForTag, Node, PartialTag, TableRowTag, Tag, TagKind,
     Template, Variable, MAX_DEPTH,
 };
 use crate::value::{self, inspect, is_blank, is_empty, num_cmp, ruby_eq, Hash, RcStr, Value};
@@ -101,7 +101,7 @@ impl Default for Limits {
             cumulative_render_score_limit: None,
             cumulative_assign_score_limit: None,
             max_output_bytes: 256 * 1024 * 1024,
-            max_steps: 50_000_000,
+            max_steps: 20_000_000,
         }
     }
 }
@@ -126,7 +126,7 @@ impl Default for RenderOptions<'_> {
 
 /// Maximum length of strings and arrays produced while rendering.
 pub const MAX_STRING_BYTES: usize = 128 * 1024 * 1024;
-pub const MAX_ARRAY_LEN: usize = 16 * 1024 * 1024;
+pub const MAX_ARRAY_LEN: usize = 4 * 1024 * 1024;
 
 // ---------------------------------------------------------------------------
 // Loop drops
@@ -303,7 +303,12 @@ pub(crate) struct Context<'a> {
     disabled_include: usize,
     partials: HashMap<RcStr, Rc<Template>>,
     parse_trim: bool,
+    /// Current nesting of rendered bodies (bounds native stack use).
+    depth: usize,
 }
+
+/// Maximum nesting of rendered block bodies across partials.
+pub const MAX_RENDER_DEPTH: usize = 600;
 
 pub struct RenderResult {
     pub output: String,
@@ -332,7 +337,9 @@ pub fn render(template: &Template, assigns: Rc<Hash>, opts: &RenderOptions) -> s
         disabled_include: 0,
         partials: HashMap::new(),
         parse_trim: template.trailing_trim,
+        depth: 0,
     };
+    crate::budget::take();
     let mut out = String::new();
     match ctx.render_template_body(&template.root, &mut out) {
         Ok(()) => Ok(RenderResult { output: out, errors: ctx.errors }),
@@ -384,7 +391,8 @@ impl<'a> Context<'a> {
     }
 
     fn add_steps(&mut self, n: u64) -> Result<()> {
-        self.scores.steps = self.scores.steps.saturating_add(n);
+        let extra = crate::budget::take();
+        self.scores.steps = self.scores.steps.saturating_add(n).saturating_add(extra);
         if self.scores.steps > self.opts.limits.max_steps {
             return Err(self.limit_error());
         }
@@ -697,23 +705,23 @@ impl<'a> Context<'a> {
     }
 
     fn eval_condition(&mut self, c: &Condition) -> Result<bool> {
-        let mut c = c;
-        loop {
-            let r = self.interpret_condition(c)?;
-            match &c.child {
-                Some((is_and, child)) => {
+        let mut r = false;
+        for (cmp, rel) in &c.items {
+            r = self.interpret_condition(cmp)?;
+            match rel {
+                Some(is_and) => {
                     if *is_and != r {
                         return Ok(r);
                     }
-                    c = child;
                 }
                 None => return Ok(r),
             }
         }
+        Ok(r)
     }
 
     /// Returns the truthiness of one comparison.
-    fn interpret_condition(&mut self, c: &Condition) -> Result<bool> {
+    fn interpret_condition(&mut self, c: &Comparison) -> Result<bool> {
         let mut lslot = Value::Nil;
         let left = self.operand(&c.left, &mut lslot)?;
         let Some((op, right_e)) = &c.op else {
@@ -780,8 +788,19 @@ impl<'a> Context<'a> {
     }
 
     fn render_body(&mut self, body: &Body, out: &mut String) -> Result<()> {
+        if self.depth >= MAX_RENDER_DEPTH {
+            return Err(Error::nesting());
+        }
+        self.depth += 1;
+        let r = self.render_body_inner(body, out);
+        self.depth -= 1;
+        r
+    }
+
+    fn render_body_inner(&mut self, body: &Body, out: &mut String) -> Result<()> {
         self.increment_render_score(body.nodes.len() as u64)?;
         for node in &body.nodes {
+            let before = out.len();
             match node {
                 Node::Text(t) => out.push_str(t),
                 Node::Output(v) => {
@@ -801,6 +820,7 @@ impl<'a> Context<'a> {
                     }
                 }
             }
+            crate::budget::charge((out.len().saturating_sub(before) / 16) as u64);
             self.increment_write_score(out)?;
         }
         Ok(())
@@ -1145,6 +1165,7 @@ impl<'a> Context<'a> {
 
     /// Renders a partial's root body like `Template#render` with an existing context.
     fn render_partial_template(&mut self, t: &Template, out: &mut String) -> Result<()> {
+        self.add_steps(16)?;
         match self.render_template_body(&t.root, out) {
             Err(e) if e.kind == ErrorKind::Memory && !self.opts.strict_errors => {
                 self.record_error(e, None);
