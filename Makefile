@@ -47,3 +47,10 @@ $(BUILD)/lqrender: tests/lqrender.c $(BUILD)/libliquid_fc.a
 	$(CC) $(ALLCFLAGS) -o $@ $^ $(LDLIBS)
 
 tools: $(BUILD)/lqrender
+
+$(BUILD)/api_test: tests/api_test.c $(BUILD)/libliquid_fc.a
+	$(CC) $(ALLCFLAGS) -o $@ $^ $(LDLIBS)
+
+.PHONY: test
+test: $(BUILD)/api_test
+	$(BUILD)/api_test

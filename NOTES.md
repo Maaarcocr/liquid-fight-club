@@ -8,6 +8,7 @@ libc, libm and POSIX.
 ```
 bin/build                 # release build -> build/liquid-server, build/libliquid_fc.a
 harness/spec              # run the four liquid-spec suites
+make test                 # C API unit tests
 make asan | debug | tools # sanitizer build, debug build, developer CLI tools
 ```
 
@@ -81,7 +82,17 @@ drops are reference counted. Functions return new references and borrow
 their arguments. Values are immutable once shared and acyclic, so reference
 counting is sufficient; freeing is iterative to survive deep data. The
 semantic questions (output form, `inspect`, Ruby `==`/`eql?`, truthiness,
-blank/empty, numeric coercion) each live in one function.
+blank/empty, numeric coercion, `obj[key]` for the collection filters) each
+live in one function.
+
+**Read-only templates and data.** After parsing, a template's literal values
+are *pinned*, and so is render data created with `liquid_data_from_json`:
+retain/release skip pinned objects and their lazily computed caches (string
+hashes, character counts) are filled in up front. Rendering therefore never
+writes to template or context memory, so one template/context pair can be
+rendered any number of times — even from several threads at once
+(`tests/threads.c` runs clean under ThreadSanitizer). Render-local containers
+that may reference pinned values are always released before their owner.
 
 **Numbers.** Integers are int64 with transparent promotion to bignums (Ruby
 semantics, e.g. `{{ 9223372036854775807 | plus: 1 }}`). Liquid's math filters
@@ -146,10 +157,20 @@ Testing beyond the spec suites:
 * `tests/fuzz_abi.c`: a libFuzzer driver for the C ABI (ASan + UBSan, leak
   detection, and a check that rendering twice gives identical results),
   seeded with every template in the spec corpus.
-* `tests/difftest.rb` + `tests/gencases.rb`: differential testing against the
-  Ruby reference in strict2 mode on templates generated with liquid-spec's
-  own mutators. 30,000 mutated and 30,000 chained-mutation cases leave only
-  a handful of known, out-of-scope differences (listed below).
+* `tests/difftest.rb`: differential testing against the Ruby reference in
+  strict2 mode (inline or raised errors, comparing full output and error
+  text), fed by four generators: `gencases.rb` (liquid-spec's own mutators,
+  deterministic and chained), `gengrammar.rb` (random filter chains,
+  conditions and loops over values of every type), `gentags.rb` (loops,
+  counters, cycle, capture, partials, whitespace control, interrupts) and
+  `gensyntax.rb` (random broken markup, comparing parse errors). On the
+  latest runs: 30,000 mutated and 30,000 chained-mutation cases, 40,000
+  grammar cases, 10,000 tag cases and 15,000 syntax cases show only the
+  known differences listed under limitations (bignum timestamps, a few
+  `Date._parse` heuristics on garbage strings, binary-string comparisons).
+* `tests/api_test.c` (`make test`): unit tests of the public API and C ABI.
+* The JSON-RPC drop callbacks (`drop_get`, `drop_iterate`) were exercised
+  end to end, including nested drops.
 
 ## Performance
 
@@ -196,11 +217,12 @@ range iteration, partial caching).
   length), slash and dot dates, month names, ctime/RFC 2822 forms, numeric
   zones and common zone abbreviations, and the bare digit-run forms. Exotic
   inputs can parse differently. Years beyond ±10^11 are rejected.
-* Integers wider than 2048 bits degrade to floats.
+* Integers wider than 2048 bits degrade to floats. Unix timestamps beyond
+  64 bits (e.g. a bignum passed to `date`) are not converted; the input is
+  returned unchanged where Ruby would format a far-future time.
 * Decimal strings keep at most 100 significant digits and quotients are
   computed to 40 digits before conversion to a float.
 * Allocation failure aborts the process (out-of-memory is not recoverable);
   the resource limits keep hostile input far away from that point.
-* Thread safety: separate templates/contexts may be used from different
-  threads; a single template or context must not be rendered concurrently
-  from several threads (not required by the ABI).
+* All library symbols are prefixed (`lq_`, `liquid_`, `lfc_`); the library
+  keeps no mutable global state.
