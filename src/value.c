@@ -552,7 +552,7 @@ void lq_inspect_str(lq_buf *b, const char *s, size_t n) {
 
 /* Inspect with cycle protection is unnecessary: values are acyclic. Depth is
    bounded by an explicit limit to avoid stack exhaustion on deep data. */
-#define INSPECT_MAX_DEPTH 512
+#define INSPECT_MAX_DEPTH 1100
 
 static void inspect_rec(lq_buf *b, lq_value v, lq_ctx *ctx, int depth);
 

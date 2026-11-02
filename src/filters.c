@@ -14,7 +14,7 @@
 #include <strings.h>
 
 #define MAX_STRING_BYTES ((size_t)256 * 1024 * 1024)
-#define MAX_DEPTH 512
+#define MAX_DEPTH 1100
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */

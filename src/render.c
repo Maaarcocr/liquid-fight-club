@@ -108,7 +108,7 @@ static bool add_assign_score(lq_ctx *ctx, int64_t n) {
 }
 
 static int64_t assign_score_of(lq_value v, int depth) {
-    if (depth > 64) return 1;
+    if (depth > 1100) return 1;
     switch (v.type) {
     case LQ_STR: return (int64_t)v.u.s->len;
     case LQ_ARR: {
@@ -474,6 +474,10 @@ static lq_value apply_filter(lq_ctx *ctx, const lq_filter *f, lq_value input) {
         }
         r = d->fn(ctx, input, args, total);
         r = to_liquid(r);
+        /* charge the safety budget for the data produced, so repeated
+           copying of growing values stays bounded */
+        if (r.type == LQ_STR) tick(ctx, (int64_t)(r.u.s->len >> 5));
+        else if (r.type == LQ_ARR) tick(ctx, (int64_t)r.u.a->len);
     }
     for (size_t i = 0; i < got; i++) lq_release(args[i]);
     if (args != small) free(args);
@@ -1374,6 +1378,7 @@ static void render_node(lq_ctx *ctx, const lq_node *n, lq_buf *out) {
             break;
         }
         add_assign_score(ctx, (int64_t)tmp.len);
+        tick(ctx, (int64_t)(tmp.len >> 5));
         lq_hash_set_take(ctx->scopes[0], n->u.capture.to, lq_str_take_buf(&tmp));
         break;
     }

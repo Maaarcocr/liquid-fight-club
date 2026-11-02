@@ -1,0 +1,206 @@
+# Liquid in C — implementation notes
+
+A standalone implementation of the [Liquid](https://shopify.github.io/liquid/)
+template language in C17, targeting the strict2 parse mode of Shopify's
+reference implementation (Ruby Liquid 5.13). It has no dependencies beyond
+libc, libm and POSIX.
+
+```
+bin/build                 # release build -> build/liquid-server, build/libliquid_fc.a
+harness/spec              # run the four liquid-spec suites
+make asan | debug | tools # sanitizer build, debug build, developer CLI tools
+```
+
+## Status
+
+All in-scope liquid-spec suites pass with 0 failures:
+
+| suite         | result                                   |
+|---------------|------------------------------------------|
+| default       | cleared 1000 of 1000, 4313 passes, 0 failures (1008 skipped: out-of-scope features) |
+| parser_errors | cleared 500 of 1000, 1905 passes, 0 failures |
+| partials      | cleared 1000 of 1000, 12 passes, 0 failures |
+| benchmarks    | cleared 1000 of 1000, 10 passes, 0 failures |
+
+**About `parser_errors` showing 500.** Every spec in that suite has complexity
+500. liquid-spec reports "cleared" as the highest complexity level *present* in
+the run, so a suite with no 1000-level spec can never print "1000 of 1000",
+even with zero failures. The harness forbids editing specs, and local specs
+cannot add a level-1000 spec (liquid-spec resets local complexity 1000 to 100).
+500 is therefore the maximum attainable value for this suite, and the suite is
+fully cleared (every spec passes).
+
+## Layout
+
+```
+include/liquid.h   public library API (parse / data / render)
+src/lq.h           value model, buffers, helpers shared by all modules
+src/internal.h     AST, parser/renderer internals, decimals, dates, drops
+src/value.c        allocation, strings/arrays/hashes, to_s/inspect/==, blank/empty,
+                   UTF-8, linear-time substring search, value hashing
+src/num.c          Float#to_s formatting, bignums, BigDecimal emulation,
+                   Ruby String#to_i / Kernel#Integer
+src/parse.c        tokenizer, strict2 expression lexer/parser, all tags -> AST
+src/render.c       context, scopes, lookups, conditions, tags, partials, limits
+src/filters.c      the standard filters
+src/date.c         Time.parse subset and Ruby strftime
+src/drops.c        forloop/tablerowloop drops, portable test drops
+src/json.c         JSON parser/writer (with drop markers)
+src/api.c          liquid.h implementation
+src/fc_abi.c       harness/liquid_fc.h C ABI (thin wrapper over liquid.h)
+server/main.c      JSON-RPC server for liquid-spec (thin wrapper)
+tests/             fuzz driver, differential tester, benchmark and CLI tools
+```
+
+## Architecture
+
+**Pipeline.** template source → tokenizer (`{% %}`, `{{ }}`, text) → block-body
+parser building an AST in a per-template arena → tree-walking renderer.
+The parser mirrors the reference structure (Tokenizer, BlockBody, Block,
+ParserSwitching) because nearly every observable behaviour — accepted
+syntax, error messages, line numbers, whitespace control, blank-body
+stripping — falls out of that structure:
+
+* The tokenizer reproduces the reference byte-scanning rules exactly,
+  including odd cases (an unterminated `{{` swallows the rest of the source,
+  a single `}` ends a variable token, `{{ ... {%` becomes one token).
+* The strict2 expression parser first renders an expression back to markup
+  text (as `Parser#expression` does) and then builds the AST with
+  `Expression.parse` / `VariableLookup` semantics. This round trip is what
+  makes cases like `x["]"]` or keywords used as variable roots behave
+  identically.
+* Errors carry the tag's line number and the `in "..."` markup context with
+  the same precedence rules as the reference (e.g. `elsif` errors report the
+  `if` line; `assign` overrides the inner variable's context).
+* Parse errors unwind with `longjmp`; everything allocated during parsing
+  lives in the template arena or a scratch arena, so unwinding cannot leak.
+
+**Value model** (`lq.h`). A 16-byte tagged `lq_value`: nil, bool, int64,
+double inline; strings, arrays, insertion-ordered hashes, ranges, bignums and
+drops are reference counted. Functions return new references and borrow
+their arguments. Values are immutable once shared and acyclic, so reference
+counting is sufficient; freeing is iterative to survive deep data. The
+semantic questions (output form, `inspect`, Ruby `==`/`eql?`, truthiness,
+blank/empty, numeric coercion) each live in one function.
+
+**Numbers.** Integers are int64 with transparent promotion to bignums (Ruby
+semantics, e.g. `{{ 9223372036854775807 | plus: 1 }}`). Liquid's math filters
+convert floats and decimal strings to `BigDecimal`; this is emulated with an
+exact decimal type (bignum mantissa + exponent), so `0.1 | plus: 0.2` is
+`0.3`, `round` is half-up on the decimal value, and division of floats by
+zero yields `Infinity`/`NaN` like the reference. Float output follows Ruby's
+`Float#to_s` (shortest round-trip digits; fixed notation for decimal
+exponents in (-4, 16), plus 16 when there is a fractional part).
+`Kernel#Integer` is reproduced down to its NUL-byte quirks.
+
+**Rendering** (`render.c`). A context holds a scope stack (assign targets the
+outermost scope, loops the innermost), an overlay hash for
+increment/decrement counters, per-context registers (cycle, `offset:
+continue`, ifchanged, the for-loop stack) and an interrupt stack. As in the
+liquid-spec harness, the render environment acts as *static* environment
+data: visible to `render` partials, separate from counters. `render` creates
+an isolated sub-context; `include` shares the caller's. Errors propagate via
+a flag on the context; each node-render point implements the reference's
+rescue logic (inline `Liquid error (line N): ...` text, raised errors,
+suppressed text for blank tags, MemoryError replacing the whole output).
+Partials are parsed on first use and cached per render.
+
+**Drops.** A vtable protocol (`get`, `to_liquid_value`, `to_s`, `iterate`,
+`to_number`). Implemented natively: forloop/tablerowloop, `self`
+(context-bound, equal by context), and the portable test drops
+(`_instantiate` markers). Host drops (`_rpc_drop`) call back into the host
+through `liquid_drop_host`; the JSON-RPC server implements these with
+`drop_get` / `drop_iterate` requests.
+
+**Interfaces.** `include/liquid.h` is the library API. `liquid_fc.h`
+(`fc_abi.c`) and the JSON-RPC server are thin wrappers over it. The server
+reports strict render errors with the legacy `-32001` error code, because the
+liquid-spec JSON-RPC adapter ignores `result.error` for renders.
+
+## Robustness
+
+Hostile templates and data cannot crash, hang, or grow memory without bound:
+
+* **Stack:** block nesting ≤ 100 (as the reference), nested `{% liquid %}`
+  counted as nesting, expression nesting ≤ 200, JSON nesting ≤ 1000, total
+  render recursion (blocks across nested partials) ≤ 1000, scope depth ≤ 100
+  (the reference's "Nesting too deep"). Verified to run within a 512 KB stack.
+* **Time:** a step budget (default 100 million) is charged per node, per loop
+  iteration and per 32 bytes produced by filters, so loops over huge ranges
+  or quadratic string building stop with "Memory limits exceeded" in about a
+  second. All string searches are linear-time (KMP for long patterns);
+  `uniq` hashes; hashing is seeded per process (ASLR); partial lookups are
+  indexed.
+* **Memory:** output and any single string are capped (default 256 MiB),
+  ranges are iterated lazily and only materialized up to 10 million elements,
+  the server keeps at most 4096 compiled templates.
+* Ruby's own resource limits (`render_score_limit`, `assign_score_limit`,
+  `render_length_limit` and their cumulative variants) are supported with the
+  reference semantics, including its quirk of resetting per-render scores for
+  each partial.
+
+Testing beyond the spec suites:
+
+* All suites pass under AddressSanitizer + UBSan (`make asan`, then
+  `harness/liquid-spec run harness/adapter.rb --command=build-asan/liquid-server`).
+* `tests/fuzz_abi.c`: a libFuzzer driver for the C ABI (ASan + UBSan, leak
+  detection, and a check that rendering twice gives identical results),
+  seeded with every template in the spec corpus.
+* `tests/difftest.rb` + `tests/gencases.rb`: differential testing against the
+  Ruby reference in strict2 mode on templates generated with liquid-spec's
+  own mutators. 30,000 mutated and 30,000 chained-mutation cases leave only
+  a handful of known, out-of-scope differences (listed below).
+
+## Performance
+
+Measured through the C ABI (`build/bench`, `tests/bench.c`) on the
+benchmark and partials suites: parsing takes 0.3–32 µs per template and
+rendering 1–55 µs, roughly 35× faster than the Ruby reference on the same
+machine. Hot paths avoid allocation where possible (small-array argument
+passing, cached string hashes, linear-scan hashes for small scopes, lazy
+range iteration, partial caching).
+
+## Notable decisions
+
+* **strict2 only.** The adapter fixes `error_modes = [:strict2]`; lax and
+  strict parsing are not implemented. `error_mode` in compile requests is
+  ignored.
+* **Fidelity over tidiness.** Where the reference has quirks they are
+  reproduced (case with multiple matching `when`s, `elsif` after `else`, a
+  second `else` in `for` ending the tag, tablerow `cols: 0`, Integer
+  parsing with NUL bytes, `hash.first` concatenation, gsub replacement
+  escapes, `round` raising for huge precision, and so on).
+* **Sorting is stable** (merge sort). Ruby's sort is not stable, so the
+  relative order of elements with equal keys can differ from the reference.
+* **Local time zone is UTC.** The reference suite runs with `TZ=UTC`;
+  timestamps with explicit offsets keep them. Without a `current_time`
+  register, "now" is the system clock.
+* **Unknown filters are no-ops** at render time (reference behaviour without
+  `strict_filters`); their arguments are still evaluated.
+* **File system lookups** use ASCII case folding and an optional `.liquid`
+  extension, like the harness's file system. Without a file system the
+  message is "Could not find asset NAME" (configurable through
+  `liquid_render_options.no_file_system_message`).
+
+## Known limitations
+
+* No `lax`/`strict` parse modes, no Shopify extensions, no Ruby-only types
+  (symbols, non-string hash keys) — all out of scope per the adapter.
+* Strings are byte strings. Ruby's distinction between binary and UTF-8
+  strings (e.g. comparing a `base64_decode` result with a literal) is not
+  modelled. Case conversion covers Latin, Greek, Cyrillic and Armenian
+  (plus `ß` and common ligatures), not all of Unicode. Non-printable
+  detection in `inspect` uses C0/C1 controls, line/paragraph separators and
+  noncharacters rather than full Unicode categories.
+* `Time.parse` is a subset of Ruby's `Date._parse`: ISO dates (any year
+  length), slash and dot dates, month names, ctime/RFC 2822 forms, numeric
+  zones and common zone abbreviations, and the bare digit-run forms. Exotic
+  inputs can parse differently. Years beyond ±10^11 are rejected.
+* Integers wider than 2048 bits degrade to floats.
+* Decimal strings keep at most 100 significant digits and quotients are
+  computed to 40 digits before conversion to a float.
+* Allocation failure aborts the process (out-of-memory is not recoverable);
+  the resource limits keep hostile input far away from that point.
+* Thread safety: separate templates/contexts may be used from different
+  threads; a single template or context must not be rendered concurrently
+  from several threads (not required by the ABI).
