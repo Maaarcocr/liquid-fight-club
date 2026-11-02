@@ -114,24 +114,24 @@ pub fn ruby_str_to_f(s: &str) -> f64 {
 }
 
 /// Ruby `Kernel#Integer(string)`; None when the string is not an integer.
+///
+/// Follows `rb_int_parse_cstr`, including its quirks: values that fit in a
+/// u64 must not have trailing garbage, while the big-number path stops at a
+/// NUL byte (C string semantics) and ignores what follows it.
 pub fn ruby_integer(s: &str) -> Option<BigInt> {
     let b = s.as_bytes();
+    let n = b.len();
     let mut i = 0;
-    while i < b.len() && is_ruby_space(b[i]) {
+    while i < n && is_ruby_space(b[i]) {
         i += 1;
     }
-    let mut end = b.len();
-    while end > i && (is_ruby_space(b[end - 1]) || b[end - 1] == 0) {
-        end -= 1;
-    }
-    let b = &b[..end];
     let mut neg = false;
-    if i < b.len() && (b[i] == b'-' || b[i] == b'+') {
+    if i < n && (b[i] == b'+' || b[i] == b'-') {
         neg = b[i] == b'-';
         i += 1;
     }
-    let mut radix = 10;
-    if i + 1 < b.len() && b[i] == b'0' {
+    let mut radix: u32 = 10;
+    if i + 1 < n && b[i] == b'0' {
         match b[i + 1] {
             b'x' | b'X' => {
                 radix = 16;
@@ -149,28 +149,109 @@ pub fn ruby_integer(s: &str) -> Option<BigInt> {
                 radix = 10;
                 i += 2;
             }
-            b'0'..=b'9' | b'_' => {
-                radix = 8;
-                i += 1;
-            }
-            _ => {}
+            _ => radix = 8,
         }
     }
-    let (digits, j) = scan_digits(b, i, radix);
-    if digits.is_empty() || j != b.len() {
-        // A lone "0" (or "0_0") is fine in octal mode.
-        if radix == 8 && digits.is_empty() && j == b.len() && i > 0 && b[i - 1] == b'0' {
-            return Some(BigInt::zero());
+    if i >= n {
+        return None;
+    }
+    let digit = |c: u8| (c as char).to_digit(radix);
+    // Squeeze leading zeros (single underscores between them are allowed).
+    if b[i] == b'0' && n - i != 1 {
+        let mut j = i + 1;
+        let mut us = 0;
+        while j < n {
+            match b[j] {
+                b'0' => {
+                    us = 0;
+                    j += 1;
+                }
+                b'_' => {
+                    us += 1;
+                    if us >= 2 {
+                        break;
+                    }
+                    j += 1;
+                }
+                _ => break,
+            }
         }
+        if us > 0 {
+            j -= 1;
+        }
+        if j >= n || b[j] == 0 || is_ruby_space(b[j]) || digit(b[j]).is_none() {
+            j -= 1;
+        }
+        i = j.max(i);
+    }
+    if digit(b[i]).is_none() {
+        return None;
+    }
+    // Fast path: plain digits that fit in a u64.
+    let mut j = i;
+    let mut val: u64 = 0;
+    let mut overflow = false;
+    while j < n {
+        let Some(d) = digit(b[j]) else { break };
+        match val.checked_mul(radix as u64).and_then(|v| v.checked_add(d as u64)) {
+            Some(v) => val = v,
+            None => overflow = true,
+        }
+        j += 1;
+    }
+    let sign = |v: BigInt| if neg { v.neg() } else { v };
+    if !overflow && !(j < n && b[j] == b'_') {
+        let mut k = j;
+        while k < n {
+            if is_ruby_space(b[k]) {
+                k += 1;
+            } else {
+                return None;
+            }
+        }
+        return Some(sign(BigInt::from_u128(val as u128)));
+    }
+    // Big path (str2big_scan_digits): stops at NUL.
+    let mut digits = String::new();
+    let mut nondigit = false;
+    let mut k = i;
+    while k < n && b[k] != 0 {
+        let c = b[k];
+        if c == b'_' {
+            if nondigit {
+                return None;
+            }
+            nondigit = true;
+        } else if digit(c).is_some() {
+            nondigit = false;
+            digits.push(c as char);
+        } else {
+            break;
+        }
+        k += 1;
+    }
+    if nondigit {
+        return None;
+    }
+    while k < n && b[k] != 0 && is_ruby_space(b[k]) {
+        k += 1;
+    }
+    if k < n && b[k] != 0 {
+        return None;
+    }
+    if digits.len() > crate::bigint::MAX_LIMBS * 9 {
         return None;
     }
     let mut v = BigInt::zero();
-    let r = BigInt::from_i64(radix as i64);
-    for c in digits.chars() {
-        let d = c.to_digit(radix)? as i64;
-        v = v.mul(&r).ok()?.add(&BigInt::from_i64(d)).ok()?;
+    if radix == 10 {
+        v = BigInt::parse(&digits)?;
+    } else {
+        let r = BigInt::from_i64(radix as i64);
+        for c in digits.chars() {
+            v = v.mul(&r).ok()?.add(&BigInt::from_i64(c.to_digit(radix)? as i64)).ok()?;
+        }
     }
-    Some(if neg { v.neg() } else { v })
+    Some(sign(v))
 }
 
 // ---------------------------------------------------------------------------
@@ -756,6 +837,14 @@ mod tests {
         assert!(ruby_integer("").is_none());
         assert!(ruby_integer("08").is_none());
         assert_eq!(ruby_integer("0").unwrap().to_string(), "0");
+        assert!(ruby_integer("666666\0").is_none());
+        assert!(ruby_integer("18446744073709551615\0").is_none());
+        assert!(ruby_integer("18446744073709551616\0").is_some());
+        assert!(ruby_integer("1486953564_3\0_3").is_some());
+        assert!(ruby_integer("14869535643\0_3").is_none());
+        assert!(ruby_integer("64478911022792251971478252\0abc\ndef").is_some());
+        assert_eq!(ruby_integer("0_7").unwrap().to_string(), "7");
+        assert_eq!(ruby_integer("-0").unwrap().to_string(), "0");
     }
 
     #[test]

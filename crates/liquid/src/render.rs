@@ -171,9 +171,11 @@ impl Drop for TablerowloopDrop {
     }
 }
 
-/// `self`: resolves variables through the scope chain. Lookups are handled by
-/// the context, which recognizes this drop.
-pub struct SelfDrop;
+/// `self`: resolves variables through the scope chain of the context it was
+/// created in. Lookups are handled by the renderer, which recognizes this drop.
+pub struct SelfDrop {
+    ctx_id: u64,
+}
 
 impl Drop for SelfDrop {
     fn class_name(&self) -> &str {
@@ -184,8 +186,22 @@ impl Drop for SelfDrop {
         Ok(Value::Nil)
     }
 
+    fn equals(&self, other: &Value) -> bool {
+        match other {
+            Value::Drop(d) => d.as_any().and_then(|a| a.downcast_ref::<SelfDrop>()).is_some_and(|o| o.ctx_id == self.ctx_id),
+            _ => false,
+        }
+    }
+
     fn as_any(&self) -> Option<&dyn std::any::Any> {
         Some(self)
+    }
+}
+
+fn self_drop_id(v: &Value) -> Option<u64> {
+    match v {
+        Value::Drop(d) => d.as_any().and_then(|a| a.downcast_ref::<SelfDrop>()).map(|s| s.ctx_id),
+        _ => None,
     }
 }
 
@@ -202,11 +218,11 @@ enum Interrupt {
 /// State that an isolated subcontext (`render`) starts fresh.
 #[derive(Default)]
 struct Local {
+    /// Identifies the context (for `self`).
+    id: u64,
     /// scopes[0] is the outermost (persistent) scope.
     scopes: Vec<Hash>,
-    /// The render assigns (`environments.first`), absent in isolated contexts.
-    env: Option<Rc<Hash>>,
-    /// Writes into `environments.first` (increment/decrement counters).
+    /// `environments.first`: increment/decrement counters.
     env_overlay: Hash,
     interrupts: Vec<Interrupt>,
     for_offsets: HashMap<RcStr, i128>,
@@ -230,7 +246,12 @@ struct Scores {
 pub(crate) struct Context<'a> {
     opts: &'a RenderOptions<'a>,
     file_system: &'a dyn FileSystem,
+    /// The render assigns (`static_environments`), shared by all contexts.
+    statics: Rc<Hash>,
     local: Local,
+    /// Contexts suspended by `render` (innermost last).
+    saved: Vec<Local>,
+    next_ctx_id: u64,
     pub(crate) errors: Vec<Error>,
     scores: Scores,
     disabled_include: usize,
@@ -249,12 +270,10 @@ pub fn render(template: &Template, assigns: Rc<Hash>, opts: &RenderOptions) -> s
     let mut ctx = Context {
         opts,
         file_system: opts.file_system.unwrap_or(&BlankFileSystem),
-        local: Local {
-            scopes: vec![Hash::new()],
-            env: Some(assigns),
-            template_name: opts.template_name.clone(),
-            ..Local::default()
-        },
+        statics: assigns,
+        local: Local { id: 0, scopes: vec![Hash::new()], template_name: opts.template_name.clone(), ..Local::default() },
+        saved: Vec::new(),
+        next_ctx_id: 1,
         errors: Vec::new(),
         scores: Scores {
             render: 0,
@@ -449,36 +468,65 @@ impl<'a> Context<'a> {
     }
 
     fn env_get(&self, key: &str) -> Option<Value> {
-        if let Some(v) = self.local.env_overlay.get(key) {
-            return Some(v.clone());
+        self.local.env_overlay.get(key).cloned()
+    }
+
+    /// The context a `self` drop refers to (the current one if it is gone).
+    fn local_by_id(&self, id: u64) -> &Local {
+        if self.local.id == id {
+            return &self.local;
         }
-        self.local.env.as_ref().and_then(|e| e.get(key).cloned())
+        self.saved.iter().rev().find(|l| l.id == id).unwrap_or(&self.local)
     }
 
     /// `Context#find_variable`.
     fn find_variable(&self, key: &str) -> Value {
-        for scope in self.local.scopes.iter().rev() {
+        self.find_variable_in(&self.local, key)
+    }
+
+    fn find_variable_in(&self, local: &Local, key: &str) -> Value {
+        for scope in local.scopes.iter().rev() {
             if let Some(v) = scope.get(key) {
                 return to_liquid(v.clone());
             }
         }
-        match self.env_get(key) {
-            Some(v) if !v.is_nil() => to_liquid(v),
-            _ => {
-                if key == "self" {
-                    Value::Drop(Rc::new(SelfDrop))
-                } else {
-                    Value::Nil
-                }
+        if let Some(v) = local.env_overlay.get(key) {
+            if !v.is_nil() {
+                return to_liquid(v.clone());
             }
         }
+        if let Some(v) = self.statics.get(key) {
+            if !v.is_nil() {
+                return to_liquid(v.clone());
+            }
+        }
+        if key == "self" && !local.scopes.iter().any(|s| s.contains_key(key)) {
+            return Value::Drop(Rc::new(SelfDrop { ctx_id: local.id }));
+        }
+        Value::Nil
     }
 
     /// `Context#variable_defined?`.
-    fn variable_defined(&self, key: &str) -> bool {
-        self.local.scopes.iter().any(|s| s.contains_key(key))
-            || self.local.env_overlay.contains_key(key)
-            || self.local.env.as_ref().is_some_and(|e| e.contains_key(key))
+    fn variable_defined_in(&self, local: &Local, key: &str) -> bool {
+        local.scopes.iter().any(|s| s.contains_key(key))
+            || local.env_overlay.contains_key(key)
+            || self.statics.contains_key(key)
+    }
+
+    /// `SelfDrop#[]`: looks a key up in the drop's context (nil when undefined).
+    pub(crate) fn self_lookup(&self, v: &Value, key: &Value) -> Option<Option<Value>> {
+        let id = self_drop_id(v)?;
+        let local = self.local_by_id(id);
+        Some(match key {
+            Value::Str(k) => {
+                if self.variable_defined_in(local, k) {
+                    Some(self.find_variable_in(local, k))
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        })
     }
 
     // ----- evaluation -----------------------------------------------------------
@@ -582,13 +630,8 @@ impl<'a> Context<'a> {
                 _ => None,
             },
             Value::Drop(d) => {
-                if d.as_any().is_some_and(|a| a.is::<SelfDrop>()) {
-                    if let Value::Str(k) = key {
-                        if self.variable_defined(k) {
-                            return Ok(Some(self.find_variable(k)));
-                        }
-                    }
-                    return Ok(None);
+                if let Some(r) = self.self_lookup(obj, key) {
+                    return Ok(r);
                 }
                 Some(to_liquid(d.get(key)?))
             }
@@ -1197,12 +1240,15 @@ impl<'a> Context<'a> {
             attrs.push((k.clone(), self.evaluate(e)?));
         }
         let inner = Local {
+            id: self.next_ctx_id,
             scopes: vec![Hash::new()],
             base_scope_depth: self.local.base_scope_depth + 1,
             template_name: Some(name.clone()),
             ..Local::default()
         };
+        self.next_ctx_id += 1;
         let saved = std::mem::replace(&mut self.local, inner);
+        self.saved.push(saved);
         if let Some(f) = forloop {
             self.set_local(Rc::from("forloop"), Value::Drop(f));
         }
@@ -1213,7 +1259,7 @@ impl<'a> Context<'a> {
             self.set_local(var_name.clone(), var);
         }
         let r = self.render_partial_template(partial, out);
-        self.local = saved;
+        self.local = self.saved.pop().expect("saved context");
         r
     }
 }

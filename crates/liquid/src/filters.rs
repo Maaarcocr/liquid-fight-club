@@ -157,21 +157,21 @@ pub(crate) fn invoke(ctx: &mut Context, name: &str, input: Value, args: &[Value]
             }
             Value::from(out)
         }
-        "sort" => sort(&input, a0, false)?,
-        "sort_natural" => sort(&input, a0, true)?,
-        "where" => filter_array(&input, a0.unwrap(), a1, FilterMode::Select)?,
-        "reject" => filter_array(&input, a0.unwrap(), a1, FilterMode::Reject)?,
-        "has" => filter_array(&input, a0.unwrap(), a1, FilterMode::Any)?,
-        "find" => filter_array(&input, a0.unwrap(), a1, FilterMode::Find)?,
-        "find_index" => filter_array(&input, a0.unwrap(), a1, FilterMode::FindIndex)?,
-        "uniq" => uniq(&input, a0)?,
+        "sort" => sort(ctx, &input, a0, false)?,
+        "sort_natural" => sort(ctx, &input, a0, true)?,
+        "where" => filter_array(ctx, &input, a0.unwrap(), a1, FilterMode::Select)?,
+        "reject" => filter_array(ctx, &input, a0.unwrap(), a1, FilterMode::Reject)?,
+        "has" => filter_array(ctx, &input, a0.unwrap(), a1, FilterMode::Any)?,
+        "find" => filter_array(ctx, &input, a0.unwrap(), a1, FilterMode::Find)?,
+        "find_index" => filter_array(ctx, &input, a0.unwrap(), a1, FilterMode::FindIndex)?,
+        "uniq" => uniq(ctx, &input, a0)?,
         "reverse" => {
             let mut items = input_iterator(&input)?;
             items.reverse();
             Value::from(items)
         }
-        "map" => map(&input, a0.unwrap())?,
-        "compact" => compact(&input, a0)?,
+        "map" => map(ctx, &input, a0.unwrap())?,
+        "compact" => compact(ctx, &input, a0)?,
         "replace" => {
             let pat = to_s(a0.unwrap());
             let rep = match a1 {
@@ -308,7 +308,7 @@ pub(crate) fn invoke(ctx: &mut Context, name: &str, input: Value, args: &[Value]
             };
             if false_check || empty { dv } else { input }
         }
-        "sum" => sum(&input, a0)?,
+        "sum" => sum(ctx, &input, a0)?,
         "json" => Value::from(json(&input)?),
         _ => input,
     })
@@ -568,37 +568,58 @@ fn truncate(s: &str, length: i64, ts: &str) -> Value {
     if n <= length {
         return Value::str(s);
     }
-    let l = (length - ts.chars().count() as i64).max(0) as usize;
+    let l = length.saturating_sub(ts.chars().count() as i64).max(0) as usize;
     let mut out: String = s.chars().take(l).collect();
     out.push_str(ts);
     Value::from(out)
 }
 
-/// Ruby `str.split(" ", limit)` (awk mode), returning at most `limit` fields.
+/// Ruby `str.split(" ", limit)` (awk mode). With a limit, the remainder after
+/// the last field is kept (even when empty), like Ruby.
 fn awk_split(s: &str, limit: Option<usize>) -> Vec<&str> {
-    let mut out = Vec::new();
     let b = s.as_bytes();
-    let mut i = 0;
     let n = b.len();
+    let mut out = Vec::new();
+    if let Some(1) = limit {
+        if n > 0 {
+            out.push(s);
+        }
+        return out;
+    }
     let is_ws = |c: u8| matches!(c, b' ' | b'\t' | b'\n' | 0x0b | 0x0c | b'\r');
-    loop {
-        while i < n && is_ws(b[i]) {
-            i += 1;
-        }
-        if i >= n {
-            break;
-        }
-        if let Some(l) = limit {
-            if out.len() + 1 == l {
-                out.push(&s[i..]);
-                return out;
+    let (mut beg, mut end, mut skip, mut i) = (0usize, 0usize, true, 1usize);
+    let mut p = 0;
+    while p < n {
+        let c = b[p];
+        p += 1;
+        if skip {
+            if is_ws(c) {
+                beg = p;
+            } else {
+                end = p;
+                skip = false;
+                if limit.is_some_and(|l| l <= i) {
+                    break;
+                }
             }
+        } else if is_ws(c) {
+            out.push(&s[beg..end]);
+            skip = true;
+            beg = p;
+            if limit.is_some() {
+                i += 1;
+            }
+        } else {
+            end = p;
         }
-        let st = i;
-        while i < n && !is_ws(b[i]) {
-            i += 1;
+    }
+    if n > 0 && (limit.is_some() || n > beg) {
+        out.push(&s[beg.min(n)..]);
+    }
+    if limit.is_none() {
+        while out.last() == Some(&"") {
+            out.pop();
         }
-        out.push(&s[st..i]);
     }
     out
 }
@@ -731,7 +752,7 @@ fn expand_replacement(rep: &str, matched: &str, pre: &str, post: &str, out: &mut
         if b[i] == b'\\' && i + 1 < b.len() {
             let r: Option<&str> = match b[i + 1] {
                 b'0' | b'&' => Some(matched),
-                b'1'..=b'9' => Some(""),
+                b'1'..=b'9' | b'+' => Some(""),
                 b'`' => Some(pre),
                 b'\'' => Some(post),
                 b'\\' => Some("\\"),
@@ -752,6 +773,21 @@ fn expand_replacement(rep: &str, matched: &str, pre: &str, post: &str, out: &mut
 
 /// `String#gsub(str, repl)` / `String#sub(str, repl)` with a literal pattern.
 fn gsub(s: &str, pat: &str, rep: &str, global: bool) -> Result<String> {
+    // `\k<name>` refers to a named group, which a literal pattern never has.
+    if rep.contains("\\k<") && (pat.is_empty() || s.contains(pat)) {
+        let b = rep.as_bytes();
+        let mut i = 0;
+        while i + 2 < b.len() {
+            if b[i] == b'\\' {
+                if b[i + 1] == b'k' && b[i + 2] == b'<' && rep[i + 3..].contains('>') {
+                    return Err(Error::new(ErrorKind::Internal, "internal"));
+                }
+                i += 2;
+            } else {
+                i += 1;
+            }
+        }
+    }
     let mut out = String::with_capacity(s.len());
     if pat.is_empty() {
         // Matches at every character boundary.
@@ -849,7 +885,10 @@ enum Prop {
     NoMethod,
 }
 
-fn item_property(item: &Value, prop: &Value) -> Result<Prop> {
+fn item_property(ctx: &Context, item: &Value, prop: &Value) -> Result<Prop> {
+    if let Some(r) = ctx.self_lookup(item, prop) {
+        return Ok(Prop::Val(r.unwrap_or(Value::Nil)));
+    }
     Ok(match item {
         Value::Hash(h) => Prop::Val(match prop {
             Value::Str(k) => h.get(k).cloned().unwrap_or(Value::Nil),
@@ -954,7 +993,7 @@ fn try_sort<T>(items: &mut [T], mut cmp: impl FnMut(&T, &T) -> Result<Ordering>)
     }
 }
 
-fn sort(input: &Value, prop: Option<&Value>, natural: bool) -> Result<Value> {
+fn sort(ctx: &Context, input: &Value, prop: Option<&Value>, natural: bool) -> Result<Value> {
     let mut items = input_iterator(input)?;
     if items.is_empty() {
         return Ok(Value::from(Vec::new()));
@@ -974,7 +1013,7 @@ fn sort(input: &Value, prop: Option<&Value>, natural: bool) -> Result<Value> {
             }
             let mut keyed = Vec::with_capacity(items.len());
             for it in items {
-                let k = match item_property(&it, p)? {
+                let k = match item_property(ctx, &it, p)? {
                     Prop::Val(v) => v,
                     Prop::TypeError => return Err(property_error(p)),
                     Prop::NoMethod => Value::Nil,
@@ -1000,7 +1039,7 @@ enum FilterMode {
     FindIndex,
 }
 
-fn filter_array(input: &Value, prop: &Value, target: Option<&Value>, mode: FilterMode) -> Result<Value> {
+fn filter_array(ctx: &Context, input: &Value, prop: &Value, target: Option<&Value>, mode: FilterMode) -> Result<Value> {
     let items = input_iterator(input)?;
     if items.is_empty() {
         return Ok(match mode {
@@ -1012,7 +1051,7 @@ fn filter_array(input: &Value, prop: &Value, target: Option<&Value>, mode: Filte
     let target = target.filter(|t| !t.is_nil());
     let mut selected = Vec::new();
     for (idx, item) in items.iter().enumerate() {
-        let v = match item_property(item, prop)? {
+        let v = match item_property(ctx, item, prop)? {
             Prop::Val(v) => v,
             Prop::TypeError => return Err(property_error(prop)),
             Prop::NoMethod => return Ok(Value::Nil),
@@ -1084,7 +1123,7 @@ fn eql_key(v: &Value) -> String {
     }
 }
 
-fn uniq(input: &Value, prop: Option<&Value>) -> Result<Value> {
+fn uniq(ctx: &Context, input: &Value, prop: Option<&Value>) -> Result<Value> {
     let items = input_iterator(input)?;
     let prop = prop.filter(|p| !p.is_nil());
     if prop.is_some() && items.is_empty() {
@@ -1096,7 +1135,7 @@ fn uniq(input: &Value, prop: Option<&Value>) -> Result<Value> {
         let base = item.to_liquid_value();
         let key = match prop {
             None => eql_key(&base),
-            Some(p) => match item_property(&base, p)? {
+            Some(p) => match item_property(ctx, &base, p)? {
                 Prop::Val(v) => eql_key(&v),
                 Prop::TypeError => return Err(property_error(p)),
                 Prop::NoMethod => return Ok(Value::Nil),
@@ -1109,7 +1148,7 @@ fn uniq(input: &Value, prop: Option<&Value>) -> Result<Value> {
     Ok(Value::from(out))
 }
 
-fn map(input: &Value, prop: &Value) -> Result<Value> {
+fn map(ctx: &Context, input: &Value, prop: &Value) -> Result<Value> {
     let items = input_iterator(input)?;
     let mut out = Vec::with_capacity(items.len());
     for item in items {
@@ -1121,7 +1160,7 @@ fn map(input: &Value, prop: &Value) -> Result<Value> {
             out.push(Value::Nil);
             continue;
         }
-        match item_property(&item, prop)? {
+        match item_property(ctx, &item, prop)? {
             Prop::Val(v) => out.push(v),
             Prop::TypeError => return Err(property_error(prop)),
             Prop::NoMethod => out.push(Value::Nil),
@@ -1130,7 +1169,7 @@ fn map(input: &Value, prop: &Value) -> Result<Value> {
     Ok(Value::from(out))
 }
 
-fn compact(input: &Value, prop: Option<&Value>) -> Result<Value> {
+fn compact(ctx: &Context, input: &Value, prop: Option<&Value>) -> Result<Value> {
     let items = input_iterator(input)?;
     let prop = prop.filter(|p| !p.is_nil());
     match prop {
@@ -1138,7 +1177,7 @@ fn compact(input: &Value, prop: Option<&Value>) -> Result<Value> {
         Some(p) => {
             let mut out = Vec::new();
             for item in items {
-                match item_property(&item, p)? {
+                match item_property(ctx, &item, p)? {
                     Prop::Val(v) => {
                         if !v.is_nil() {
                             out.push(item);
@@ -1153,7 +1192,7 @@ fn compact(input: &Value, prop: Option<&Value>) -> Result<Value> {
     }
 }
 
-fn sum(input: &Value, prop: Option<&Value>) -> Result<Value> {
+fn sum(ctx: &Context, input: &Value, prop: Option<&Value>) -> Result<Value> {
     let items = input_iterator(input)?;
     if items.is_empty() {
         return Ok(Value::Int(0));
@@ -1165,7 +1204,7 @@ fn sum(input: &Value, prop: Option<&Value>) -> Result<Value> {
             None => values.push(item),
             Some(p) => {
                 if responds_to_index(&item) {
-                    match item_property(&item, p)? {
+                    match item_property(ctx, &item, p)? {
                         Prop::Val(v) => values.push(v),
                         Prop::TypeError => return Err(property_error(p)),
                         Prop::NoMethod => values.push(Value::Int(0)),

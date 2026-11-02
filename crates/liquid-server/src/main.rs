@@ -64,7 +64,10 @@ struct MapFileSystem {
 
 impl MapFileSystem {
     fn new(j: Option<&Json>) -> Option<MapFileSystem> {
-        let Some(Json::Object(members)) = j else { return None };
+        let members = match j {
+            Some(Json::Object(m)) => m.as_slice(),
+            _ => &[],
+        };
         let mut files = Vec::new();
         for (k, v) in members {
             if let Json::Str(content) = v {
@@ -75,7 +78,7 @@ impl MapFileSystem {
                 files.push((key, content.clone()));
             }
         }
-        if files.is_empty() { None } else { Some(MapFileSystem { files }) }
+        Some(MapFileSystem { files })
     }
 }
 

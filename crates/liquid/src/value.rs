@@ -278,7 +278,7 @@ pub fn format_float(f: f64) -> String {
     if f < 0.0 {
         out.push('-');
     }
-    if !(-3..=15).contains(&decpt) {
+    if !((-3..=15).contains(&decpt) || (decpt == 16 && digits.len() > 16)) {
         // Exponent form: d.ddde+XX
         out.push_str(&digits[..1]);
         out.push('.');
@@ -653,6 +653,8 @@ mod tests {
         assert_eq!(format_float(100.0), "100.0");
         assert_eq!(format_float(-1.5), "-1.5");
         assert_eq!(format_float(1e100), "1.0e+100");
+        assert_eq!(format_float(3000000000000000.5), "3000000000000000.5");
+        assert_eq!(format_float(9999999999999998.0), "9.999999999999998e+15");
     }
 
     #[test]
