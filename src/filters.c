@@ -416,7 +416,7 @@ static lq_value f_size(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     case LQ_ARR: return lq_int((int64_t)in.u.a->len);
     case LQ_HASH: return lq_int((int64_t)in.u.h->len);
     case LQ_INT: return lq_int(8);
-    case LQ_BIGINT: return lq_int((int64_t)((in.u.bi->n * 4 + 7) / 8 * 8));
+    case LQ_BIGINT: return lq_int(lq_bigint_size(in.u.bi));
     case LQ_RANGE: {
         int64_t x = in.u.r->first, y = in.u.r->last;
         return lq_int(y < x ? 0 : (y - x == INT64_MAX ? INT64_MAX : y - x + 1));

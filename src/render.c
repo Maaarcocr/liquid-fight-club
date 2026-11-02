@@ -314,7 +314,7 @@ lq_value lq_lookup_step(lq_ctx *ctx, lq_value obj, lq_value key_in, bool command
         break;
     case LQ_INT:
     case LQ_BIGINT:
-        if (command && is_cmd(key, "size")) r = lq_int(obj.type == LQ_INT ? 8 : (int64_t)(obj.u.bi->n * 4));
+        if (command && is_cmd(key, "size")) r = lq_int(obj.type == LQ_INT ? 8 : lq_bigint_size(obj.u.bi));
         break;
     case LQ_RANGE: {
         int64_t a = obj.u.r->first, b = obj.u.r->last;

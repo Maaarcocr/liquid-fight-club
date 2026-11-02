@@ -331,6 +331,18 @@ void lq_bigint_fmt(lq_buf *b, const lq_bigint *x) {
     lq_mag_to_dec(b, &m);
 }
 
+/* Integer#size for a bignum: bytes needed for the magnitude */
+int64_t lq_bigint_size(const lq_bigint *x) {
+    if (!x->n) return 0;
+    uint32_t top = x->limb[x->n - 1];
+    int64_t bits = (int64_t)(x->n - 1) * 32;
+    while (top) {
+        bits++;
+        top >>= 1;
+    }
+    return (bits + 7) / 8;
+}
+
 double lq_bigint_to_double(const lq_bigint *x) {
     mag m = {(uint32_t *)x->limb, x->n, x->n};
     double d = lq_mag_to_double(&m);

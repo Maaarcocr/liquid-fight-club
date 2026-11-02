@@ -285,6 +285,7 @@ lq_value lq_parse_int_text(const char *s, size_t n);
 lq_value lq_bigint_normalize(lq_bigint *b); /* returns INT if it fits */
 void lq_bigint_fmt(lq_buf *b, const lq_bigint *x);
 double lq_bigint_to_double(const lq_bigint *x);
+int64_t lq_bigint_size(const lq_bigint *x);
 int lq_num_cmp(lq_value a, lq_value b); /* both numeric: INT/FLOAT/BIGINT */
 bool lq_is_numeric(lq_value v);
 
