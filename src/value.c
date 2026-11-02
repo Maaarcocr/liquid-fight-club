@@ -147,6 +147,14 @@ bool lq_utf8_valid(const char *s, size_t n) {
     const unsigned char *p = (const unsigned char *)s;
     size_t i = 0;
     while (i < n) {
+        /* ASCII fast path: 8 bytes at a time */
+        while (i + 8 <= n) {
+            uint64_t w;
+            memcpy(&w, p + i, 8);
+            if (w & 0x8080808080808080ull) break;
+            i += 8;
+        }
+        if (i >= n) break;
         if (p[i] < 0x80) { i++; continue; }
         int32_t cp;
         size_t k = lq_utf8_decode(p + i, n - i, &cp);

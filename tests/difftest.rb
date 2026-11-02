@@ -59,6 +59,9 @@ ARGF.each_line do |line|
   total += 1
   r = reference(c)
   next if r == :timeout || r.to_s.start_with?("RUBY ")
+  # binary (non-UTF-8) results are out of scope (binary_data)
+  next unless r.dup.force_encoding("UTF-8").valid_encoding?
+  r = r.dup.force_encoding("UTF-8")
   s = subject(adapter, c)
   next if r == s
   mismatch += 1

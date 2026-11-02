@@ -52,6 +52,7 @@ lq_value dec_to_int(const dec *d);
 lq_value lq_int_add(lq_value a, lq_value b, bool sub);
 lq_value lq_int_mul(lq_value a, lq_value b);
 void lq_int_divmod(lq_value a, lq_value b, lq_value *q, lq_value *r);
+lq_value lq_pow2(int64_t k);
 
 /* ------------------------------------------------------------------ */
 /* Arena                                                               */

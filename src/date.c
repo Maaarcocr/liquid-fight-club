@@ -395,6 +395,17 @@ static bool parse_time_string(const char *src, size_t n, const lq_time *now, lq_
             }
         }
     }
+    /* ISO week ("w10"): Date._parse yields only cweek, which Time.parse
+       cannot turn into a time */
+    if (!have_date) {
+        for (size_t i = 0; i + 2 < n; i++) {
+            if (s[i] == 'w' && (i == 0 || !isalpha((unsigned char)s[i - 1])) && digit_run(s, n, i + 1) == 2) {
+                free(ps.s);
+                free(ps.used);
+                return false;
+            }
+        }
+    }
     /* bare digit runs (Date._parse "ddd" forms): dd, ddd (yday), mmdd,
        yyddd, yymmdd, yyyyddd, yyyymmdd[hh[mm[ss]]] */
     int yday = 0;

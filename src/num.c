@@ -813,10 +813,7 @@ void dec_from_text(dec *d, const char *s, size_t n) {
     }
     mag_from_dec(&d->m, dig.p ? dig.p : "", dig.len);
     d->e = exp;
-    if (!d->m.n) {
-        d->neg = 0;
-        d->e = 0;
-    }
+    if (!d->m.n) d->e = 0; /* keep the sign: BigDecimal("-0.0") is -0 */
     lq_buf_free(&dig);
 }
 
@@ -896,6 +893,11 @@ void dec_add(dec *r, const dec *a, const dec *b, bool sub) {
         r->neg = a->special == DEC_INF ? a->neg : bneg;
         return;
     }
+    if (!a->m.n && !b->m.n) {
+        /* signed zeros: negative only when both are negative */
+        r->neg = a->neg && bneg;
+        return;
+    }
     mag am, bm;
     int64_t e;
     if (!dec_align(a, b, &am, &bm, &e)) {
@@ -939,7 +941,7 @@ void dec_mul(dec *r, const dec *a, const dec *b) {
     }
     mag_mul(&r->m, &a->m, &b->m);
     r->e = a->e + b->e;
-    r->neg = r->m.n ? a->neg != b->neg : 0;
+    r->neg = a->neg != b->neg; /* BigDecimal keeps signed zeros */
 }
 
 /* r = a / b with DEC_DIV_DIGITS significant digits (truncated). */
@@ -961,7 +963,10 @@ void dec_div(dec *r, const dec *a, const dec *b) {
         }
         return;
     }
-    if (!a->m.n) return;
+    if (!a->m.n) {
+        r->neg = a->neg != b->neg;
+        return;
+    }
     int64_t da = (int64_t)mag_digits(&a->m), db = (int64_t)mag_digits(&b->m);
     int64_t k = DEC_DIV_DIGITS - (da - db);
     if (k < 0) k = 0;
@@ -1101,6 +1106,20 @@ lq_value dec_to_int(const dec *d) {
         mag_free(&p);
     }
     lq_value v = bigint_from_mag(m.n ? d->neg : 0, &m);
+    mag_free(&m);
+    return v;
+}
+
+/* 2^k as an integer value (k <= 4096) */
+lq_value lq_pow2(int64_t k) {
+    mag m;
+    mag_init(&m);
+    size_t limbs = (size_t)(k / 32) + 1;
+    mag_reserve(&m, limbs);
+    memset(m.d, 0, limbs * sizeof(uint32_t));
+    m.d[k / 32] = (uint32_t)1 << (k % 32);
+    m.n = limbs;
+    lq_value v = bigint_from_mag(0, &m);
     mag_free(&m);
     return v;
 }

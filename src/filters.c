@@ -128,10 +128,110 @@ static lq_value input_iter(lq_ctx *ctx, lq_value input) {
     }
 }
 
+/* Ruby converts a Float index with NUM2LONG: truncation, RangeError when out
+   of range (which Liquid reports as an internal error). */
+static bool float_index(lq_value key, int64_t *out) {
+    double d = key.u.f;
+    if (d != d || d >= 9223372036854775808.0 || d < -9223372036854775808.0) return false;
+    *out = (int64_t)d;
+    return true;
+}
+
+#define BITS_MAX 4096
+
+static bool is_neg_int(lq_value n) { return n.type == LQ_INT ? n.u.i < 0 : n.u.bi->neg; }
+
+/* Integer#[](a..b): floor(n / 2^a) mod 2^(b-a+1) (two's complement field). */
+static lq_value int_bits(lq_value n, int64_t a, int64_t b, int *status) {
+    if (b < a) return lq_int(0);
+    if (b - a >= BITS_MAX || a < -BITS_MAX) {
+        *status = 3;
+        return lq_nil();
+    }
+    int64_t w = b - a + 1;
+    lq_value q;
+    if (a >= BITS_MAX) {
+        q = lq_int(is_neg_int(n) ? -1 : 0);
+    } else if (a >= 0) {
+        lq_value p = lq_pow2(a);
+        lq_int_divmod(n, p, &q, NULL);
+        lq_release(p);
+    } else {
+        lq_value p = lq_pow2(-a);
+        q = lq_int_mul(n, p);
+        lq_release(p);
+    }
+    lq_value m = lq_pow2(w), r;
+    lq_int_divmod(q, m, NULL, &r);
+    lq_release(m);
+    lq_release(q);
+    return r;
+}
+
+/* Ruby's str[a..b] / ary[a..b] bounds: returns false for nil */
+static bool range_slice_bounds(int64_t len, int64_t a, int64_t b, int64_t *start, int64_t *count) {
+    if (a < 0) a += len;
+    if (a < 0 || a > len) return false;
+    if (b < 0) b += len;
+    int64_t c = b - a + 1;
+    if (c < 0) c = 0;
+    if (c > len - a) c = len - a;
+    *start = a;
+    *count = c;
+    return true;
+}
+
 /* Emulate Ruby's obj[key] for the collection filters.
-   status: 0 ok, 1 TypeError, 2 NoMethodError (no [] at all) */
+   status: 0 ok, 1 TypeError, 2 NoMethodError (no [] at all), 3 RangeError */
 static lq_value ruby_index(lq_ctx *ctx, lq_value obj, lq_value key, int *status) {
     *status = 0;
+    bool intlike = obj.type == LQ_INT || obj.type == LQ_BIGINT;
+    if (key.type == LQ_FLOAT && (obj.type == LQ_ARR || obj.type == LQ_STR || intlike)) {
+        double d = key.u.f;
+        int64_t k;
+        if (d != d) {
+            *status = 3;
+            return lq_nil();
+        }
+        if (!float_index(key, &k)) {
+            if (!intlike) {
+                *status = 3;
+                return lq_nil();
+            }
+            return lq_int(d < 0 ? 0 : (is_neg_int(obj) ? 1 : 0));
+        }
+        return ruby_index(ctx, obj, lq_int(k), status);
+    }
+    if (key.type == LQ_BIGINT) {
+        if (intlike) return lq_int(key.u.bi->neg ? 0 : (is_neg_int(obj) ? 1 : 0));
+        if (obj.type == LQ_STR || obj.type == LQ_ARR) {
+            *status = 3;
+            return lq_nil();
+        }
+    }
+    if (key.type == LQ_RANGE) {
+        int64_t a = key.u.r->first, b = key.u.r->last;
+        if (intlike) return int_bits(obj, a, b, status);
+        if (obj.type == LQ_ARR) {
+            int64_t st, cnt;
+            if (!range_slice_bounds((int64_t)obj.u.a->len, a, b, &st, &cnt)) return lq_nil();
+            lq_value r = lq_arr_new((size_t)cnt);
+            for (int64_t i = 0; i < cnt; i++) lq_arr_push(r.u.a, obj.u.a->items[st + i]);
+            return r;
+        }
+        if (obj.type == LQ_STR) {
+            int64_t st, cnt;
+            int64_t len = (int64_t)lq_str_nchars(obj.u.s);
+            if (!range_slice_bounds(len, a, b, &st, &cnt)) return lq_nil();
+            size_t bo = char_offset(obj.u.s->data, obj.u.s->len, (size_t)st);
+            size_t be = bo + char_offset(obj.u.s->data + bo, obj.u.s->len - bo, (size_t)cnt);
+            return lq_str_new(obj.u.s->data + bo, be - bo);
+        }
+    }
+    if (intlike && key.type == LQ_INT) {
+        if (key.u.i < 0) return lq_int(0);
+        return int_bits(obj, key.u.i, key.u.i, status);
+    }
     switch (obj.type) {
     case LQ_HASH: {
         lq_value v;
@@ -141,14 +241,6 @@ static lq_value ruby_index(lq_ctx *ctx, lq_value obj, lq_value key, int *status)
     case LQ_ARR:
         if (key.type == LQ_INT) {
             int64_t i = key.u.i, n = (int64_t)obj.u.a->len;
-            if (i < 0) i += n;
-            if (i >= 0 && i < n) return lq_retain(obj.u.a->items[i]);
-            return lq_nil();
-        }
-        if (key.type == LQ_FLOAT) {
-            double d = key.u.f;
-            if (d != d || isinf(d)) { *status = 1; return lq_nil(); }
-            int64_t i = (int64_t)d, n = (int64_t)obj.u.a->len;
             if (i < 0) i += n;
             if (i >= 0 && i < n) return lq_retain(obj.u.a->items[i]);
             return lq_nil();
@@ -207,11 +299,16 @@ static bool responds_to_index(lq_value v) {
            v.type == LQ_BIGINT || v.type == LQ_DROP;
 }
 
-static void raise_property_error(lq_ctx *ctx, lq_value property) {
-    lq_value s = S(ctx, property);
+static void raise_index_error(lq_ctx *ctx, lq_value property, int status) {
+    if (status == 3) {
+        lq_raise(ctx, LQ_ERR_INTERNAL, "internal");
+        return;
+    }
+    lq_value s = lq_to_str(property, ctx);
     lq_raise(ctx, LQ_ERR_ARGUMENT, "cannot select the property '%.*s'", (int)s.u.s->len, s.u.s->data);
     lq_release(s);
 }
+
 
 /* ------------------------------------------------------------------ */
 /* Case mapping (Unicode subset: Latin, Greek, Cyrillic, Armenian)     */
@@ -1193,20 +1290,21 @@ static lq_value do_sort(lq_ctx *ctx, lq_value in, lq_value *a, size_t n, bool na
                 return lq_nil();
             }
     }
+    if (len == 1) return arr; /* Ruby never calls the comparator */
     sort_item *items = lq_xmalloc(len * sizeof(sort_item));
     sort_item *tmp = lq_xmalloc(len * sizeof(sort_item));
-    bool type_err = false;
+    int type_err = 0;
     for (size_t i = 0; i < len; i++) {
         items[i].v = arr.u.a->items[i];
         if (has_prop) {
             int st;
             items[i].key = ruby_index(ctx, items[i].v, a[0], &st);
-            if (st == 1) type_err = true;
+            if (st == 1 || st == 3) type_err = st;
         } else items[i].key = lq_retain(items[i].v);
     }
     lq_value result = lq_nil();
     if (type_err) {
-        raise_property_error(ctx, a[0]);
+        raise_index_error(ctx, a[0], type_err);
     } else {
         sort_ctx sc = {ctx, natural, false};
         merge_sort(&sc, items, tmp, len);
@@ -1246,11 +1344,11 @@ static lq_value filter_array(lq_ctx *ctx, lq_value in, lq_value *a, size_t n, in
         int st;
         lq_value v = ruby_index(ctx, item, prop, &st);
         if (ctx->has_err) { lq_release(v); lq_release(out); lq_release(arr); return lq_nil(); }
-        if (st == 1) {
+        if (st == 1 || st == 3) {
             lq_release(v);
             lq_release(out);
             lq_release(arr);
-            raise_property_error(ctx, prop);
+            raise_index_error(ctx, prop, st);
             return lq_nil();
         }
         if (st == 2) {
@@ -1312,7 +1410,7 @@ static lq_value f_uniq(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     if (ctx->has_err) { lq_release(arr); return lq_nil(); }
     bool has_prop = n > 0 && a[0].type != LQ_NIL;
     size_t len = arr.u.a->len;
-    if (has_prop && len == 0) return arr;
+    if (len <= 1) return arr; /* Array#uniq does not call the block */
     lq_value out = lq_arr_new(0);
     lq_value keys = lq_arr_new(0);
     /* open addressing table of indices into keys (by eql?-consistent hash) */
@@ -1333,7 +1431,7 @@ static lq_value f_uniq(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
                 lq_release(arr);
                 free(table);
                 free(hashes);
-                if (st == 1) raise_property_error(ctx, a[0]);
+                if (st == 1 || st == 3) raise_index_error(ctx, a[0], st);
                 return lq_nil();
             }
         } else key = lq_liquid_value(item, ctx);
@@ -1390,11 +1488,11 @@ static lq_value f_map(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
         int st;
         lq_value v = ruby_index(ctx, e, a[0], &st);
         if (ctx->has_err) { lq_release(v); lq_release(out); lq_release(arr); return lq_nil(); }
-        if (st == 1) {
+        if (st == 1 || st == 3) {
             lq_release(v);
             lq_release(out);
             lq_release(arr);
-            raise_property_error(ctx, a[0]);
+            raise_index_error(ctx, a[0], st);
             return lq_nil();
         }
         lq_arr_push_take(out.u.a, v);
@@ -1421,7 +1519,7 @@ static lq_value f_compact(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
             lq_release(v);
             lq_release(out);
             lq_release(arr);
-            if (st == 1) raise_property_error(ctx, a[0]);
+            if (st == 1 || st == 3) raise_index_error(ctx, a[0], st);
             return lq_nil();
         }
         if (v.type != LQ_NIL) lq_arr_push(out.u.a, item);
@@ -1796,11 +1894,11 @@ static lq_value f_sum(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
         } else if (responds_to_index(item)) {
             int st;
             lq_value v = ruby_index(ctx, item, a[0], &st);
-            if (st == 1) {
+            if (st == 1 || st == 3) {
                 lq_release(v);
                 lq_release(vals);
                 lq_release(arr);
-                raise_property_error(ctx, a[0]);
+                raise_index_error(ctx, a[0], st);
                 return lq_nil();
             }
             lq_arr_push_take(vals.u.a, v);
