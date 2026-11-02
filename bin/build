@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Build everything in release mode and place the artifacts in build/.
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+cargo build --release --workspace --quiet
+mkdir -p build
+cp -f target/release/liquid-server build/liquid-server
+cp -f target/release/libliquid_fc.a build/libliquid_fc.a
