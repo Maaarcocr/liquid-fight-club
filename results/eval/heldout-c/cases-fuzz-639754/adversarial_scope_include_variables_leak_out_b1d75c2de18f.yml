@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_scope_include_variables_leak_out_b1d75c2de18f
+  template: |-
+    {% include '0' -%}[{{
+    inner }}]
+  complexity: 210
+  hint: |-
+    Differential case generated from scope_include_variables_leak_out (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/scopes.yml:122).
+    Mutations: trim_markers_tag_close, literal_boundary_string_2, delimiter_whitespace_output_open.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: "{% assign inner = 'leaked' %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

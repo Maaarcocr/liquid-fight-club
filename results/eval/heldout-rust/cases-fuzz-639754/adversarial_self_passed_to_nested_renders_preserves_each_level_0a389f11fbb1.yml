@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_self_passed_to_nested_renders_preserves_each_level_0a389f11fbb1
+  template: 'α{%- assign a = -1 -%}{%- assign s1 = self -%}{%- render '''', outer:
+    s1 -%}ω'
+  complexity: 300
+  hint: |-
+    Differential case generated from self_passed_to_nested_renders_preserves_each_level (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/bare_bracket_self.yml:427).
+    Mutations: literal_boundary_string_0, literal_boundary_number_1, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet1: "{%- assign a = 2 -%}{%- assign s2 = self -%}{%- render 'snippet2',
+      outer: outer, middle: s2 -%}"
+    snippet2: "{%- assign a = 3 -%}{{- outer.a }}|{{ middle.a }}|{{ self.a -}}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

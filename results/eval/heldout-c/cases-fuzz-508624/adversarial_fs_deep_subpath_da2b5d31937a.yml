@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_fs_deep_subpath_da2b5d31937a
+  template: "{% include '' %}"
+  complexity: 240
+  hint: |-
+    Differential case generated from fs_deep_subpath (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filesystem.yml:101).
+    Mutations: literal_boundary_string_0.
+    Classification: error_category_mismatch.
+  filesystem:
+    a/b/c/d/deep.liquid: Deep!
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

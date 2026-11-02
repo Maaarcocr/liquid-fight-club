@@ -1,0 +1,21 @@
+---
+specs:
+- name: adversarial_dynamic_include_for_iterates_6a70f1d5799c
+  template: |-
+    α{% include tpl for items -
+    %}ω
+  complexity: 1000
+  hint: |-
+    Differential case generated from dynamic_include_for_iterates (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic_partials.yml:18).
+    Mutations: trim_markers_tag_close, delimiter_whitespace_tag_close, text_boundary_unicode.
+    Classification: reference_ok_subject_error.
+  environment:
+    tpl: item
+    items:
+    - 1
+    - 2
+    - 3
+    - 4
+  filesystem:
+    item: "[{{ item }}]"
+  expected: α[1][2][3][4]ω

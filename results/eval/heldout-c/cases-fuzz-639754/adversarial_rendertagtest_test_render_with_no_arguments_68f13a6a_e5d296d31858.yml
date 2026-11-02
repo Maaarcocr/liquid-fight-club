@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_rendertagtest_test_render_with_no_arguments_68f13a6a_e5d296d31858
+  template: '{% render "0" %}'
+  complexity: 190
+  hint: |-
+    Differential case generated from RenderTagTest#test_render_with_no_arguments_68f13a6a (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:5084).
+    Mutations: literal_boundary_string_2.
+    Classification: error_category_mismatch.
+  filesystem:
+    source: rendered content
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

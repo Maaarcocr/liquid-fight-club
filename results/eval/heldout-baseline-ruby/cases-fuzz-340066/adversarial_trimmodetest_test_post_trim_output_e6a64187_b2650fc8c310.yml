@@ -1,0 +1,30 @@
+---
+specs:
+- name: adversarial_trimmodetest_test_post_trim_output_e6a64187_b2650fc8c310
+  template: |2+
+
+
+          <div>
+            <p>
+              {{ 'John' -
+    }}
+            </p>
+          </div>
+
+
+  complexity: 140
+  hint: |-
+    Differential case generated from TrimModeTest#test_post_trim_output_e6a64187 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:7890).
+    Mutations: text_boundary_newlines, text_boundary_newlines, delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  expected: |2+
+
+
+          <div>
+            <p>
+              John
+            </p>
+          </div>
+
+
+...

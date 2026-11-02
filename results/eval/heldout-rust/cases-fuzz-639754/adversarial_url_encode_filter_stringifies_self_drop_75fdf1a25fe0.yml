@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_url_encode_filter_stringifies_self_drop_75fdf1a25fe0
+  template: |-
+    {{
+    - self | url_encode -}}
+  complexity: 300
+  hint: |-
+    Differential case generated from url_encode_filter_stringifies_self_drop (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/bare_bracket_self.yml:590).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open, trim_markers_output_close.
+    Classification: reference_ok_subject_error.
+  expected: ''

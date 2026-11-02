@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_date_format_colon_z_timezone_offset_colon_20ac9bca48de
+  template: |-
+    {{
+    '2020-06-15 14:30:00 -04:00' | date: '%:z'  | date: '%:z' }}
+  complexity: 420
+  hint: |-
+    Differential case generated from date_format_colon_z_timezone_offset_colon (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/date-filters.yml:391).
+    Mutations: delimiter_whitespace_output_open, filter_boundary_duplicate.
+    Classification: output_mismatch.
+  expected: "+00:00"

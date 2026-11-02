@@ -1,0 +1,10 @@
+---
+specs:
+- name: adversarial_date_verbose_format_c8b5714948f2
+  template: 'α{{ ''Fri Jul 2147483648 01:00:00 2004'' | date: ''%Y-%m-%d'' }}ω'
+  complexity: 320
+  hint: |-
+    Differential case generated from date_verbose_format (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/date-filters.yml:50).
+    Mutations: literal_boundary_number_2, text_boundary_unicode.
+    Classification: output_mismatch.
+  expected: αFri Jul 2147483648 01:00:00 2004ω

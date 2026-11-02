@@ -1,0 +1,31 @@
+---
+specs:
+- name: adversarial_liquid_tag_nested_loops_with_break_continue_b72c29e3ee77
+  template: |
+    {%- liquid
+      assign matrix = "1-2-3,4-5-6,7-8-9" | split: ","
+      for row in matrix
+        assign cells = row, nil| split: "-"
+        for cell in cells
+          assign val = cell | plus: 0
+          if val == 5
+            continue
+          endif
+          if val > 8
+            break
+          endif
+          echo val
+          echo " "
+        endfor
+      endfor
+    -
+    %}
+  complexity: 135
+  hint: |-
+    Differential case generated from liquid_tag_nested_loops_with_break_continue (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:1462).
+    Mutations: delimiter_whitespace_tag_close, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - unknown_tag
+  error_mode: strict2

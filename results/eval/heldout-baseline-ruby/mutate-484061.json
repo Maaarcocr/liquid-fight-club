@@ -1,0 +1,389 @@
+{
+  "mode": "mutate",
+  "seed": 484061,
+  "generated": 1000,
+  "executed": 1000,
+  "passed": 982,
+  "failed": 18,
+  "skipped": 0,
+  "failures": [
+    {
+      "id": "db41f744bdd9",
+      "parent": "downcase_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ text | downcase, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | downcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_downcase_empty_string_db41f744bdd9.yml"
+    },
+    {
+      "id": "e61f1684cb49",
+      "parent": "downcase_on_nil",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ missing | downcase, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ missing | downcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_downcase_on_nil_e61f1684cb49.yml"
+    },
+    {
+      "id": "8f63388a444a",
+      "parent": "filter_capitalize",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ 'hello world' | capitalize, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ 'hello world' | capitalize, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_filter_capitalize_8f63388a444a.yml"
+    },
+    {
+      "id": "ddfd8d4c1855",
+      "parent": "filter_downcase",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ 'HELLO' | downcase, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ 'HELLO' | downcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_filter_downcase_ddfd8d4c1855.yml"
+    },
+    {
+      "id": "e42460057f5f",
+      "parent": "filter_size_array",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ items | size, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ items | size, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_filter_size_array_e42460057f5f.yml"
+    },
+    {
+      "id": "6e62341f5984",
+      "parent": "filter_size_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ 'hello' | size, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ 'hello' | size, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_filter_size_string_6e62341f5984.yml"
+    },
+    {
+      "id": "b434494fd68e",
+      "parent": "filter_strip",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ '  hello  ' | strip, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ '  hello  ' | strip, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_filter_strip_b434494fd68e.yml"
+    },
+    {
+      "id": "dd0a782d50fb",
+      "parent": "filter_upcase",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ 'hello' | upcase, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ 'hello' | upcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_filter_upcase_dd0a782d50fb.yml"
+    },
+    {
+      "id": "912f578fe99a",
+      "parent": "upcase_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ text | upcase, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | upcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_upcase_empty_string_912f578fe99a.yml"
+    },
+    {
+      "id": "c6b705877f9a",
+      "parent": "upcase_on_nil",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ missing | upcase, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ missing | upcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_upcase_on_nil_c6b705877f9a.yml"
+    },
+    {
+      "id": "009a6779b220",
+      "parent": "capitalize_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ text | capitalize, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | capitalize, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_capitalize_empty_string_009a6779b220.yml"
+    },
+    {
+      "id": "6cecc688e504",
+      "parent": "capitalize_on_nil",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ missing | capitalize, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ missing | capitalize, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_capitalize_on_nil_6cecc688e504.yml"
+    },
+    {
+      "id": "d5e9ceff74fd",
+      "parent": "lstrip_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ text | lstrip, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | lstrip, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_lstrip_empty_string_d5e9ceff74fd.yml"
+    },
+    {
+      "id": "385561637dff",
+      "parent": "rstrip_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ text | rstrip, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | rstrip, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_rstrip_empty_string_385561637dff.yml"
+    },
+    {
+      "id": "398d092bd6fc",
+      "parent": "size_empty_array",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ items | size, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ items | size, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_size_empty_array_398d092bd6fc.yml"
+    },
+    {
+      "id": "efd95322ce3e",
+      "parent": "size_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ text | size, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | size, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_size_empty_string_efd95322ce3e.yml"
+    },
+    {
+      "id": "a1a64794fe4e",
+      "parent": "strip_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ text | strip, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | strip, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_strip_empty_string_a1a64794fe4e.yml"
+    },
+    {
+      "id": "bbb24543ed0a",
+      "parent": "strip_on_nil",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ missing | strip, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ missing | strip, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-baseline-ruby/cases-mutate-484061/adversarial_strip_on_nil_bbb24543ed0a.yml"
+    }
+  ]
+}

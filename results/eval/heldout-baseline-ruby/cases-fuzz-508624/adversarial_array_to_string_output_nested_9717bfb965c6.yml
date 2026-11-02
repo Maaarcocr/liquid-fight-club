@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_array_to_string_output_nested_9717bfb965c6
+  template: |-
+    {{
+    - array }}
+  complexity: 120
+  hint: |-
+    Differential case generated from array_to_string_output_nested (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/type-coercion.yml:61).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    array:
+    - a
+    - - b
+      - c
+  expected: ''

@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_literal_boolean_true_b25378b71675
+  template: |-
+    {{
+    - true -}}
+  complexity: 30
+  hint: |-
+    Differential case generated from literal_boolean_true (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/expressions.yml:35).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open, trim_markers_output_close.
+    Classification: reference_ok_subject_error.
+  expected: ''

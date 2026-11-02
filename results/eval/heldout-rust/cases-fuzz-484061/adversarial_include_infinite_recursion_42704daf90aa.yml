@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_include_infinite_recursion_42704daf90aa
+  template: |-
+    {% include ' '
+    -%}
+  complexity: 602
+  hint: |-
+    Differential case generated from include_infinite_recursion (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:720).
+    Mutations: literal_boundary_string_1, delimiter_whitespace_tag_close, trim_markers_tag_close.
+    Classification: error_category_mismatch.
+  filesystem:
+    recursive: "{% include 'recursive' %}"
+  features:
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - unknown

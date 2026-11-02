@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_float_serialization_with_zero_in_decimal_place_a2ab9d7d5d8a
+  template: |-
+    {%- assign min_aspect_ratio = 0 -
+    %}{{ min_aspect_ratio }}
+  complexity: 1000
+  hint: |-
+    Differential case generated from Float serialization with zero in decimal place (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/manual.yml:2).
+    Mutations: delimiter_whitespace_tag_close, literal_boundary_number_1, literal_boundary_number_0.
+    Classification: reference_ok_subject_error.
+  expected: '0'

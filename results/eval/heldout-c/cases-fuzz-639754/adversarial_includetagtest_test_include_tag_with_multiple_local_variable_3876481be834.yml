@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_includetagtest_test_include_tag_with_multiple_local_variable_3876481be834
+  template: "{% include '0' echo1: echo1, echo2: more_echos.echo2 %}"
+  complexity: 190
+  hint: |-
+    Differential case generated from IncludeTagTest#test_include_tag_with_multiple_local_variables_from_context_2dccf161 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4041).
+    Mutations: literal_boundary_string_2.
+    Classification: error_category_mismatch.
+  environment:
+    echo1: test123
+    more_echos:
+      echo2: test321
+  filesystem:
+    locale_variables: 'Locale: {{echo1}} {{echo2}}'
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_lstrip_287bf5e9_368cc07aa0ff
+  template: "{{ __liquid_spec_missing__ | lstrip | lstrip, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_lstrip_287bf5e9 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:2714).
+    Mutations: lookup_boundary_missing, filter_boundary_extra_argument, filter_boundary_duplicate.
+    Classification: error_category_mismatch.
+  environment:
+    a0: 123
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

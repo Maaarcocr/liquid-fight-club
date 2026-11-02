@@ -1,0 +1,24 @@
+---
+specs:
+- name: adversarial_tablerowtest_test_table_row_does_not_leak_interrupts_0d2db2b_1a49ae73b744
+  template: |2+
+
+    {% for i in (1..2) - reversed limit: 0 %}
+    {% for j in (1..2) -%}
+    {% tablerow k in (1..3) %}{% break %}{% endtablerow -%}
+    loop j={{ j }}
+    {% endfor -%}
+    loop i={{ i }}
+    {% endfor -%}
+    after loop
+
+  complexity: 180
+  hint: |-
+    Differential case generated from TableRowTest#test_table_row_does_not_leak_interrupts_0d2db2bc (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:7495).
+    Mutations: for_boundary_reversed, for_boundary_limit_zero, text_boundary_newlines.
+    Classification: reference_ok_subject_error.
+  expected: |2+
+
+    after loop
+
+...

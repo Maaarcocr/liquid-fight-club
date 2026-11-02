@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_comment_inline_between_tags_ac75002ef580
+  template: |-
+    {%- assign a = 1 -
+    %}{%- # separator comment -%}{%- assign b = 2 -%}{{ a }}{{ b }}
+  complexity: 114
+  hint: |-
+    Differential case generated from comment_inline_between_tags (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:1558).
+    Mutations: delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: '12'

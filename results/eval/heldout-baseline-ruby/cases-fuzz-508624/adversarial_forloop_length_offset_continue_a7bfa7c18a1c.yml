@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_forloop_length_offset_continue_a7bfa7c18a1c
+  template: |-
+    {%
+    for i in items limit:2 - reversed %}{{ forloop.length }}-{% endfor %}|{% for i in items offset:continue limit:2 %}{{ forloop.length }}-{% endfor %}
+  complexity: 332
+  hint: |-
+    Differential case generated from forloop_length_offset_continue (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/for-loops.yml:153).
+    Mutations: trim_markers_tag_close, for_boundary_reversed, delimiter_whitespace_tag_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    items:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  expected: 2-2-|2-2-

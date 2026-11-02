@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_includetagtest_test_including_via_variable_value_0d38d66d_862c60fa9d95
+  template: |-
+    {% assign page = ' '
+    %}{% include page for foo %}
+  complexity: 190
+  hint: |-
+    Differential case generated from IncludeTagTest#test_including_via_variable_value_0d38d66d (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4069).
+    Mutations: literal_boundary_string_3, delimiter_whitespace_tag_close, literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  environment:
+    foo:
+      title: Draft 151cm
+  filesystem:
+    product: 'Product: {{ product.title }} '
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

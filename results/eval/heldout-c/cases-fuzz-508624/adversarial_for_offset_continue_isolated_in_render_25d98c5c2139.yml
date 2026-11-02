@@ -1,0 +1,24 @@
+---
+specs:
+- name: adversarial_for_offset_continue_isolated_in_render_25d98c5c2139
+  template: |-
+    {% for i in items limit:0 %}{{
+    i }}{% endfor %}{% render ' ', items: items %}{% for i in items offset:continue %}{{ i }}{% endfor %}
+  complexity: 333
+  hint: |-
+    Differential case generated from for_offset_continue_isolated_in_render (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/for-loops.yml:166).
+    Mutations: literal_boundary_number_0, literal_boundary_string_1, delimiter_whitespace_output_open.
+    Classification: error_category_mismatch.
+  environment:
+    items:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+  filesystem:
+    cont: "{% for i in items limit:2 %}{{ i }}{% endfor %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

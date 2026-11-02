@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_compact_3620392c_c780ba157779
+  template: "{{- a0 | compact, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_compact_3620392c (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:882).
+    Mutations: trim_markers_output_open, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0:
+    - foo
+    - bar
+  expected: foobar

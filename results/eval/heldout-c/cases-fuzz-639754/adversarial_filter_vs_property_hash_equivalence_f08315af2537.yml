@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_filter_vs_property_hash_equivalence_f08315af2537
+  template: |
+    filter first:{{- h | first, nil -}}, property first:{{- h.first }}
+    filter last:{{- h | last }}, property last:{{- h.last }}
+    filter size:{{- h | size }}, property size:{{- h.size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_vs_property_hash_equivalence (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:450).
+    Mutations: trim_markers_output_close, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    h:
+      a: 1
+      b: 2
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

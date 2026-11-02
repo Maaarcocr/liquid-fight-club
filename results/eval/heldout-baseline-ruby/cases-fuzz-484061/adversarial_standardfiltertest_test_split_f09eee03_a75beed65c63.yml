@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_split_f09eee03_a75beed65c63
+  template: |-
+    {{
+    - a0}}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_split_f09eee03 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:4540).
+    Mutations: filter_boundary_remove, trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: A?Z
+    a1: "~"
+  expected: ''

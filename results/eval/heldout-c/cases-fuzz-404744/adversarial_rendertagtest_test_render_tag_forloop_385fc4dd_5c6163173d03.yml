@@ -1,0 +1,22 @@
+---
+specs:
+- name: adversarial_rendertagtest_test_render_tag_forloop_385fc4dd_5c6163173d03
+  template: |-
+    {% render '' for products
+    -%}
+  complexity: 190
+  hint: |-
+    Differential case generated from RenderTagTest#test_render_tag_forloop_385fc4dd (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4987).
+    Mutations: literal_boundary_string_0, delimiter_whitespace_tag_close, trim_markers_tag_close.
+    Classification: error_category_mismatch.
+  environment:
+    products:
+    - title: Draft 151cm
+    - title: Element 155cm
+  filesystem:
+    product: 'Product: {{ product.title }} {% if forloop.first %}first{% endif %}
+      {% if forloop.last %}last{% endif %} index:{{ forloop.index }} '
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

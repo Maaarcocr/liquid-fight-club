@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_filter_size_array_e42460057f5f
+  template: "{{ items | size, nil }}"
+  complexity: 40
+  hint: |-
+    Differential case generated from filter_size_array (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:282).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    items:
+    - a
+    - b
+    - c
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

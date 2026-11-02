@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_dynamic_include_missing_partial_5f145086568e
+  template: |2
+
+    {% assign tpl = ' ' %}{% include tpl %}
+  complexity: 550
+  hint: |-
+    Differential case generated from dynamic_include_missing_partial (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic-partials.yml:539).
+    Mutations: text_boundary_newlines, literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  features:
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - unknown

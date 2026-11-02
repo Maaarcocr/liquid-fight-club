@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_includetagtest_test_include_tag_with_default_name_d96f44b2_0d0f6952a94c
+  template: "{% include '0' -%}"
+  complexity: 190
+  hint: |-
+    Differential case generated from IncludeTagTest#test_include_tag_with_default_name_d96f44b2 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4014).
+    Mutations: literal_boundary_string_3, literal_boundary_string_2, trim_markers_tag_close.
+    Classification: error_category_mismatch.
+  environment:
+    product:
+      title: Draft 151cm
+  filesystem:
+    product: 'Product: {{ product.title }} '
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

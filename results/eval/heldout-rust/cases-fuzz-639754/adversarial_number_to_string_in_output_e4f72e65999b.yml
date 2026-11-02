@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_number_to_string_in_output_e4f72e65999b
+  template: |-
+    {{
+    - 42
+    }}
+  complexity: 110
+  hint: |-
+    Differential case generated from number_to_string_in_output (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/type-coercion.yml:40).
+    Mutations: delimiter_whitespace_output_close, trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  expected: ''

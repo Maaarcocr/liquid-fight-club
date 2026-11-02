@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_reverse_7d361a86_02691df07fe1
+  template: "{{ __liquid_spec_missing__ | __liquid_spec_unknown_filter__, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_reverse_7d361a86 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:3209).
+    Mutations: lookup_boundary_missing, filter_boundary_extra_argument, filter_boundary_unknown.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: foo
+  expected: ''

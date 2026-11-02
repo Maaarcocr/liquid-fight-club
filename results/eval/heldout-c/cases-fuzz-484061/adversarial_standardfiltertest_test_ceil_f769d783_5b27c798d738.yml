@@ -1,0 +1,25 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_ceil_f769d783_5b27c798d738
+  template: |-
+    {{
+    a0 | ceil, nil
+    }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_ceil_f769d783 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:800).
+    Mutations: delimiter_whitespace_output_close, filter_boundary_extra_argument, delimiter_whitespace_output_open.
+    Classification: error_category_mismatch.
+  environment:
+    a0:
+    - foo: bar
+    - foo: 123
+    - foo:
+    - foo: true
+    - foo:
+      - foo
+      - bar
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

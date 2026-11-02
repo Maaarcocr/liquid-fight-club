@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardtagtest_test_multiline_tag_64ca716b_91ae51ec626b
+  template: |-
+    0{% for i in (1..3) limit: 0 - offset: 1 %} {{
+    i
+    }}{%
+    endfor
+    %}
+  complexity: 130
+  hint: |-
+    Differential case generated from StandardTagTest#test_multiline_tag_64ca716b (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:7046).
+    Mutations: for_boundary_limit_zero, trim_markers_tag_close, for_boundary_offset_one.
+    Classification: reference_ok_subject_error.
+  expected: '0'

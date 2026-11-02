@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_blank_if_body_raises_error_strict2_6db735f5aa31
+  template: |2
+
+    {%- if 5 > "é" %}{% endif %}
+  complexity: 750
+  hint: |-
+    Differential case generated from blank_if_body_raises_error_strict2 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/blank_body_error_handling.yml:305).
+    Mutations: literal_boundary_string_3, trim_markers_tag_open, text_boundary_newlines.
+    Classification: error_category_mismatch.
+  features:
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - render

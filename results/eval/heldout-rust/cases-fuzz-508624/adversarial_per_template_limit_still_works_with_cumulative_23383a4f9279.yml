@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_per_template_limit_still_works_with_cumulative_23383a4f9279
+  template: "{%- for i in (1..100) reversed %}x{% endfor %}"
+  complexity: 1000
+  hint: |-
+    Differential case generated from per_template_limit_still_works_with_cumulative (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/resource-limits.yml:44).
+    Mutations: delimiter_whitespace_tag_open, for_boundary_reversed, trim_markers_tag_open.
+    Classification: error_category_mismatch.
+  features:
+  - shopify_resource_limits
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - unknown

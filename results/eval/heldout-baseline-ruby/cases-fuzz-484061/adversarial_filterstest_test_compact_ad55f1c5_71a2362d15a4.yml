@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_filterstest_test_compact_ad55f1c5_71a2362d15a4
+  template: "{{words | __liquid_spec_unknown_filter__, nil | __liquid_spec_unknown_filter__
+    | join}}"
+  complexity: 160
+  hint: |-
+    Differential case generated from FiltersTest#test_compact_ad55f1c5 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:1939).
+    Mutations: filter_boundary_unknown, filter_boundary_duplicate, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    words:
+    - a
+    -
+    - b
+    -
+    - c
+  expected: a  b  c

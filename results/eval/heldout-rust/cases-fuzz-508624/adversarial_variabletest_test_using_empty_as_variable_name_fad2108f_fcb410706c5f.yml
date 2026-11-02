@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_variabletest_test_using_empty_as_variable_name_fad2108f_fcb410706c5f
+  template: |-
+    {% assign foo = empty %}{{
+    - foo }}
+  complexity: 300
+  hint: |-
+    Differential case generated from VariableTest#test_using_empty_as_variable_name_fad2108f (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:8815).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  expected: ''

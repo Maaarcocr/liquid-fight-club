@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_rendertagtest_test_render_accepts_multiple_named_arguments_1_1e6eb9a41600
+  template: '{% render " ", one: 2147483648, two: 2 %}'
+  complexity: 190
+  hint: |-
+    Differential case generated from RenderTagTest#test_render_accepts_multiple_named_arguments_1aa9f622 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4904).
+    Mutations: literal_boundary_string_1, literal_boundary_number_2.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: "{{ one }} {{ two }}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_whitespace_trim_preserves_raw_block_content_aebdde0c20de
+  template: |-
+    {% raw %}  {% endraw %}{{- nil -
+    }}
+  complexity: 210
+  hint: |-
+    Differential case generated from whitespace_trim_preserves_raw_block_content (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/scalar_and_iteration_semantics.yml:84).
+    Mutations: delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  expected: "  "

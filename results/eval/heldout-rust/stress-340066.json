@@ -1,0 +1,10 @@
+{
+  "mode": "stress",
+  "seed": 340066,
+  "generated": 100,
+  "executed": 100,
+  "passed": 100,
+  "failed": 0,
+  "skipped": 0,
+  "failures": []
+}

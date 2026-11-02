@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_assigntest_test_assign_with_hyphen_in_variable_name_9daf16f1_366a9cf226c8
+  template: |
+    {% assign this-thing = 'Print this-thing' -
+    %}
+    {{
+    this-thing -}}
+  complexity: 300
+  hint: |-
+    Differential case generated from AssignTest#test_assign_with_hyphen_in_variable_name_9daf16f1 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:28).
+    Mutations: delimiter_whitespace_output_open, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: |2-
+
+    Print this-thing

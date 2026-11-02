@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_size_bdbea2e5_3e75239356ee
+  template: |-
+    {{-
+    a0 | size, nil }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_size_bdbea2e5 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:3646).
+    Mutations: delimiter_whitespace_output_open, filter_boundary_extra_argument, trim_markers_output_open.
+    Classification: error_category_mismatch.
+  environment:
+    a0: true
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

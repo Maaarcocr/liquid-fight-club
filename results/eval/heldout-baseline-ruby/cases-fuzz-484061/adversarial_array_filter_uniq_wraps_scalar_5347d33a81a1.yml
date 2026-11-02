@@ -1,0 +1,10 @@
+---
+specs:
+- name: adversarial_array_filter_uniq_wraps_scalar_5347d33a81a1
+  template: '{{ 5 | uniq, nil | join: "," -}}'
+  complexity: 330
+  hint: |-
+    Differential case generated from array_filter_uniq_wraps_scalar (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filter_argument_semantics.yml:104).
+    Mutations: filter_boundary_extra_argument, trim_markers_output_close.
+    Classification: reference_ok_subject_error.
+  expected: '5'

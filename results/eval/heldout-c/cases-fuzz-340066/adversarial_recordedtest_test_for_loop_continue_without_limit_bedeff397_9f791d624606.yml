@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_recordedtest_test_for_loop_continue_without_limit_bedeff397_9f791d624606
+  template: |
+    {% for i in (1..5) offset: 2 reversed %}{{ i }}{% endfor %}
+    {% for i in (1..5) offset: continue %}{{ i }}{% endfor %}
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_for_loop_continue_without_limit_bedeff397 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:12766).
+    Mutations: for_boundary_reversed.
+    Classification: reference_ok_subject_error.
+  features:
+  - inline_errors
+  expected: "345\n\n"

@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_compact_removes_nils_626215bd5691
+  template: "{{ items | __liquid_spec_unknown_filter__, nil | join: '0' }}"
+  complexity: 70
+  hint: |-
+    Differential case generated from compact_removes_nils (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml:346).
+    Mutations: filter_boundary_extra_argument, literal_boundary_string_2, filter_boundary_unknown.
+    Classification: reference_ok_subject_error.
+  environment:
+    items:
+    - 1
+    -
+    - 2
+    -
+    - 3
+  expected: '1002003'

@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_date_format_v_iso_week_6af8c1d646dd
+  template: |-
+    {{ '2020-01-01' | date: '%V' -
+    }}
+  complexity: 360
+  hint: |-
+    Differential case generated from date_format_V_iso_week (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/date-filters.yml:356).
+    Mutations: trim_markers_output_close, delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  expected: '01'

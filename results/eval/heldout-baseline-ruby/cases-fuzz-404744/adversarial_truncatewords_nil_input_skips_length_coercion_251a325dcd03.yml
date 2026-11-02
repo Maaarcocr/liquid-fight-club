@@ -1,0 +1,10 @@
+---
+specs:
+- name: adversarial_truncatewords_nil_input_skips_length_coercion_251a325dcd03
+  template: "{{- nil | truncatewords: nil -, nil}}"
+  complexity: 500
+  hint: |-
+    Differential case generated from truncatewords_nil_input_skips_length_coercion (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filter_argument_semantics.yml:39).
+    Mutations: trim_markers_output_open, trim_markers_output_close, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  expected: ''

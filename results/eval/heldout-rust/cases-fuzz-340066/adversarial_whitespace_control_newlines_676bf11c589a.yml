@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_whitespace_control_newlines_676bf11c589a
+  template: |2
+
+    {{- ' ' -
+    }}
+  complexity: 55
+  hint: |-
+    Differential case generated from whitespace_control_newlines (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:424).
+    Mutations: delimiter_whitespace_output_close, literal_boundary_string_1.
+    Classification: reference_ok_subject_error.
+  expected: " \n"

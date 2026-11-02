@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfilterstest_test_legacy_map_on_hashes_with_dynamic_k_39efe391f063
+  template: |-
+    {%
+    assign key = 'foo' %}{{
+    - thing | map: key | map: 'bar' }}
+  complexity: 180
+  hint: |-
+    Differential case generated from StandardFiltersTest#test_legacy_map_on_hashes_with_dynamic_key_453a3a1b (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:5700).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open, delimiter_whitespace_tag_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    thing:
+      foo:
+        bar: 42
+  expected: ''

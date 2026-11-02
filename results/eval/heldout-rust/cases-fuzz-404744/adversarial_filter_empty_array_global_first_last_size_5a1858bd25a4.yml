@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_filter_empty_array_global_first_last_size_5a1858bd25a4
+  template: |
+    empty_array, __liquid_spec_unknown_filter__:{{
+    - arr | first }}
+    empty_array, last:{{- __liquid_spec_missing__ | last }}
+    empty_array, size:{{- arr | size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_empty_array_global_first_last_size (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:118).
+    Mutations: delimiter_whitespace_output_open, lookup_boundary_missing, filter_boundary_unknown.
+    Classification: reference_ok_subject_error.
+  environment:
+    arr: []
+  expected: |
+    empty_array, __liquid_spec_unknown_filter__:
+    empty_array, last:
+    empty_array, size:0

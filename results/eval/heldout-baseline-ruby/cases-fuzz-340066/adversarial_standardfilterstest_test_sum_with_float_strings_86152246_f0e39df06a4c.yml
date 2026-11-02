@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfilterstest_test_sum_with_float_strings_86152246_f0e39df06a4c
+  template: "{{ input | sum, nil }}"
+  complexity: 180
+  hint: |-
+    Differential case generated from StandardFiltersTest#test_sum_with_float_strings_86152246 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:6140).
+    Mutations: filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    input:
+    - 0.1
+    - '0.2'
+    - '0.3'
+  expected: '0.6'

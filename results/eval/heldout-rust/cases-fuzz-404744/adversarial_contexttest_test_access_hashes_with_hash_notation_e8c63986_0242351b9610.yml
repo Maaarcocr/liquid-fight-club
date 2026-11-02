@@ -1,0 +1,21 @@
+---
+specs:
+- name: adversarial_contexttest_test_access_hashes_with_hash_notation_e8c63986_0242351b9610
+  template: |2
+
+    {{ products["tags"].first -
+    }}
+  complexity: 140
+  hint: |-
+    Differential case generated from ContextTest#test_access_hashes_with_hash_notation_e8c63986 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:1020).
+    Mutations: trim_markers_output_close, delimiter_whitespace_output_close, text_boundary_newlines.
+    Classification: reference_ok_subject_error.
+  environment:
+    products:
+      count: 5
+      tags:
+      - deepsnow
+      - freestyle
+  expected: |2
+
+    deepsnow

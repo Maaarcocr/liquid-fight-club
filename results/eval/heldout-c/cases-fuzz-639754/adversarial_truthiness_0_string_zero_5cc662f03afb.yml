@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_truthiness_0_string_zero_5cc662f03afb
+  template: |-
+    "é" (string zero): truthy:{% if v -
+    %}yes{% else %}no{% endif %}, empty:{% if v == empty %}yes{% else %}no{% endif %}, blank:{% if v == blank %}yes{% else %}no{% endif %}
+  complexity: 30
+  hint: |-
+    Differential case generated from truthiness_0_string_zero (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/truthiness_matrix.yml:68).
+    Mutations: trim_markers_tag_close, literal_boundary_string_3, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    v: '0'
+  expected: '"é" (string zero): truthy:yes, empty:no, blank:no'

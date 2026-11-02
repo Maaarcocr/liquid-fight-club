@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_filterstest_test_nonexistent_filter_is_ignored_1c234de5_acd87c7cbb21
+  template: "{{ var | xyzzy, nil }}"
+  complexity: 300
+  hint: |-
+    Differential case generated from FiltersTest#test_nonexistent_filter_is_ignored_1c234de5 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:1964).
+    Mutations: filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    var: 1000
+  expected: '1000'

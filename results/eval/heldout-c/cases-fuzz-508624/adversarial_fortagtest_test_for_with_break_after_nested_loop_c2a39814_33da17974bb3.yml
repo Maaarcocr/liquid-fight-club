@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_fortagtest_test_for_with_break_after_nested_loop_c2a39814_33da17974bb3
+  template: |-
+    {% for i in (1..2) - limit: 2147483648 %}
+      {% for j in (1..2) -%}
+        {{ i }}-{{ j }},
+      {%- endfor -%}
+      {% break -%}
+    {% endfor -%}
+    after
+  complexity: 120
+  hint: |-
+    Differential case generated from ForTagTest#test_for_with_break_after_nested_loop_c2a39814 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:2447).
+    Mutations: for_boundary_limit_one, literal_boundary_number_2.
+    Classification: reference_ok_subject_error.
+  expected: |2-
+
+      1-1,1-2,after

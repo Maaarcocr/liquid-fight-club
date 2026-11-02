@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_continue_propagates_through_include_2c03176fcf10
+  template: "{% for i in (1..3) %}{{ i }}{% include '' %}{{ i }}{% endfor %}"
+  complexity: 210
+  hint: |-
+    Differential case generated from continue_propagates_through_include (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/interrupts.yml:119).
+    Mutations: literal_boundary_string_0.
+    Classification: error_category_mismatch.
+  filesystem:
+    cont: "{% continue %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

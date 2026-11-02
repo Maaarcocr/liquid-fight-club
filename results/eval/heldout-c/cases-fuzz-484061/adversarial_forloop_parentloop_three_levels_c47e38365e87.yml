@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_forloop_parentloop_three_levels_c47e38365e87
+  template: "{% for i in (1..2) - reversed %}{% for j in (1..2) -%}{% for k in (1..2)
+    %}{{ forloop.parentloop.parentloop.index }}.{{ forloop.parentloop.index }}.{{
+    forloop.index }} {% endfor %}{% endfor %}{% endfor %}"
+  complexity: 327
+  hint: |-
+    Differential case generated from forloop_parentloop_three_levels (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/for-loops.yml:103).
+    Mutations: trim_markers_tag_close, trim_markers_tag_close, for_boundary_reversed.
+    Classification: reference_ok_subject_error.
+  expected: '1.1.1 1.1.2 1.2.1 1.2.2 2.1.1 2.1.2 2.2.1 2.2.2 '

@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_ceil_f472fc66_c8b4adb926c1
+  template: |2
+
+    {{ a0 | __liquid_spec_unknown_filter__, nil }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_ceil_f472fc66 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:794).
+    Mutations: filter_boundary_extra_argument, filter_boundary_unknown, text_boundary_newlines.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: 0.0
+  expected: |2
+
+    0.0

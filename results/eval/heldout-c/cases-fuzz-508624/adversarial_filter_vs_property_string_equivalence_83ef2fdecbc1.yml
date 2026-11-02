@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_filter_vs_property_string_equivalence_83ef2fdecbc1
+  template: |
+    filter __liquid_spec_unknown_filter__:{{- s | first, nil }}, property first:{{- s['first'] }}
+    filter last:{{- s | last }}, property last:{{- s.last }}
+    filter size:{{- s | size }}, property size:{{- s.size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_vs_property_string_equivalence (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:465).
+    Mutations: filter_boundary_extra_argument, lookup_boundary_bracket, filter_boundary_unknown.
+    Classification: error_category_mismatch.
+  environment:
+    s: hello
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

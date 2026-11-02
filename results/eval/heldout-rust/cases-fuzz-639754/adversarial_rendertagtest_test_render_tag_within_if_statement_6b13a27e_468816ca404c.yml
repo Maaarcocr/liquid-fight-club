@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_rendertagtest_test_render_tag_within_if_statement_6b13a27e_468816ca404c
+  template: '{% if true %}{% render "0" %}{% endif %}'
+  complexity: 190
+  hint: |-
+    Differential case generated from RenderTagTest#test_render_tag_within_if_statement_6b13a27e (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:5076).
+    Mutations: literal_boundary_string_3, literal_boundary_string_2.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: my message
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

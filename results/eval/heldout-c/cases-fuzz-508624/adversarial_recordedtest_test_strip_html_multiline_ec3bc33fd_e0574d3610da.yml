@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_recordedtest_test_strip_html_multiline_ec3bc33fd_e0574d3610da
+  template: |-
+    {{ '<script>
+    foo
+    </script>' | strip_html, nil }}
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_strip_html_multiline_ec3bc33fd (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:23212).
+    Mutations: filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  features:
+  - inline_errors
+  expected: 'Liquid error (line 1): wrong number of arguments (given 2, expected 1)'

@@ -1,0 +1,15 @@
+time	arm	event	detail
+2026-11-02T14:42:52+01:00	rust	launched	tmux lfc-rust
+2026-11-02T14:42:52+01:00	c	launched	tmux lfc-c
+2026-11-02T14:43:47+01:00	rust	kickoff	/goal sent
+2026-11-02T14:43:47+01:00	c	kickoff	/goal sent
+2026-11-02T14:44:54+01:00	rust	config-check	ok: only effort high + claude-opus-5-5 in transcript
+2026-11-02T14:44:54+01:00	c	config-check	ok: only effort high + claude-opus-5-5 in transcript
+2026-11-02T15:02:47+01:00	rust	blocked	permission prompt: read outside working dir (Ruby Liquid reference at /var/lib/gems), waiting since ~14:46; transcript idle 976s at 15:02
+2026-11-02T15:16:30+01:00	rust	unblocked	answered prompt: Yes, keep allowing reads outside working dirs (user approved; user setting covers both arms)
+2026-11-02T16:32:54+01:00	rust	stopped	goal unmeetable: parser_errors suite caps at "500 of 1000" (all 1905 specs rated complexity 500); agent reports 1905 passes 0 failures, other suites 1000/1000, NOTES.md written, tree clean; agent asked a question (accept 500?) and is waiting. HEAD b65cb8e
+2026-11-02T16:32:54+01:00	c	stopped-turn	same finding: parser_errors 500 of 1000, 1905 passes 0 failures; other suites 1000/1000; turn ended 16:14 with a 30-min fuzz shell still running, goal still active. HEAD 76b2ba4
+2026-11-02T16:35:41+01:00	all	criterion	user: done = every in-scope spec passes (4313 default, 1905 parser_errors, 12 partials, 10 benchmarks, 0 failures) + NOTES.md + clean tree; complexity line ignored
+2026-11-02T16:35:41+01:00	rust	DONE	verified: 4313/1905/12/10 passes, 0 failures; NOTES.md 182 lines; tree clean; final commit b65cb8e (2026-11-02T16:21:21+01:00)
+2026-11-02T16:51:09+01:00	c	DONE	verified: 4313/1905/12/10 passes, 0 failures; NOTES.md 234 lines; tree clean; final commit 76b2ba4 (2026-11-02T16:13:52+01:00)
+2026-11-02T17:26:16+01:00	all	frozen	pushed impl/rust b65cb8e and impl/c 76b2ba4; transcripts, logs and usage CSVs in results/

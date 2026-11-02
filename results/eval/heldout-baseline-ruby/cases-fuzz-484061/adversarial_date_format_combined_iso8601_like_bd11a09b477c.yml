@@ -1,0 +1,10 @@
+---
+specs:
+- name: adversarial_date_format_combined_iso8601_like_bd11a09b477c
+  template: "{{ '0' | date: '%Y-%m-%dT%H:%M:%S' }}"
+  complexity: 360
+  hint: |-
+    Differential case generated from date_format_combined_iso8601_like (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/date-filters.yml:506).
+    Mutations: literal_boundary_string_2.
+    Classification: output_mismatch.
+  expected: '1970-01-01T00:00:00'

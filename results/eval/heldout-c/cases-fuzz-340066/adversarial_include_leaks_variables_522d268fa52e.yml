@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_include_leaks_variables_522d268fa52e
+  template: α{%- include '0' %}[{{ inner }}]ω
+  complexity: 220
+  hint: |-
+    Differential case generated from include_leaks_variables (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:356).
+    Mutations: text_boundary_unicode, literal_boundary_string_2, trim_markers_tag_open.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: "{% assign inner = 'leaked' %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

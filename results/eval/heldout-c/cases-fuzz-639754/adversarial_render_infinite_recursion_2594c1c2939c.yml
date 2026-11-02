@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_render_infinite_recursion_2594c1c2939c
+  template: "{% render 'é' %}"
+  complexity: 600
+  hint: |-
+    Differential case generated from render_infinite_recursion (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:694).
+    Mutations: literal_boundary_string_3.
+    Classification: error_category_mismatch.
+  filesystem:
+    recursive: "{% render 'recursive' %}"
+  features:
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - unknown

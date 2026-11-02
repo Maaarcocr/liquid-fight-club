@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_rendertagtest_test_render_does_not_mutate_parent_scope_983ca_27bf554cef5d
+  template: "{% render ' ' %}{{ __liquid_spec_missing__ }}"
+  complexity: 190
+  hint: |-
+    Differential case generated from RenderTagTest#test_render_does_not_mutate_parent_scope_983caf02 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4929).
+    Mutations: lookup_boundary_missing, literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: "{% assign inner = 1 %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

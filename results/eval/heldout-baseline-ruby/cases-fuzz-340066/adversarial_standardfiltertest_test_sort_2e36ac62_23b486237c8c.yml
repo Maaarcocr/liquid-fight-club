@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_sort_2e36ac62_23b486237c8c
+  template: |-
+    {{
+    a0 | sort, nil | sort }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_sort_2e36ac62 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:4105).
+    Mutations: delimiter_whitespace_output_open, filter_boundary_duplicate, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0:
+    - foo
+    - bar
+  expected: barfoo

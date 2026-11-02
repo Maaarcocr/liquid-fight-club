@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_downcase_on_nil_e61f1684cb49
+  template: "{{ missing | downcase, nil }}"
+  complexity: 40
+  hint: |-
+    Differential case generated from downcase_on_nil (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml:17).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

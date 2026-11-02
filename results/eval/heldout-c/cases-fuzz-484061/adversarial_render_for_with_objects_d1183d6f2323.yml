@@ -1,0 +1,21 @@
+---
+specs:
+- name: adversarial_render_for_with_objects_d1183d6f2323
+  template: "{%- render ' ' for products as product %}"
+  complexity: 268
+  hint: |-
+    Differential case generated from render_for_with_objects (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:616).
+    Mutations: literal_boundary_string_1, trim_markers_tag_open.
+    Classification: error_category_mismatch.
+  environment:
+    products:
+    - name: Widget
+      price: 10
+    - name: Gadget
+      price: 20
+  filesystem:
+    card: "{{ product.name }}:${{ product.price }} "
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

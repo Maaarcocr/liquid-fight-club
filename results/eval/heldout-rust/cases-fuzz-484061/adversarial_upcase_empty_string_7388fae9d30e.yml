@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_upcase_empty_string_7388fae9d30e
+  template: "{{ text | __liquid_spec_unknown_filter__, nil }}"
+  complexity: 40
+  hint: |-
+    Differential case generated from upcase_empty_string (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml:5).
+    Mutations: filter_boundary_unknown, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    text: ''
+  expected: ''

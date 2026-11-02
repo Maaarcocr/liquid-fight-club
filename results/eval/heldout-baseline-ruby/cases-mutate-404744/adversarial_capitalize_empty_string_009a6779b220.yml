@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_capitalize_empty_string_009a6779b220
+  template: "{{ text | capitalize, nil }}"
+  complexity: 45
+  hint: |-
+    Differential case generated from capitalize_empty_string (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml:27).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    text: ''
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

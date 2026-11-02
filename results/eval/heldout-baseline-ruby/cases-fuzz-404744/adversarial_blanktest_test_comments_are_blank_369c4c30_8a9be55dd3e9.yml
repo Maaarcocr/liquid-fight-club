@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_blanktest_test_comments_are_blank_369c4c30_8a9be55dd3e9
+  template: |-
+    {% for i in (1..10) - reversed
+    %} {% comment %} whatever {% endcomment %} {% endfor %}{% if true %} {% comment %} whatever {% endcomment %} {% endif %}
+  complexity: 140
+  hint: |-
+    Differential case generated from BlankTest#test_comments_are_blank_369c4c30 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:108).
+    Mutations: trim_markers_tag_close, for_boundary_reversed, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: ''

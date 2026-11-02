@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_property_access_hash_first_last_size_9b1eca63facc
+  template: |
+    h.first:{{
+    - h.first -}}
+    h.last:{{- h.last }}
+    h.size:{{- h.size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from property_access_hash_first_last_size (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:309).
+    Mutations: trim_markers_output_close, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    h:
+      a: 1
+      b: 2
+  expected: |
+    h.first:h.last:
+    h.size:2

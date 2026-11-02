@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_escape_f80cd6bb_74c423b915d8
+  template: α{{ __liquid_spec_missing__ | escape, nil }}ω
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_escape_f80cd6bb (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:1664).
+    Mutations: filter_boundary_extra_argument, lookup_boundary_missing, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  environment:
+    a0: "<strong>"
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

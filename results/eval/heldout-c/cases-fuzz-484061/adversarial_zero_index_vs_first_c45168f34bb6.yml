@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_zero_index_vs_first_c45168f34bb6
+  template: |-
+    {{
+    - __liquid_spec_missing__[0] }}
+  complexity: 60
+  hint: |-
+    Differential case generated from zero_index_vs_first (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/expressions.yml:295).
+    Mutations: lookup_boundary_missing, trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    list:
+    - first
+    - second
+  expected: ''

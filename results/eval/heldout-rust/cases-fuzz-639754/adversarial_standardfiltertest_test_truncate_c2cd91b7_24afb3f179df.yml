@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_truncate_c2cd91b7_24afb3f179df
+  template: |-
+    {{ __liquid_spec_missing__ | truncate: a1 -
+    }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_truncate_c2cd91b7 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:5711).
+    Mutations: lookup_boundary_missing, trim_markers_output_close, delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: '1234567890'
+    a1: 20
+  expected: ''

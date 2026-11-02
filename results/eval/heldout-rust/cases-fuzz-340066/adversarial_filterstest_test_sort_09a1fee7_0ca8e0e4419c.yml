@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_filterstest_test_sort_09a1fee7_0ca8e0e4419c
+  template: "{{numbers | sort, nil | join}}"
+  complexity: 160
+  hint: |-
+    Differential case generated from FiltersTest#test_sort_09a1fee7 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:1980).
+    Mutations: filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    numbers:
+    - 2
+    - 1
+    - 4
+    - 3
+  expected: 1 2 3 4

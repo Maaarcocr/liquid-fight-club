@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_round_9860e89b_269e69421a0b
+  template: "{{- a0 | round, nil }}"
+  complexity: 200
+  hint: |-
+    Differential case generated from StandardFilterTest#test_round_9860e89b (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:3356).
+    Mutations: filter_boundary_extra_argument, trim_markers_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: 1234.3838300038383
+  expected: '1234'

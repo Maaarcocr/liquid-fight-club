@@ -1,0 +1,27 @@
+---
+specs:
+- name: adversarial_recordedtest_test_for_loop_with_invalid_offset_e42506198_8ad861bc325b
+  template: |
+    {%- for i in array offset: "continue" -
+    %}
+      1st For Loop: {{
+    - i }}
+    {% endfor %}
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_for_loop_with_invalid_offset_e42506198 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:12935).
+    Mutations: trim_markers_output_open, delimiter_whitespace_tag_close, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    array:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    limit: 3
+  features:
+  - inline_errors
+  expected: 'Liquid error (line 1): invalid integer
+
+    '

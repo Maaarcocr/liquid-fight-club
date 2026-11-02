@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_lstrip_empty_string_d5e9ceff74fd
+  template: "{{ text | lstrip, nil }}"
+  complexity: 45
+  hint: |-
+    Differential case generated from lstrip_empty_string (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml:401).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    text: ''
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

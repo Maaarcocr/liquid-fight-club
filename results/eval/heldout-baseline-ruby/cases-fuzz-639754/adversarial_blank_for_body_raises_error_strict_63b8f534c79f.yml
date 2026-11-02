@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_blank_for_body_raises_error_strict_63b8f534c79f
+  template: "{% for i in (1..3) offset: xs limit: 1 %}{% endfor %}"
+  complexity: 750
+  hint: |-
+    Differential case generated from blank_for_body_raises_error_strict (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/blank_body_error_handling.yml:330).
+    Mutations: delimiter_whitespace_tag_close, for_boundary_limit_one.
+    Classification: error_category_mismatch.
+  environment:
+    xs: bad
+  features:
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - render

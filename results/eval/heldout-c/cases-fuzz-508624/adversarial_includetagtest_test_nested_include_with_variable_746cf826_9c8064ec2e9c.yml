@@ -1,0 +1,21 @@
+---
+specs:
+- name: adversarial_includetagtest_test_nested_include_with_variable_746cf826_9c8064ec2e9c
+  template: "{% include '' for products %}"
+  complexity: 190
+  hint: |-
+    Differential case generated from IncludeTagTest#test_nested_include_with_variable_746cf826 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4121).
+    Mutations: literal_boundary_string_0.
+    Classification: error_category_mismatch.
+  environment:
+    products:
+    - title: Draft 151cm
+    - title: Element 155cm
+  filesystem:
+    nested_product_template: 'Product: {{ nested_product_template.title }} {%include
+      ''details''%} '
+    details: details
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_for_basic_array_902c54f32fa1
+  template: "{% for item in items reversed reversed %}{{ item }}{% endfor %}"
+  complexity: 70
+  hint: |-
+    Differential case generated from for_basic_array (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:511).
+    Mutations: for_boundary_reversed, delimiter_whitespace_tag_open, for_boundary_reversed.
+    Classification: reference_ok_subject_error.
+  environment:
+    items:
+    - a
+    - b
+    - c
+  expected: cba

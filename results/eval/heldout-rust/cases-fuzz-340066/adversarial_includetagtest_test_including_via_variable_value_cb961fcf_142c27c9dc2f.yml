@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_includetagtest_test_including_via_variable_value_cb961fcf_142c27c9dc2f
+  template: "{%- assign page = '0' %}{% include page %}"
+  complexity: 190
+  hint: |-
+    Differential case generated from IncludeTagTest#test_including_via_variable_value_cb961fcf (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4091).
+    Mutations: literal_boundary_string_2, trim_markers_tag_open.
+    Classification: error_category_mismatch.
+  filesystem:
+    pick_a_source: from TestFileSystem
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

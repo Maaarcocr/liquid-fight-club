@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_standardtagtest_test_case_on_length_with_else_491675e2_701f791bbcdf
+  template: |-
+    {%
+    case a.empty? -
+    %}{% when true %}true{% when false %}false{% else %}else{% endcase %}
+  complexity: 90
+  hint: |-
+    Differential case generated from StandardTagTest#test_case_on_length_with_else_491675e2 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:6475).
+    Mutations: delimiter_whitespace_tag_open, trim_markers_tag_close, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: else

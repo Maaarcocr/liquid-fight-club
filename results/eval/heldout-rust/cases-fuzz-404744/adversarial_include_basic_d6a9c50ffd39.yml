@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_include_basic_d6a9c50ffd39
+  template: α{% include ' ' -%}ω
+  complexity: 215
+  hint: |-
+    Differential case generated from include_basic (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:302).
+    Mutations: trim_markers_tag_close, literal_boundary_string_1, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: hello from snippet
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

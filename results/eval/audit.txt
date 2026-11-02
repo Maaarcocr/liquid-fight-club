@@ -1,0 +1,9 @@
+4889 spec names, 188 long expected outputs
+SUMMARY rust: library name hits=0, library expected hits=0, tests name hits=0, tests expected hits=0
+/home/marco/lfc/eval-work/c: src/drops.c: spec name tablerowloop_col
+/home/marco/lfc/eval-work/c: src/drops.c: spec name tablerowloop_row
+/home/marco/lfc/eval-work/c: src/internal.h: spec name tablerowloop_col
+/home/marco/lfc/eval-work/c: src/internal.h: spec name tablerowloop_row
+/home/marco/lfc/eval-work/c: src/render.c: spec name tablerowloop_col
+/home/marco/lfc/eval-work/c: src/render.c: spec name tablerowloop_row
+SUMMARY c: library name hits=6, library expected hits=0, tests name hits=0, tests expected hits=0

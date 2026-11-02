@@ -1,0 +1,37 @@
+---
+specs:
+- name: adversarial_recordedtest_test_seven_nested_case_tags_1b247b46_0de55561883c
+  template: |
+    {% case 1 -
+    %}
+    {%- when 1 -%}
+      {%- case 2 -%}
+      {%- when 2 -%}
+        {%- case 3 -%}
+        {%- when 3 -%}
+          {%- case 4 -%}
+          {%- when 4 -%}
+            {%- case 5 -%}
+            {%- when 5 -%}
+              {%- case 6 -%}
+              {%- when 6 -%}
+                {%- case 7 -%}
+                {%- when 7 -%}
+                  OK
+                {%- endcase -%}
+              {%- endcase -%}
+            {%- endcase -%}
+          {%- endcase -%}
+        {%- endcase -%}
+      {%- endcase -%}
+    {%- else -%}
+      FAIL
+    {%- endcase -%}
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_seven_nested_case_tags_1b247b46 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:23687).
+    Mutations: trim_markers_tag_open, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  features:
+  - inline_errors
+  expected: OK

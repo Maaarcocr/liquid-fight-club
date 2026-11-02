@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_sort_on_nil_2328364a4937
+  template: |-
+    {{
+    missing | sort, nil -}}
+  complexity: 60
+  hint: |-
+    Differential case generated from sort_on_nil (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml:83).
+    Mutations: delimiter_whitespace_output_open, filter_boundary_extra_argument, trim_markers_output_close.
+    Classification: reference_ok_subject_error.
+  expected: ''

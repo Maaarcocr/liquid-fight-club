@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_url_encode_ad7c06ac_98281e478922
+  template: |-
+    {{ a0 | url_encode, nil | url_encode
+    }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_url_encode_ad7c06ac (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:6701).
+    Mutations: filter_boundary_duplicate, delimiter_whitespace_output_close, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0:
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

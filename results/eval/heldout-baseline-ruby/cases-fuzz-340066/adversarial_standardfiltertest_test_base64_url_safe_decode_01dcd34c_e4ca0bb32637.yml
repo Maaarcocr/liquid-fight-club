@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_base64_url_safe_decode_01dcd34c_e4ca0bb32637
+  template: |-
+    {{
+    a0 | base64_url_safe_decode, nil }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_base64_url_safe_decode_01dcd34c (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:339).
+    Mutations: filter_boundary_extra_argument, delimiter_whitespace_output_open.
+    Classification: error_category_mismatch.
+  environment:
+    a0: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXogQUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVogMTIzNDU2Nzg5MCAhQCMkJV4mKigpLT1fKy8_Ljo7W117fVx8
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

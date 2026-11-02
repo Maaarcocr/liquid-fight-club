@@ -1,0 +1,5 @@
+#9655067: cov: 9843 ft: 16910 corp: 4613 exec/s: 71 oom/timeout/crash: 9/8/0 time: 3501s job: 84 dft_time: 0
+#9657105: cov: 9843 ft: 16921 corp: 4617 exec/s: 119 oom/timeout/crash: 9/8/0 time: 3536s job: 85 dft_time: 0
+#9661387: cov: 9843 ft: 16921 corp: 4617 exec/s: 53 oom/timeout/crash: 10/8/0 time: 3617s job: 86 dft_time: 0
+INFO: fuzzed for 3626 seconds, wrapping up soon
+INFO: exiting: 70 time: 3626s

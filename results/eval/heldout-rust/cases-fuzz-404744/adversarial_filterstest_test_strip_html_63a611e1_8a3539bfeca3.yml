@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_filterstest_test_strip_html_63a611e1_8a3539bfeca3
+  template: "{{ var | strip_html, nil }}"
+  complexity: 80
+  hint: |-
+    Differential case generated from FiltersTest#test_strip_html_63a611e1 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:2054).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    var: "<b>bla blub</a>"
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

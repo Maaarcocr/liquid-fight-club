@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_strip_newlines_ac17b986_b9433ba3eac1
+  template: |-
+    {{
+
+    - a0 | strip_newlines }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_strip_newlines_ac17b986 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:5138).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: 123
+  expected: ''

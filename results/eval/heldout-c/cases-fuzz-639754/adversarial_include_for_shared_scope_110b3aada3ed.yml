@@ -1,0 +1,22 @@
+---
+specs:
+- name: adversarial_include_for_shared_scope_110b3aada3ed
+  template: |2
+
+    {% include ' ' for items %}{{ __liquid_spec_missing__ }}
+  complexity: 229
+  hint: |-
+    Differential case generated from include_for_shared_scope (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:456).
+    Mutations: text_boundary_newlines, lookup_boundary_missing, literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  environment:
+    items:
+    - a
+    - b
+    - c
+  filesystem:
+    counter: "{% assign count = count | default: 0 | plus: 1 %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

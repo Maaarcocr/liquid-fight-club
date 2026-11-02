@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_fs_nested_3_levels_d6fc46b48696
+  template: "{% include ' ' %}"
+  complexity: 320
+  hint: |-
+    Differential case generated from fs_nested_3_levels (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filesystem.yml:271).
+    Mutations: literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  filesystem:
+    a.liquid: "{% include 'b' %}"
+    b.liquid: "{% include 'c' %}"
+    c.liquid: Deep!
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

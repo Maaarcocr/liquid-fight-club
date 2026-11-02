@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_size_11612dc3_25a879a6c8e4
+  template: α{{ a0 | size, nil, nil }}ω
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_size_11612dc3 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:3566).
+    Mutations: filter_boundary_extra_argument, filter_boundary_extra_argument, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  environment:
+    a0: 0
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

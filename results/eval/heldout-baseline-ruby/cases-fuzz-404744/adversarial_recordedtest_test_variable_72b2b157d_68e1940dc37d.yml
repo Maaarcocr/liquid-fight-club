@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_recordedtest_test_variable_72b2b157d_68e1940dc37d
+  template: |-
+    {{
+    - __liquid_spec_missing__ }}
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_variable_72b2b157d (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:23485).
+    Mutations: lookup_boundary_missing, trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    x: OK
+  features:
+  - inline_errors
+  expected: ''

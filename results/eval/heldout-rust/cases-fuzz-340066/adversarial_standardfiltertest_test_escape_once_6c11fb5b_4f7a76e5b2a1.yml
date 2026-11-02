@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_escape_once_6c11fb5b_4f7a76e5b2a1
+  template: "{{ __liquid_spec_missing__ | escape_once, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_escape_once_6c11fb5b (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:1773).
+    Mutations: lookup_boundary_missing, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0:
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

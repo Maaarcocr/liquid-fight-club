@@ -1,0 +1,21 @@
+---
+specs:
+- name: adversarial_filter_vs_property_array_equivalence_5ab2284ead5d
+  template: |
+    filter first:{{- arr | first, nil }}, property first:{{- arr.first }}
+    filter last:{{- arr | last }}, property last:{{- arr.last }}
+    filter size:{{- arr | size }}, property size:{{- arr.size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_vs_property_array_equivalence (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:434).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    arr:
+    - 10
+    - 20
+    - 30
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

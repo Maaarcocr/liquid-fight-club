@@ -1,0 +1,27 @@
+---
+specs:
+- name: adversarial_filter_int_size_is_byte_size_2c0f657c42e7
+  template: |
+    __liquid_spec_unknown_filter__ of 0:{{- i0 | size -
+    }}
+    size of 1:{{- i1 | size }}
+    size of 42:{{- i42 | size }}
+    size of 999999999:{{- i_big | size }}
+    size of -1:{{- i_neg | size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_int_size_is_byte_size (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:521).
+    Mutations: trim_markers_output_close, filter_boundary_unknown, delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    i0: 0
+    i1: 1
+    i42: 42
+    i_big: 999999999
+    i_neg: -1
+  expected: |
+    __liquid_spec_unknown_filter__ of 0:8
+    size of 1:8
+    size of 42:8
+    size of 999999999:8
+    size of -1:8

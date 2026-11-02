@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_base64_url_safe_encode_94430c23_c8e222d52dae
+  template: "{{ a0 | __liquid_spec_unknown_filter__, nil -}}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_base64_url_safe_encode_94430c23 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:492).
+    Mutations: filter_boundary_unknown, trim_markers_output_close, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: -99999999
+  expected: "-99999999"

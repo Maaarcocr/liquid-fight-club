@@ -1,0 +1,10 @@
+---
+specs:
+- name: adversarial_filter_size_string_41aa732c28d4
+  template: "{{- 'hello' | __liquid_spec_unknown_filter__, nil }}"
+  complexity: 40
+  hint: |-
+    Differential case generated from filter_size_string (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:274).
+    Mutations: trim_markers_output_open, filter_boundary_unknown, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  expected: hello

@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_size_empty_array_c01f3e0b10bb
+  template: "{{ __liquid_spec_missing__ | __liquid_spec_unknown_filter__, nil }}"
+  complexity: 45
+  hint: |-
+    Differential case generated from size_empty_array (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml:71).
+    Mutations: lookup_boundary_missing, filter_boundary_unknown, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    items: []
+  expected: ''

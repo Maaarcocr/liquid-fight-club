@@ -1,0 +1,11 @@
+name	parse_us	context_us	render_us	output_bytes	output_fnv1a
+bench_dynamic_partials	1.07	5.96	19.07	1803	29bf9a6f428e5dbe
+bench_liquid_tag_inventory_report	14.32	0.08	39.20	467	382659b7fbd41e82
+bench_liquid_tag_leaderboard	9.71	2.12	21.33	252	9365e0939ea0bebe
+bench_storefront_cart_page	38.32	6.12	22.44	6227	921d39658e5f9bb8
+bench_storefront_cms_page	3.27	14.63	50.97	8147	476d1871a817bd75
+bench_storefront_collection_page	42.89	17.72	76.78	6101	5b42c0edf984a841
+bench_storefront_order_email	42.46	4.58	11.21	5213	a9a1bfcd84e177ba
+bench_storefront_product_page	61.51	29.60	66.28	15123	bc38f8a9cb88bd89
+shopify_theme_full_page	10.30	11828.25	3.22	13271	a9f5b9fc81898e1d
+shopify_theme_product_page	27.31	11778.51	37.12	9563	bd2bb897f2d0002e

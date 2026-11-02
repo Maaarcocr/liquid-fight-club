@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_replace_overlapping_fb1fc0224758
+  template: |-
+    α{{ text | replace: 'aa', 'X' -
+    }}ω
+  complexity: 300
+  hint: |-
+    Differential case generated from replace_overlapping (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/string-filters.yml:269).
+    Mutations: text_boundary_unicode, trim_markers_output_close, delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    text: aaaa
+  expected: αXXω

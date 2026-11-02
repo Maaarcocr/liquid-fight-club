@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_dynamic_include_nested_dynamic_inside_dynamic_dba607385369
+  template: α{% assign tpl = '0' %}{% include tpl %}ω
+  complexity: 600
+  hint: |-
+    Differential case generated from dynamic_include_nested_dynamic_inside_dynamic (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic-partials.yml:457).
+    Mutations: literal_boundary_string_2, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  environment:
+    inner_tpl: content
+  filesystem:
+    wrapper: "{% include inner_tpl %}"
+    content: "[CONTENT]"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_default_65b543df_71bcb97bcdc4
+  template: "{{ a0 | default, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_default_65b543df (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:1250).
+    Mutations: filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: foo
+  expected: foo

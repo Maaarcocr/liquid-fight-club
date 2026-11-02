@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_recordedtest_test_if_elsif_else_1a0846cb9_91fb9daeb2fa
+  template: |-
+    α{% if x -
+    %}if{% elsif y %}elsif{% else %}else{% endif %}ω
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_if_elsif_else_1a0846cb9 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:13185).
+    Mutations: text_boundary_unicode, trim_markers_tag_close, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    x: false
+    "y": false
+  features:
+  - inline_errors
+  expected: αelseω

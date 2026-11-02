@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_newline_to_br_52938eb3_7ba653729085
+  template: "{{ a0 | newline_to_br, nil | newline_to_br }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_newline_to_br_52938eb3 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:2882).
+    Mutations: filter_boundary_duplicate, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0: -1234.003030303
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

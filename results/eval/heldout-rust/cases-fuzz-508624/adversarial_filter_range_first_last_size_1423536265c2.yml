@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_filter_range_first_last_size_1423536265c2
+  template: |
+    {%- assign r = (1..5) -
+    %}
+    range, first:{{- r | first }}
+    range, last:{{- r | last }}
+    range, size:{{- r | size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_range_first_last_size (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:331).
+    Mutations: delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: |2
+
+    range, first:1
+    range, last:5
+    range, size:5

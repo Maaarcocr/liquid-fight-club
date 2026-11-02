@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_filter_bool_false_global_first_last_size_568665b70a5e
+  template: |
+    bool, first:{{- b | first, nil }}
+    bool, last:{{- b | last }}
+    bool, size:{{- b | size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_bool_false_global_first_last_size (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:59).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    b: false
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

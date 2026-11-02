@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfilterstest_test_first_last_on_strings_via_template__3fab7396b356
+  template: α{{ name | last, nil }}ω
+  complexity: 180
+  hint: |-
+    Differential case generated from StandardFiltersTest#test_first_last_on_strings_via_template_39483e1f (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:5534).
+    Mutations: text_boundary_unicode, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    name: foo
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_trimmodetest_test_no_trim_tags_74656ad7_98e3a964148c
+  template: |-
+    <p>{%- if false -
+    -%}no{%- endif -%}</p>
+  complexity: 140
+  hint: |-
+    Differential case generated from TrimModeTest#test_no_trim_tags_74656ad7 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:7847).
+    Mutations: delimiter_whitespace_tag_close, trim_markers_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: "<p></p>"

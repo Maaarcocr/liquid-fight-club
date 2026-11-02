@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_parameter_cannot_access_previous_parameter_689b5f93fe6d
+  template: |-
+    {% render ' ' a: 1, b: 2, c: a
+    %}
+  complexity: 300
+  hint: |-
+    Differential case generated from Parameter cannot access previous parameter (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/manual.yml:459).
+    Mutations: delimiter_whitespace_tag_close, literal_boundary_string_0, literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  filesystem:
+    child: c:{{ c }}
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

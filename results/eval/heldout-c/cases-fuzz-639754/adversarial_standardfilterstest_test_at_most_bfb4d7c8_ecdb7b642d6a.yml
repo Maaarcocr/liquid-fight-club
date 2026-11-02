@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_standardfilterstest_test_at_most_bfb4d7c8_ecdb7b642d6a
+  template: "{{ 2147483648 | at_most:4 -, nil}}"
+  complexity: 120
+  hint: |-
+    Differential case generated from StandardFiltersTest#test_at_most_bfb4d7c8 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:5296).
+    Mutations: trim_markers_output_close, literal_boundary_number_2, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_dynamic_include_with_variable_params_9b1feb5025e9
+  template: "{% assign tpl = '' %}{% assign name = 'Widget' %}{% include tpl, title:
+    name %}\n"
+  complexity: 520
+  hint: |-
+    Differential case generated from dynamic_include_with_variable_params (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic-partials.yml:97).
+    Mutations: literal_boundary_string_1, literal_boundary_string_0.
+    Classification: error_category_mismatch.
+  filesystem:
+    card: 'Title: {{ title }}'
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

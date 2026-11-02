@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_render_with_variable_expression_1319ad0e60fc
+  template: "{% assign count = items | size -%}{% render '0', value: count %}"
+  complexity: 192
+  hint: |-
+    Differential case generated from render_with_variable_expression (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:33).
+    Mutations: literal_boundary_string_3, literal_boundary_string_2, trim_markers_tag_close.
+    Classification: error_category_mismatch.
+  environment:
+    items:
+    - a
+    - b
+    - c
+  filesystem:
+    show: 'Count: {{ value }}'
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

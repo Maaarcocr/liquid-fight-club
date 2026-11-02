@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_uniq_30a995e3_4116075badc5
+  template: |-
+    {{
+    - a0 | uniq }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_uniq_30a995e3 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:6067).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: 1234.3838300038383
+  expected: ''

@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_last_on_nil_14c0acf2cc0a
+  template: "{{- missing | last, nil }}"
+  complexity: 50
+  hint: |-
+    Differential case generated from last_on_nil (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml:61).
+    Mutations: trim_markers_output_open, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

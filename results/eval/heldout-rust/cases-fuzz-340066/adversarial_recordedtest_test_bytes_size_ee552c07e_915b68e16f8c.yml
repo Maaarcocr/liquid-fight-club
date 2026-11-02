@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_recordedtest_test_bytes_size_ee552c07e_915b68e16f8c
+  template: |2
+
+    {{
+    - name.size }}
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_bytes_size_ee552c07e (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:3771).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open, text_boundary_newlines.
+    Classification: reference_ok_subject_error.
+  environment:
+    value: !binary |-
+      8J+Ri8A=
+  features:
+  - inline_errors
+  expected: "\n\n"

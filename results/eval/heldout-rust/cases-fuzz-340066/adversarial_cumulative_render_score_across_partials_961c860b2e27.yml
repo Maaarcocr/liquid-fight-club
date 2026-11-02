@@ -1,0 +1,22 @@
+---
+specs:
+- name: adversarial_cumulative_render_score_across_partials_961c860b2e27
+  template: |2
+
+    {% render ' ' %}{% render 'b' %}{% render 'c' %}
+  complexity: 1000
+  hint: |-
+    Differential case generated from cumulative_render_score_across_partials (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/resource-limits.yml:11).
+    Mutations: literal_boundary_string_0, literal_boundary_string_1, text_boundary_newlines.
+    Classification: error_category_mismatch.
+  filesystem:
+    a: "{% for i in (1..10) %}x{% endfor %}"
+    b: "{% for i in (1..10) %}x{% endfor %}"
+    c: "{% for i in (1..10) %}x{% endfor %}"
+  features:
+  - shopify_resource_limits
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - unknown

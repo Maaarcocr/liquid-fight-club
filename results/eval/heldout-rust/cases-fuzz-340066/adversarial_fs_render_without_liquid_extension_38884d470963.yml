@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_fs_render_without_liquid_extension_38884d470963
+  template: "{% render '0' %}"
+  complexity: 190
+  hint: |-
+    Differential case generated from fs_render_without_liquid_extension (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filesystem.yml:64).
+    Mutations: literal_boundary_string_0, literal_boundary_string_3, literal_boundary_string_2.
+    Classification: error_category_mismatch.
+  filesystem:
+    foo.liquid: Render without ext
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

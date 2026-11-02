@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_liquidtagtest_test_nested_liquid_liquid_is_not_skipped_if_us_eed1ec33be4d
+  template: |-
+    α{% liquid liquid liquid echo liquid -
+    %}
+    ω
+  complexity: 130
+  hint: |-
+    Differential case generated from LiquidTagTest#test_nested_liquid_liquid_is_not_skipped_if_used_in_non_tag_position_a49dffab (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4430).
+    Mutations: delimiter_whitespace_tag_close, text_boundary_unicode, trim_markers_tag_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    liquid: liquid
+  expected: |-
+    αliquid
+    ω

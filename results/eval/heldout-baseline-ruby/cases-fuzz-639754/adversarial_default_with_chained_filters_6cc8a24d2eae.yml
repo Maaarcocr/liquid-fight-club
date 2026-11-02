@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_default_with_chained_filters_6cc8a24d2eae
+  template: "{{ missing | upcase, nil | default: 'NONE' }}"
+  complexity: 120
+  hint: |-
+    Differential case generated from default_with_chained_filters (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml:256).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

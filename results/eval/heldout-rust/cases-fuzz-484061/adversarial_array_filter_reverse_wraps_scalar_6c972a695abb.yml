@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_array_filter_reverse_wraps_scalar_6c972a695abb
+  template: "{{ 5 | reverse, nil }}"
+  complexity: 335
+  hint: |-
+    Differential case generated from array_filter_reverse_wraps_scalar (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filter_argument_semantics.yml:95).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

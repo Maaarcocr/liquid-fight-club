@@ -1,0 +1,17 @@
+arm	mode	executed	divergences	net_of_baseline	net_per_1000	fixed_vs_baseline
+rust	fuzz	3896	321	93	23.87	7
+#   00cdd517e217 error_category_mismatch: '{% include "é", arg1: "value1", arg2: "value2" %}'
+#   06517c02fd4d error_category_mismatch: "[{%-\nrender ' ' for missing %}]"
+#   0a389f11fbb1 error_category_mismatch: "α{%- assign a = -1 -%}{%- assign s1 = self -%}{%- render '', outer: s1 -%}ω"
+#   0a7c97234f14 error_category_mismatch: "{%\ninclude 'é'\n%}"
+#   0c17260cf4e0 error_category_mismatch: "{% render 'é'\n%}{{ __liquid_spec_missing__.name }}"
+rust	mutate	5000	18	0	0.00	0
+rust	stress	500	0	0	0.00	0
+c	fuzz	3896	321	93	23.87	7
+#   00cdd517e217 error_category_mismatch: '{% include "é", arg1: "value1", arg2: "value2" %}'
+#   06517c02fd4d error_category_mismatch: "[{%-\nrender ' ' for missing %}]"
+#   0a389f11fbb1 error_category_mismatch: "α{%- assign a = -1 -%}{%- assign s1 = self -%}{%- render '', outer: s1 -%}ω"
+#   0a7c97234f14 error_category_mismatch: "{%\ninclude 'é'\n%}"
+#   0c17260cf4e0 error_category_mismatch: "{% render 'é'\n%}{{ __liquid_spec_missing__.name }}"
+c	mutate	5000	18	0	0.00	0
+c	stress	500	0	0	0.00	0

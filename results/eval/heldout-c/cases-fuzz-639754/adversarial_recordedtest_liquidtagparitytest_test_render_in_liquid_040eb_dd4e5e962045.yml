@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_recordedtest_liquidtagparitytest_test_render_in_liquid_040eb_dd4e5e962045
+  template: |-
+    {% liquid
+    render '', name: 'World'
+    %}
+  complexity: 500
+  hint: |-
+    Differential case generated from RecordedTest#LiquidTagParityTest#test_render_in_liquid_040ebc79 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/liquid_tag.yml:751).
+    Mutations: literal_boundary_string_0.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: Hello {{ name }}
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

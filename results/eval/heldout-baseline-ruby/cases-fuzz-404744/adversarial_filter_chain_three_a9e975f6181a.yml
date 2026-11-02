@@ -1,0 +1,11 @@
+---
+specs:
+- name: adversarial_filter_chain_three_a9e975f6181a
+  template: "{{ '  hello  ' | __liquid_spec_unknown_filter__, nil | upcase | append:
+    '!' }}"
+  complexity: 80
+  hint: |-
+    Differential case generated from filter_chain_three (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:594).
+    Mutations: filter_boundary_unknown, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  expected: "  HELLO  !"

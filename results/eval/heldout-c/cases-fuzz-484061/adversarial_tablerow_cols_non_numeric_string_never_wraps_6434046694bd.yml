@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_tablerow_cols_non_numeric_string_never_wraps_6434046694bd
+  template: |-
+    {% tablerow a in (1..4) cols: xs -
+    %}{{ a }}{% endtablerow %}
+  complexity: 700
+  hint: |-
+    Differential case generated from tablerow_cols_non_numeric_string_never_wraps (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/tablerow_attribute_coercion.yml:38).
+    Mutations: trim_markers_tag_close, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    xs: bad
+  expected: |
+    <tr class="row1">
+    <td class="col1">1</td><td class="col2">2</td><td class="col3">3</td><td class="col4">4</td></tr>

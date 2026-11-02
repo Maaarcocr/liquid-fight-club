@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_recordedtest_test_bool_literal_9766e10de_fe3d4f822774
+  template: |-
+    α{{
+    - true }}, {{ false }}ω
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_bool_literal_9766e10de (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:3689).
+    Mutations: trim_markers_output_open, text_boundary_unicode, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  features:
+  - inline_errors
+  expected: α, falseω

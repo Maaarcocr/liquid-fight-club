@@ -1,0 +1,19 @@
+commit,time,input,cache_write,cache_read,output,total,subject
+4712cc1ac7,2026-11-01T17:33:44+01:00,0,0,0,0,0,Initial commit
+86bef43080,2026-11-01T17:01:11+00:00,0,0,0,0,0,Scaffold: Liquid in C
+d55185dbd7,2026-11-02T15:30:10+01:00,172,509676,26985123,306219,27801190,"Liquid engine in C: parser, renderer, filters, JSON-RPC server, C ABI"
+2bae1b77f7,2026-11-02T15:30:43+01:00,178,512122,28601531,308188,29422019,Match Ruby Integer() parsing of NUL-terminated big literals
+2c99ad7ef6,2026-11-02T15:43:16+01:00,258,587450,51828330,358922,52774960,Harden against hostile input; differential and fuzz testing tools
+1721aba41b,2026-11-02T15:47:07+01:00,280,602599,58683459,374976,59661314,Bound quadratic copying via the step budget; raise nested-data depth caps; NOTES.md
+8b223d5051,2026-11-02T15:51:47+01:00,302,636764,65806508,395524,66839098,Pin templates and render data so rendering is read-only on them; cap strftime output
+7ae686c02c,2026-11-02T15:59:36+01:00,338,682511,78148248,425562,79256659,Match Ruby indexing semantics in collection filters; grammar-based differential fuzzing
+48bccd0fb1,2026-11-02T16:03:06+01:00,360,698086,86048389,437566,87184401,Prefix internal symbols (lq_) so the static library does not pollute the global namespace; more differential generators
+e99c5d98c3,2026-11-02T16:04:43+01:00,368,704491,88962467,444783,90112109,"API unit tests (make test); NOTES: read-only templates/data, test tooling"
+c9e4f4f4bc,2026-11-02T16:05:12+01:00,372,707322,90430094,446897,91584685,README
+cf3f0be137,2026-11-02T16:07:13+01:00,386,718574,95613335,456030,96788325,Full Unicode case mapping tables for upcase/downcase/capitalize
+b89f4e7525,2026-11-02T16:07:50+01:00,390,721711,97108153,458646,98288900,Exact String#inspect escaping table for all code points
+d651295ec1,2026-11-02T16:09:12+01:00,396,726001,99361436,461715,100549548,Integer#size for bignums counts magnitude bytes
+3dfb128dd2,2026-11-02T16:10:03+01:00,402,729415,101627429,465130,102822376,Saturating line-number arithmetic for multi-gigabyte templates
+a4d319b76a,2026-11-02T16:11:17+01:00,410,734556,104667589,467954,105870509,NOTES: refresh limits and testing summary
+9b83ab08b7,2026-11-02T16:12:09+01:00,418,743187,107738448,470881,108952934,Remove leftover cruft in parser and filters
+76b2ba451f,2026-11-02T16:13:52+01:00,434,750287,113930321,477038,115158080,date: support bignum Unix timestamps (whole-day offset)

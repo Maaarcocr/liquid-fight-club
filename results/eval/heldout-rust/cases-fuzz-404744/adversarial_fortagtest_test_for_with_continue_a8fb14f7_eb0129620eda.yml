@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_fortagtest_test_for_with_continue_a8fb14f7_eb0129620eda
+  template: "{% for i in array.items limit: 0 reversed %}{% continue %}{{ i }}{% endfor
+    %}"
+  complexity: 120
+  hint: |-
+    Differential case generated from ForTagTest#test_for_with_continue_a8fb14f7 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:2519).
+    Mutations: for_boundary_limit_zero, for_boundary_reversed.
+    Classification: reference_ok_subject_error.
+  environment:
+    array:
+      items:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+  expected: ''

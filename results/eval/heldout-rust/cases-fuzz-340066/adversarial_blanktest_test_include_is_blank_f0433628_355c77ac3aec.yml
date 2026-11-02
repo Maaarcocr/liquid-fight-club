@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_blanktest_test_include_is_blank_f0433628_355c77ac3aec
+  template: |-
+    {% for i in (1..10)
+    %}{% include '0' %}{% endfor %}{% if true %}{% include 'foobar' %}{% endif %}
+  complexity: 190
+  hint: |-
+    Differential case generated from BlankTest#test_include_is_blank_f0433628 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:147).
+    Mutations: delimiter_whitespace_tag_close, literal_boundary_string_2.
+    Classification: error_category_mismatch.
+  filesystem:
+    foobar: foobar
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

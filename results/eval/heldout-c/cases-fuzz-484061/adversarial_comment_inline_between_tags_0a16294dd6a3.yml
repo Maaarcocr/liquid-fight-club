@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_comment_inline_between_tags_0a16294dd6a3
+  template: |2
+
+    {%- assign a = 2147483648 -
+    %}{%- # separator comment -%}{%- assign b = 2 -%}{{ a }}{{ b }}
+  complexity: 114
+  hint: |-
+    Differential case generated from comment_inline_between_tags (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:1558).
+    Mutations: literal_boundary_number_2, text_boundary_newlines, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: '21474836482
+
+    '

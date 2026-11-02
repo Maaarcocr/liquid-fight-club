@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_base64_url_safe_decode_567959c5_0a479ba939a1
+  template: "{{ __liquid_spec_missing__ | base64_url_safe_decode, nil, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_base64_url_safe_decode_567959c5 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:351).
+    Mutations: filter_boundary_extra_argument, lookup_boundary_missing, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0: 4pyF
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

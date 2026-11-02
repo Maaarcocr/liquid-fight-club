@@ -1,0 +1,21 @@
+---
+specs:
+- name: adversarial_dynamic_include_for_with_alias_596e59fa1afa
+  template: |-
+    {% assign tpl = ''
+    %}{% include tpl for products as product %}
+  complexity: 530
+  hint: |-
+    Differential case generated from dynamic_include_for_with_alias (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic-partials.yml:150).
+    Mutations: literal_boundary_string_0, delimiter_whitespace_tag_close.
+    Classification: error_category_mismatch.
+  environment:
+    products:
+    - Widget
+    - Gadget
+  filesystem:
+    card: "[{{ product }}]"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,25 @@
+---
+specs:
+- name: adversarial_fortagtest_test_dynamic_variable_limiting_225c0d3e_f4bf012f9de0
+  template: "{% for i in array limit: limit offset: offset limit: 0 - limit: 1 %}{{
+    i }}{%endfor%}"
+  complexity: 130
+  hint: |-
+    Differential case generated from ForTagTest#test_dynamic_variable_limiting_225c0d3e (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:2078).
+    Mutations: for_boundary_limit_zero, trim_markers_tag_close, for_boundary_limit_one.
+    Classification: reference_ok_subject_error.
+  environment:
+    array:
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 0
+    limit: 2
+    offset: 2
+  expected: '3'

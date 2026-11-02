@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_blanktest_test_include_is_blank_0679f444_544c8f0bb44b
+  template: "{% for i in (1..10) - limit: 0 limit: 1 %} {% include ' ' %} {% endfor
+    %}{% if true %} {% include ' ' %} {% endif %}"
+  complexity: 190
+  hint: |-
+    Differential case generated from BlankTest#test_include_is_blank_0679f444 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:128).
+    Mutations: trim_markers_tag_close, for_boundary_limit_zero, for_boundary_limit_one.
+    Classification: reference_ok_subject_error.
+  filesystem:
+    " ": " "
+  expected: "      "

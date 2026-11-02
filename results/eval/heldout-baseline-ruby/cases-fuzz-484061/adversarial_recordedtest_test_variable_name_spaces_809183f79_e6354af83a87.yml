@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_recordedtest_test_variable_name_spaces_809183f79_e6354af83a87
+  template: "{{-- __liquid_spec_missing__ }}{{ bar }}{{ baz }}"
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_variable_name_spaces_809183f79 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:23502).
+    Mutations: trim_markers_output_open, lookup_boundary_missing, trim_markers_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    'foo ': foo
+    'bar  ': bar
+    baz: baz
+  features:
+  - inline_errors
+  expected: baz

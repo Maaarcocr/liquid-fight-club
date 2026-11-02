@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_default_9ee110c1_703ff895782f
+  template: |-
+    {{
+    a0 | default: a1, allow_false: true - | default: a1, allow_false: true -}}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_default_9ee110c1 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:1304).
+    Mutations: delimiter_whitespace_output_open, trim_markers_output_close, filter_boundary_duplicate.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: false
+    a1: bar
+    a2:
+      allow_false: true
+  expected: 'false'

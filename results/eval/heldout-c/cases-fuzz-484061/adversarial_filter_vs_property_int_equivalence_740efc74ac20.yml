@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_filter_vs_property_int_equivalence_740efc74ac20
+  template: |
+    filter first:{{
+    - i | first }}, property first:{{- __liquid_spec_missing__.first }}
+    filter last:{{- i | last }}, property last:{{- i.last }}
+    filter size:{{- i | size }}, property size:{{- i.size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_vs_property_int_equivalence (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:480).
+    Mutations: delimiter_whitespace_output_open, lookup_boundary_missing.
+    Classification: reference_ok_subject_error.
+  environment:
+    i: 42
+  expected: |
+    filter first:, property first:
+    filter last:, property last:
+    filter size:8, property size:8

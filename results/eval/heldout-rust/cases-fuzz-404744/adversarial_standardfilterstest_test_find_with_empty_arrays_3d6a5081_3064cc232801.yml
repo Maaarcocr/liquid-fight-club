@@ -1,0 +1,19 @@
+---
+specs:
+- name: adversarial_standardfilterstest_test_find_with_empty_arrays_3d6a5081_3064cc232801
+  template: |
+    {% assign product = products}
+    {%- unless product -%}
+      Product not found.
+    {%- endunless -%}
+  complexity: 180
+  hint: |-
+    Differential case generated from StandardFiltersTest#test_find_with_empty_arrays_3d6a5081 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:5480).
+    Mutations: trim_markers_tag_open, filter_boundary_remove.
+    Classification: error_category_mismatch.
+  environment:
+    products: []
+  errors:
+    render_error:
+    - unknown_tag
+  error_mode: strict2

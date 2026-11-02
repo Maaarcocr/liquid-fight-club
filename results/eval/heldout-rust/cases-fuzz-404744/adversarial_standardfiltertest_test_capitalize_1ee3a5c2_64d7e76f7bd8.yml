@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_capitalize_1ee3a5c2_64d7e76f7bd8
+  template: "{{ a0 | capitalize | capitalize, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_capitalize_1ee3a5c2 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:556).
+    Mutations: filter_boundary_extra_argument, filter_boundary_duplicate.
+    Classification: error_category_mismatch.
+  environment:
+    a0: 0
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

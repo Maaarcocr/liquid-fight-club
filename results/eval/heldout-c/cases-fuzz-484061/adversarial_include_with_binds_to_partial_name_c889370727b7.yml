@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_include_with_binds_to_partial_name_c889370727b7
+  template: |-
+    {%
+    include ' ' with featured
+    %}
+  complexity: 225
+  hint: |-
+    Differential case generated from include_with_binds_to_partial_name (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:406).
+    Mutations: delimiter_whitespace_tag_close, literal_boundary_string_1, delimiter_whitespace_tag_open.
+    Classification: error_category_mismatch.
+  environment:
+    featured: Widget
+  filesystem:
+    product: 'Product: {{ product }}'
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_filter_undefined_first_last_size_07243723b239
+  template: |
+    undefined, __liquid_spec_unknown_filter__:{{
+    - undefined | first }}
+    undefined, last:{{- undefined | last }}
+    undefined, size:{{- undefined | size }}
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_undefined_first_last_size (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:353).
+    Mutations: delimiter_whitespace_output_open, filter_boundary_unknown.
+    Classification: reference_ok_subject_error.
+  expected: |
+    undefined, __liquid_spec_unknown_filter__:
+    undefined, last:
+    undefined, size:0

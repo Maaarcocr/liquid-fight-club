@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_rendertagtest_test_optional_commas_583e97ac_8d6f41f20c11
+  template: |2
+
+    {% render " "  arg1: "value1"  arg2: "value2"
+    %}
+  complexity: 190
+  hint: |-
+    Differential case generated from RenderTagTest#test_optional_commas_583e97ac (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4880).
+    Mutations: literal_boundary_string_1, delimiter_whitespace_tag_close, text_boundary_newlines.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: hello {{ arg1 }} {{ arg2 }}
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

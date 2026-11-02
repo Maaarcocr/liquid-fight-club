@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_variabletest_test_unless_tag_calls_to_liquid_value_037c21b9_f419909ee5ee
+  template: |-
+    {% unless foo -
+    %}true{% endunless %}
+  complexity: 220
+  hint: |-
+    Differential case generated from VariableTest#test_unless_tag_calls_to_liquid_value_037c21b9 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:8781).
+    Mutations: trim_markers_tag_close, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    foo:
+      'instantiate:BooleanDrop:':
+        value: false
+  features:
+  - drops
+  expected: 'true'

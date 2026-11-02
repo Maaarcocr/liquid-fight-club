@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_chain_array_math_aggregation_5aedd864498e
+  template: |-
+    {{
+    prices | map: 'amount'  | map: 'amount' | sum | divided_by: prices.size | round: 2147483648 }}
+  complexity: 355
+  hint: |-
+    Differential case generated from chain_array_math_aggregation (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-chains.yml:235).
+    Mutations: delimiter_whitespace_output_open, literal_boundary_number_2, filter_boundary_duplicate.
+    Classification: error_category_mismatch.
+  environment:
+    prices:
+    - amount: 10
+    - amount: 20
+    - amount: 30
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

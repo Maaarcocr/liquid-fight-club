@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_for_parentloop_nil_in_render_b528b6b39a6b
+  template: |-
+    {%-
+    for i in (1..2) %}{% render '' %}{% endfor %}
+  complexity: 334
+  hint: |-
+    Differential case generated from for_parentloop_nil_in_render (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/for-loops.yml:178).
+    Mutations: literal_boundary_string_0, delimiter_whitespace_tag_open, trim_markers_tag_open.
+    Classification: error_category_mismatch.
+  filesystem:
+    inner: "{% for j in (1..2) %}{{ forloop.parentloop.index }}-{{ forloop.index }}
+      {% endfor %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

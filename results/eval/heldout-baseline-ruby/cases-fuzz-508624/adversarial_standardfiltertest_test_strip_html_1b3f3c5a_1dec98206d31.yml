@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_strip_html_1b3f3c5a_1dec98206d31
+  template: |2
+
+    α{{ a0 | strip_html, nil }}ω
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_strip_html_1b3f3c5a (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:4863).
+    Mutations: text_boundary_unicode, text_boundary_newlines, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0: "<div id='test'>test</div>"
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

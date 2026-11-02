@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_last_e785a892_99bb02166640
+  template: "{{ a0 | last, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_last_e785a892 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:2654).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0: true
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_recordedtest_test_for_loop_with_offset_that_is_an_undefined__77cdc64332d2
+  template: "{% for item in array offset:a limit: 1 reversed -%}NO{% endfor %}"
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_for_loop_with_offset_that_is_an_undefined_variable_d29b07005 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:2256).
+    Mutations: for_boundary_limit_one, for_boundary_reversed, trim_markers_tag_close.
+    Classification: reference_ok_subject_error.
+  features:
+  - inline_errors
+  expected: ''

@@ -1,0 +1,1432 @@
+{
+  "mode": "fuzz",
+  "seed": 484061,
+  "generated": 1000,
+  "executed": 794,
+  "passed": 729,
+  "failed": 65,
+  "skipped": 206,
+  "failures": [
+    {
+      "id": "a957ef978f85",
+      "parent": "decrement_basic",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "text_boundary_unicode",
+        "trim_markers_tag_close",
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "α{% decrement counter -\n%}{% decrement counter %}{% decrement counter %}ω",
+      "reference": {
+        "status": "ok",
+        "output": "α-1-1-2ω"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"counter -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_decrement_basic_a957ef978f85.yml"
+    },
+    {
+      "id": "6c972a695abb",
+      "parent": "array_filter_reverse_wraps_scalar",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filter_argument_semantics.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ 5 | reverse, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ 5 | reverse, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_array_filter_reverse_wraps_scalar_6c972a695abb.yml"
+    },
+    {
+      "id": "916093afbf8f",
+      "parent": "StandardFilterTest#test_escape_6b68e52c",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ a0 | escape, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | escape, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_escape_6b68e52c_916093afbf8f.yml"
+    },
+    {
+      "id": "f7119a8babce",
+      "parent": "filter_times",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "trim_markers_output_open",
+        "delimiter_whitespace_output_open"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{\n- 4 | times: 2 }}",
+      "reference": {
+        "status": "ok",
+        "output": "0"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): [:dash, \"-\"] is not a valid expression in \"{{\n- 4 | times: 2 }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_filter_times_f7119a8babce.yml"
+    },
+    {
+      "id": "e6354af83a87",
+      "parent": "RecordedTest#test_variable_name_spaces_809183f79",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "trim_markers_output_open",
+        "lookup_boundary_missing",
+        "trim_markers_output_open"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{-- __liquid_spec_missing__ }}{{ bar }}{{ baz }}",
+      "reference": {
+        "status": "ok",
+        "output": "baz"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): [:dash, \"-\"] is not a valid expression in \"{{- __liquid_spec_missing__ }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_variable_name_spaces_809183f79_e6354af83a87.yml"
+    },
+    {
+      "id": "27bf554cef5d",
+      "parent": "RenderTagTest#test_render_does_not_mutate_parent_scope_983caf02",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "lookup_boundary_missing",
+        "literal_boundary_string_1"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% render ' ' %}{{ __liquid_spec_missing__ }}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset  "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset  "
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_rendertagtest_test_render_does_not_mutate_parent_scope_983ca_27bf554cef5d.yml"
+    },
+    {
+      "id": "5f3840e179e6",
+      "parent": "RecordedTest#test_for_loop_bounds_permutations_6b653b4ca",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "for_boundary_reversed",
+        "for_boundary_limit_one"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ \"rev: false, off: -5, lim: 5\" }}\n{% for i in array  offset: -5, limit: 5 reversed limit: 1 %}\n  {{- i }}:::\n  length:{{ forloop.length -}}\n  ,index:{{ forloop.index -}}\n  ,index0:{{ forloop.index0 -}}\n  ,rindex:{{ forloop.rindex -}}\n  ,rindex0:{{ forloop.rindex0 -}}\n  ,first:{{ forloop.first -}}\n  ,last:{{ forloop.last -}}\n{% endfor %}\n",
+      "reference": {
+        "status": "ok",
+        "output": "rev: false, off: -5, lim: 5\n\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Invalid attribute in for loop. Valid attributes are limit and offset in \"i in array  offset: -5, limit: 5 reversed limit: 1\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_for_loop_bounds_permutations_6b653b4ca_5f3840e179e6.yml"
+    },
+    {
+      "id": "544c8f0bb44b",
+      "parent": "BlankTest#test_include_is_blank_0679f444",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "trim_markers_tag_close",
+        "for_boundary_limit_zero",
+        "for_boundary_limit_one"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{% for i in (1..10) - limit: 0 limit: 1 %} {% include ' ' %} {% endfor %}{% if true %} {% include ' ' %} {% endif %}",
+      "reference": {
+        "status": "ok",
+        "output": "      "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"i in (1..10) - limit: 0 limit: 1\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_blanktest_test_include_is_blank_0679f444_544c8f0bb44b.yml"
+    },
+    {
+      "id": "972b49ce2067",
+      "parent": "StandardFilterTest#test_downcase_5d28ec5a",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ a0 | downcase, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | downcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_downcase_5d28ec5a_972b49ce2067.yml"
+    },
+    {
+      "id": "c889370727b7",
+      "parent": "include_with_binds_to_partial_name",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml",
+      "mutations": [
+        "delimiter_whitespace_tag_close",
+        "literal_boundary_string_1",
+        "delimiter_whitespace_tag_open"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{%\ninclude ' ' with featured\n%}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 2): Could not find asset  "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 2): Could not find asset  "
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_include_with_binds_to_partial_name_c889370727b7.yml"
+    },
+    {
+      "id": "6971075ca554",
+      "parent": "array_to_string_output_single",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/type-coercion.yml",
+      "mutations": [
+        "trim_markers_output_close",
+        "text_boundary_unicode",
+        "delimiter_whitespace_output_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "α{{ array -\n}}ω",
+      "reference": {
+        "status": "ok",
+        "output": "αdataω"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"{{ array -\n}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_array_to_string_output_single_6971075ca554.yml"
+    },
+    {
+      "id": "71a2362d15a4",
+      "parent": "FiltersTest#test_compact_ad55f1c5",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "filter_boundary_unknown",
+        "filter_boundary_duplicate",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{words | __liquid_spec_unknown_filter__, nil | __liquid_spec_unknown_filter__ | join}}",
+      "reference": {
+        "status": "ok",
+        "output": "a  b  c"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{words | __liquid_spec_unknown_filter__, nil | __liquid_spec_unknown_filter__ | join}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_filterstest_test_compact_ad55f1c5_71a2362d15a4.yml"
+    },
+    {
+      "id": "30976cd3cdbe",
+      "parent": "RenderTagTest#test_render_tag_for_1f290aec",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "trim_markers_tag_open",
+        "literal_boundary_string_3"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{%- render 'é' for products %}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset é"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset é"
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_rendertagtest_test_render_tag_for_1f290aec_30976cd3cdbe.yml"
+    },
+    {
+      "id": "e6f235c09fc0",
+      "parent": "StandardFilterTest#test_base64_encode_18c6c9c8",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ a0 | base64_encode, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | base64_encode, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_base64_encode_18c6c9c8_e6f235c09fc0.yml"
+    },
+    {
+      "id": "c47e38365e87",
+      "parent": "forloop_parentloop_three_levels",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/for-loops.yml",
+      "mutations": [
+        "trim_markers_tag_close",
+        "trim_markers_tag_close",
+        "for_boundary_reversed"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{% for i in (1..2) - reversed %}{% for j in (1..2) -%}{% for k in (1..2) %}{{ forloop.parentloop.parentloop.index }}.{{ forloop.parentloop.index }}.{{ forloop.index }} {% endfor %}{% endfor %}{% endfor %}",
+      "reference": {
+        "status": "ok",
+        "output": "1.1.1 1.1.2 1.2.1 1.2.2 2.1.1 2.1.2 2.2.1 2.2.2 "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"i in (1..2) - reversed\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_forloop_parentloop_three_levels_c47e38365e87.yml"
+    },
+    {
+      "id": "d1183d6f2323",
+      "parent": "render_for_with_objects",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml",
+      "mutations": [
+        "literal_boundary_string_1",
+        "trim_markers_tag_open"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{%- render ' ' for products as product %}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset  "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset  "
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_render_for_with_objects_d1183d6f2323.yml"
+    },
+    {
+      "id": "7c0f8ee1955b",
+      "parent": "dynamic_include_missing_partial",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic-partials.yml",
+      "mutations": [
+        "literal_boundary_string_2"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% assign tpl = '0' %}{% include tpl %}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset 0"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset 0"
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_dynamic_include_missing_partial_7c0f8ee1955b.yml"
+    },
+    {
+      "id": "8ad861bc325b",
+      "parent": "RecordedTest#test_for_loop_with_invalid_offset_e42506198",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "trim_markers_output_open",
+        "delimiter_whitespace_tag_close",
+        "delimiter_whitespace_output_open"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{%- for i in array offset: \"continue\" -\n%}\n  1st For Loop: {{\n- i }}\n{% endfor %}\n",
+      "reference": {
+        "status": "ok",
+        "output": "Liquid error (line 1): invalid integer\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"i in array offset: \"continue\" -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_for_loop_with_invalid_offset_e42506198_8ad861bc325b.yml"
+    },
+    {
+      "id": "5b27c798d738",
+      "parent": "StandardFilterTest#test_ceil_f769d783",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "delimiter_whitespace_output_close",
+        "filter_boundary_extra_argument",
+        "delimiter_whitespace_output_open"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{\na0 | ceil, nil\n}}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{\na0 | ceil, nil\n}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_ceil_f769d783_5b27c798d738.yml"
+    },
+    {
+      "id": "21a5038ee1bf",
+      "parent": "render_params_independent",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml",
+      "mutations": [
+        "literal_boundary_number_0",
+        "text_boundary_newlines",
+        "literal_boundary_string_2"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "\n{% render '0' a: 0, b: a %}\n",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 2): Could not find asset 0"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 2): Could not find asset 0"
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_render_params_independent_21a5038ee1bf.yml"
+    },
+    {
+      "id": "6a70f1d5799c",
+      "parent": "dynamic_include_for_iterates",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic_partials.yml",
+      "mutations": [
+        "trim_markers_tag_close",
+        "delimiter_whitespace_tag_close",
+        "text_boundary_unicode"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "α{% include tpl for items -\n%}ω",
+      "reference": {
+        "status": "ok",
+        "output": "α[1][2][3][4]ω"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"tpl for items -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_dynamic_include_for_iterates_6a70f1d5799c.yml"
+    },
+    {
+      "id": "35cc085646c2",
+      "parent": "filter_where",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "trim_markers_output_open",
+        "delimiter_whitespace_output_open",
+        "filter_boundary_remove"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{\n- items| map: 'name' | join: ', ' }}",
+      "reference": {
+        "status": "ok",
+        "output": ""
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): [:dash, \"-\"] is not a valid expression in \"{{\n- items| map: 'name' | join: ', ' }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_filter_where_35cc085646c2.yml"
+    },
+    {
+      "id": "f8bcfe5e8a32",
+      "parent": "StandardFilterTest#test_escape_f80cd6bb",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "delimiter_whitespace_output_close",
+        "trim_markers_output_close",
+        "delimiter_whitespace_output_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ a0 | escape\n-\n}}",
+      "reference": {
+        "status": "ok",
+        "output": "&lt;strong&gt;"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"{{ a0 | escape\n-\n}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_escape_f80cd6bb_f8bcfe5e8a32.yml"
+    },
+    {
+      "id": "796a3e26585f",
+      "parent": "StandardFilterTest#test_strip_newlines_6826588b",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "trim_markers_output_close",
+        "filter_boundary_extra_argument",
+        "trim_markers_output_close"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ a0 | strip_newlines, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | strip_newlines, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_strip_newlines_6826588b_796a3e26585f.yml"
+    },
+    {
+      "id": "a75beed65c63",
+      "parent": "StandardFilterTest#test_split_f09eee03",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_remove",
+        "trim_markers_output_open",
+        "delimiter_whitespace_output_open"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{\n- a0}}",
+      "reference": {
+        "status": "ok",
+        "output": ""
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): [:dash, \"-\"] is not a valid expression in \"{{\n- a0}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_split_f09eee03_a75beed65c63.yml"
+    },
+    {
+      "id": "c45168f34bb6",
+      "parent": "zero_index_vs_first",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/expressions.yml",
+      "mutations": [
+        "lookup_boundary_missing",
+        "trim_markers_output_open",
+        "delimiter_whitespace_output_open"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{\n- __liquid_spec_missing__[0] }}",
+      "reference": {
+        "status": "ok",
+        "output": ""
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): [:dash, \"-\"] is not a valid expression in \"{{\n- __liquid_spec_missing__[0] }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_zero_index_vs_first_c45168f34bb6.yml"
+    },
+    {
+      "id": "c01f3e0b10bb",
+      "parent": "size_empty_array",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "lookup_boundary_missing",
+        "filter_boundary_unknown",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ __liquid_spec_missing__ | __liquid_spec_unknown_filter__, nil }}",
+      "reference": {
+        "status": "ok",
+        "output": ""
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ __liquid_spec_missing__ | __liquid_spec_unknown_filter__, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_size_empty_array_c01f3e0b10bb.yml"
+    },
+    {
+      "id": "ebb95f1beee2",
+      "parent": "upcase_on_nil",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml",
+      "mutations": [
+        "text_boundary_unicode",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "α{{ missing | upcase, nil }}ω",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ missing | upcase, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_upcase_on_nil_ebb95f1beee2.yml"
+    },
+    {
+      "id": "7ba653729085",
+      "parent": "StandardFilterTest#test_newline_to_br_52938eb3",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_duplicate",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ a0 | newline_to_br, nil | newline_to_br }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | newline_to_br, nil | newline_to_br }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_newline_to_br_52938eb3_7ba653729085.yml"
+    },
+    {
+      "id": "02691df07fe1",
+      "parent": "StandardFilterTest#test_reverse_7d361a86",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "lookup_boundary_missing",
+        "filter_boundary_extra_argument",
+        "filter_boundary_unknown"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ __liquid_spec_missing__ | __liquid_spec_unknown_filter__, nil }}",
+      "reference": {
+        "status": "ok",
+        "output": ""
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ __liquid_spec_missing__ | __liquid_spec_unknown_filter__, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_reverse_7d361a86_02691df07fe1.yml"
+    },
+    {
+      "id": "3876425d2fb8",
+      "parent": "StandardFilterTest#test_escape_once_24a25f87",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_extra_argument",
+        "text_boundary_unicode"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "α{{ a0 | escape_once, nil }}ω",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | escape_once, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_escape_once_24a25f87_3876425d2fb8.yml"
+    },
+    {
+      "id": "2c0f657c42e7",
+      "parent": "filter_int_size_is_byte_size",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml",
+      "mutations": [
+        "trim_markers_output_close",
+        "filter_boundary_unknown",
+        "delimiter_whitespace_output_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "__liquid_spec_unknown_filter__ of 0:{{- i0 | size -\n}}\nsize of 1:{{- i1 | size }}\nsize of 42:{{- i42 | size }}\nsize of 999999999:{{- i_big | size }}\nsize of -1:{{- i_neg | size }}\n",
+      "reference": {
+        "status": "ok",
+        "output": "__liquid_spec_unknown_filter__ of 0:8\nsize of 1:8\nsize of 42:8\nsize of 999999999:8\nsize of -1:8\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"{{ i0 | size -\n}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_filter_int_size_is_byte_size_2c0f657c42e7.yml"
+    },
+    {
+      "id": "ac75002ef580",
+      "parent": "comment_inline_between_tags",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{%- assign a = 1 -\n%}{%- # separator comment -%}{%- assign b = 2 -%}{{ a }}{{ b }}",
+      "reference": {
+        "status": "ok",
+        "output": "12"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"a = 1 -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_comment_inline_between_tags_ac75002ef580.yml"
+    },
+    {
+      "id": "56d8f1947c78",
+      "parent": "RecordedTest#test_for_loop_bounds_permutations_2c984f183",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "text_boundary_unicode",
+        "literal_boundary_number_0",
+        "for_boundary_reversed"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "α{{ \"rev: true, off: 0, lim: 5\" }}\n{% for i in array reversed, offset: -6, limit: 5 reversed %}\n  {{- i }}:::\n  length:{{ forloop.length -}}\n  ,index:{{ forloop.index -}}\n  ,index0:{{ forloop.index0 -}}\n  ,rindex:{{ forloop.rindex -}}\n  ,rindex0:{{ forloop.rindex0 -}}\n  ,first:{{ forloop.first -}}\n  ,last:{{ forloop.last -}}\n{% endfor %}\nω",
+      "reference": {
+        "status": "ok",
+        "output": "αrev: true, off: 0, lim: 5\n\nω"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Invalid attribute in for loop. Valid attributes are limit and offset in \"i in array reversed, offset: -6, limit: 5 reversed\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_for_loop_bounds_permutations_2c984f183_56d8f1947c78.yml"
+    },
+    {
+      "id": "11fede9422f5",
+      "parent": "StandardFilterTest#test_round_93e6c0cb",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "delimiter_whitespace_output_open",
+        "filter_boundary_duplicate",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{\na0 | round, nil | round }}",
+      "reference": {
+        "status": "ok",
+        "output": "0"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{\na0 | round, nil | round }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_round_93e6c0cb_11fede9422f5.yml"
+    },
+    {
+      "id": "e3d6521d697f",
+      "parent": "StandardFilterTest#test_escape_once_98cd7425",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_extra_argument",
+        "filter_boundary_duplicate"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ a0 | escape_once | escape_once, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | escape_once | escape_once, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_escape_once_98cd7425_e3d6521d697f.yml"
+    },
+    {
+      "id": "8f42b60a53dd",
+      "parent": "StandardFilterTest#test_url_decode_1ef18eac",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_extra_argument",
+        "lookup_boundary_missing",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ __liquid_spec_missing__ | url_decode, nil, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 3, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ __liquid_spec_missing__ | url_decode, nil, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_url_decode_1ef18eac_8f42b60a53dd.yml"
+    },
+    {
+      "id": "d6fc46b48696",
+      "parent": "fs_nested_3_levels",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filesystem.yml",
+      "mutations": [
+        "literal_boundary_string_1"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% include ' ' %}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset  "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset  "
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_fs_nested_3_levels_d6fc46b48696.yml"
+    },
+    {
+      "id": "740efc74ac20",
+      "parent": "filter_vs_property_int_equivalence",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml",
+      "mutations": [
+        "delimiter_whitespace_output_open",
+        "lookup_boundary_missing"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "filter first:{{\n- i | first }}, property first:{{- __liquid_spec_missing__.first }}\nfilter last:{{- i | last }}, property last:{{- i.last }}\nfilter size:{{- i | size }}, property size:{{- i.size }}\n",
+      "reference": {
+        "status": "ok",
+        "output": "filter first:, property first:\nfilter last:, property last:\nfilter size:8, property size:8\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): [:dash, \"-\"] is not a valid expression in \"{{\n- i | first }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_filter_vs_property_int_equivalence_740efc74ac20.yml"
+    },
+    {
+      "id": "dca2cb267a1c",
+      "parent": "Parameter cannot access previous parameter",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/manual.yml",
+      "mutations": [
+        "literal_boundary_string_0"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% render '' a: 1, b: 2, c: a %}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset "
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_parameter_cannot_access_previous_parameter_dca2cb267a1c.yml"
+    },
+    {
+      "id": "3274b8394344",
+      "parent": "IncludeTagTest#test_include_tag_with_local_variables_1cfb460f",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "literal_boundary_string_3",
+        "literal_boundary_string_2"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% include '0' echo1: 'test123' %}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset 0"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset 0"
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_includetagtest_test_include_tag_with_local_variables_1cfb460_3274b8394344.yml"
+    },
+    {
+      "id": "ba5c05dbdcb6",
+      "parent": "RecordedTest#test_parity_on_other_gsub_escape_sequences_1003c6a87",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "text_boundary_newlines",
+        "filter_boundary_duplicate"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "\n{{ \"1. toto\" | replace: \"t\", \" | replace: \"t\", \"\\0\" \"  | replace: \"t\", \" | replace: \"t\", \"\\0\" \" }}\n{{ \"2. toto\" | replace: \"t\", \"\\1\" }}\n{{ \"3. toto\" | replace: \"t\", \"\\k<lol>\" }}\n{{ \"4. toto\" | replace: \"t\", \"\\&\" }}\n{{ \"5. toto\" | replace: \"t\", \"\\'\" }}\n{{ \"6. toto\" | replace: \"t\", \"\\`\" }}\n{{ \"7. toto\" | replace: \"t\", \"\\+\" }}\n",
+      "reference": {
+        "status": "ok",
+        "output": "\nLiquid error (line 2): wrong number of arguments (given 4, expected 2..3)\n2. oo\nLiquid error (line 4): internal\n4. toto\n5. otoooo\n6. 6. o6. too\n7. oo\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Unexpected character \\ in \"{{ \"1. toto\" | replace: \"t\", \" | replace: \"t\", \"\\0\" \"  | replace: \"t\", \" | replace: \"t\", \"\\0\" \" }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_parity_on_other_gsub_escape_sequences_1003_ba5c05dbdcb6.yml"
+    },
+    {
+      "id": "704efbed1ec4",
+      "parent": "StandardFilterTest#test_sum_170f339b",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "trim_markers_output_close",
+        "filter_boundary_extra_argument",
+        "trim_markers_output_open"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{- a0 | sum, nil -}}",
+      "reference": {
+        "status": "ok",
+        "output": "0"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | sum, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_sum_170f339b_704efbed1ec4.yml"
+    },
+    {
+      "id": "42704daf90aa",
+      "parent": "include_infinite_recursion",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml",
+      "mutations": [
+        "literal_boundary_string_1",
+        "delimiter_whitespace_tag_close",
+        "trim_markers_tag_close"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% include ' '\n-%}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset  "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset  "
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_include_infinite_recursion_42704daf90aa.yml"
+    },
+    {
+      "id": "71df0a8ca2e5",
+      "parent": "RecordedTest#test_for_loop_bounds_permutations_353bf7e85",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "for_boundary_reversed",
+        "literal_boundary_number_2",
+        "for_boundary_limit_one"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ \"rev: true, off: 2147483648, lim: 2\" }}\n{% for i in array reversed, offset: 6, limit: 2 reversed limit: 1 %}\n  {{- i }}:::\n  length:{{ forloop.length -}}\n  ,index:{{ forloop.index -}}\n  ,index0:{{ forloop.index0 -}}\n  ,rindex:{{ forloop.rindex -}}\n  ,rindex0:{{ forloop.rindex0 -}}\n  ,first:{{ forloop.first -}}\n  ,last:{{ forloop.last -}}\n{% endfor %}\n",
+      "reference": {
+        "status": "ok",
+        "output": "rev: true, off: 2147483648, lim: 2\n\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Invalid attribute in for loop. Valid attributes are limit and offset in \"i in array reversed, offset: 6, limit: 2 reversed limit: 1\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_for_loop_bounds_permutations_353bf7e85_71df0a8ca2e5.yml"
+    },
+    {
+      "id": "22c6772815f5",
+      "parent": "StandardFilterTest#test_url_encode_b0bba5d2",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "delimiter_whitespace_output_open",
+        "filter_boundary_duplicate",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{\na0 | url_encode, nil | url_encode }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{\na0 | url_encode, nil | url_encode }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_url_encode_b0bba5d2_22c6772815f5.yml"
+    },
+    {
+      "id": "21ffef2780a2",
+      "parent": "RecordedTest#test_for_loop_bounds_permutations_a9e4131f5",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "literal_boundary_string_2",
+        "for_boundary_reversed"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ \"0\" }}\n{% for i in array reversed, offset: -5, limit: -5 reversed %}\n  {{- i }}:::\n  length:{{ forloop.length -}}\n  ,index:{{ forloop.index -}}\n  ,index0:{{ forloop.index0 -}}\n  ,rindex:{{ forloop.rindex -}}\n  ,rindex0:{{ forloop.rindex0 -}}\n  ,first:{{ forloop.first -}}\n  ,last:{{ forloop.last -}}\n{% endfor %}\n",
+      "reference": {
+        "status": "ok",
+        "output": "0\n\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Invalid attribute in for loop. Valid attributes are limit and offset in \"i in array reversed, offset: -5, limit: -5 reversed\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_for_loop_bounds_permutations_a9e4131f5_21ffef2780a2.yml"
+    },
+    {
+      "id": "79cc79edf088",
+      "parent": "UnlessElseTagTest#test_unless_192e56a3",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "trim_markers_tag_close",
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": " {% unless true -\n%} this text should not go into the output {% endunless %} ",
+      "reference": {
+        "status": "ok",
+        "output": "  "
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"true -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_unlesselsetagtest_test_unless_192e56a3_79cc79edf088.yml"
+    },
+    {
+      "id": "0d0f6952a94c",
+      "parent": "IncludeTagTest#test_include_tag_with_default_name_d96f44b2",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "literal_boundary_string_3",
+        "literal_boundary_string_2",
+        "trim_markers_tag_close"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% include '0' -%}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset 0"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset 0"
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_includetagtest_test_include_tag_with_default_name_d96f44b2_0d0f6952a94c.yml"
+    },
+    {
+      "id": "fff09b88521c",
+      "parent": "render_cannot_modify_environment",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml",
+      "mutations": [
+        "literal_boundary_string_3",
+        "trim_markers_output_close"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% render 'é' %}{{ user.name -}}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset é"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset é"
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_render_cannot_modify_environment_fff09b88521c.yml"
+    },
+    {
+      "id": "10cc32a66fca",
+      "parent": "property_nested",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "trim_markers_output_open",
+        "trim_markers_output_close",
+        "delimiter_whitespace_output_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{- user.address.city -\n}}",
+      "reference": {
+        "status": "ok",
+        "output": "Seattle"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"{{ user.address.city -\n}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_property_nested_10cc32a66fca.yml"
+    },
+    {
+      "id": "3fab7396b356",
+      "parent": "StandardFiltersTest#test_first_last_on_strings_via_template_39483e1f",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "text_boundary_unicode",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "α{{ name | last, nil }}ω",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ name | last, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfilterstest_test_first_last_on_strings_via_template__3fab7396b356.yml"
+    },
+    {
+      "id": "0a16294dd6a3",
+      "parent": "comment_inline_between_tags",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml",
+      "mutations": [
+        "literal_boundary_number_2",
+        "text_boundary_newlines",
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "\n{%- assign a = 2147483648 -\n%}{%- # separator comment -%}{%- assign b = 2 -%}{{ a }}{{ b }}\n",
+      "reference": {
+        "status": "ok",
+        "output": "21474836482\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Expected end_of_string but found dash in \"a = 2147483648 -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_comment_inline_between_tags_0a16294dd6a3.yml"
+    },
+    {
+      "id": "592f221f95da",
+      "parent": "lstrip_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_unknown",
+        "text_boundary_newlines",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "\n{{ text | __liquid_spec_unknown_filter__, nil }}\n",
+      "reference": {
+        "status": "ok",
+        "output": "\n\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Expected end_of_string but found comma in \"{{ text | __liquid_spec_unknown_filter__, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_lstrip_empty_string_592f221f95da.yml"
+    },
+    {
+      "id": "532b6b040834",
+      "parent": "StandardFilterTest#test_compact_13fafe13",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "text_boundary_newlines",
+        "trim_markers_output_close",
+        "delimiter_whitespace_output_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "\n{{ a0 | compact -\n}}\n",
+      "reference": {
+        "status": "ok",
+        "output": "\nfoo\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): Expected end_of_string but found dash in \"{{ a0 | compact -\n}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_compact_13fafe13_532b6b040834.yml"
+    },
+    {
+      "id": "0168915020b3",
+      "parent": "StandardFilterTest#test_strip_bedc4ea4",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_extra_argument",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{ a0 | strip, nil, nil }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 3, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | strip, nil, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_strip_bedc4ea4_0168915020b3.yml"
+    },
+    {
+      "id": "7388fae9d30e",
+      "parent": "upcase_empty_string",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml",
+      "mutations": [
+        "filter_boundary_unknown",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ text | __liquid_spec_unknown_filter__, nil }}",
+      "reference": {
+        "status": "ok",
+        "output": ""
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ text | __liquid_spec_unknown_filter__, nil }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_upcase_empty_string_7388fae9d30e.yml"
+    },
+    {
+      "id": "39efe391f063",
+      "parent": "StandardFiltersTest#test_legacy_map_on_hashes_with_dynamic_key_453a3a1b",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml",
+      "mutations": [
+        "trim_markers_output_open",
+        "delimiter_whitespace_output_open",
+        "delimiter_whitespace_tag_open"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{%\nassign key = 'foo' %}{{\n- thing | map: key | map: 'bar' }}",
+      "reference": {
+        "status": "ok",
+        "output": ""
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 2): [:dash, \"-\"] is not a valid expression in \"{{\n- thing | map: key | map: 'bar' }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfilterstest_test_legacy_map_on_hashes_with_dynamic_k_39efe391f063.yml"
+    },
+    {
+      "id": "6434046694bd",
+      "parent": "tablerow_cols_non_numeric_string_never_wraps",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/tablerow_attribute_coercion.yml",
+      "mutations": [
+        "trim_markers_tag_close",
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{% tablerow a in (1..4) cols: xs -\n%}{{ a }}{% endtablerow %}",
+      "reference": {
+        "status": "ok",
+        "output": "<tr class=\"row1\">\n<td class=\"col1\">1</td><td class=\"col2\">2</td><td class=\"col3\">3</td><td class=\"col4\">4</td></tr>\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"a in (1..4) cols: xs -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_tablerow_cols_non_numeric_string_never_wraps_6434046694bd.yml"
+    },
+    {
+      "id": "0c17260cf4e0",
+      "parent": "render_cannot_modify_environment",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml",
+      "mutations": [
+        "lookup_boundary_missing",
+        "literal_boundary_string_3",
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{% render 'é'\n%}{{ __liquid_spec_missing__.name }}",
+      "reference": {
+        "status": "error",
+        "error_category": "unknown",
+        "error_message": "Liquid::FileSystemError: Liquid error (line 1): Could not find asset é"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidRenderError: Liquid error: Render error: Liquid error (line 1): Could not find asset é"
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_render_cannot_modify_environment_0c17260cf4e0.yml"
+    },
+    {
+      "id": "0de55561883c",
+      "parent": "RecordedTest#test_seven_nested_case_tags_1b247b46",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "trim_markers_tag_open",
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{% case 1 -\n%}\n{%- when 1 -%}\n  {%- case 2 -%}\n  {%- when 2 -%}\n    {%- case 3 -%}\n    {%- when 3 -%}\n      {%- case 4 -%}\n      {%- when 4 -%}\n        {%- case 5 -%}\n        {%- when 5 -%}\n          {%- case 6 -%}\n          {%- when 6 -%}\n            {%- case 7 -%}\n            {%- when 7 -%}\n              OK\n            {%- endcase -%}\n          {%- endcase -%}\n        {%- endcase -%}\n      {%- endcase -%}\n    {%- endcase -%}\n  {%- endcase -%}\n{%- else -%}\n  FAIL\n{%- endcase -%}\n",
+      "reference": {
+        "status": "ok",
+        "output": "OK"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"1 -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_seven_nested_case_tags_1b247b46_0de55561883c.yml"
+    },
+    {
+      "id": "b78c55690dfd",
+      "parent": "RecordedTest#test_if_short_circuit_conditions_and_right_precedence_bc6f11e60",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml",
+      "mutations": [
+        "trim_markers_tag_close",
+        "delimiter_whitespace_tag_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{% if false and true or true and false or true -\n%}matched if{% else %}matched else{% endif %}\n",
+      "reference": {
+        "status": "ok",
+        "output": "matched else\n"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found dash in \"false and true or true and false or true -\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_recordedtest_test_if_short_circuit_conditions_and_right_prec_b78c55690dfd.yml"
+    },
+    {
+      "id": "931de9bdb791",
+      "parent": "StandardFilterTest#test_base64_encode_f5c3c752",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "filter_boundary_duplicate",
+        "delimiter_whitespace_output_open",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "{{\na0 | base64_encode, nil | base64_encode }}",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{\na0 | base64_encode, nil | base64_encode }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_base64_encode_f5c3c752_931de9bdb791.yml"
+    },
+    {
+      "id": "2ee3e0846c50",
+      "parent": "StandardFilterTest#test_url_encode_60c8b46a",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml",
+      "mutations": [
+        "text_boundary_unicode",
+        "delimiter_whitespace_output_close",
+        "filter_boundary_extra_argument"
+      ],
+      "classification": "error_category_mismatch",
+      "template": "α{{ a0 | url_encode, nil\n}}ω",
+      "reference": {
+        "status": "error",
+        "error_category": "render",
+        "error_message": "Liquid::ArgumentError: Liquid error (line 1): wrong number of arguments (given 2, expected 1)"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ a0 | url_encode, nil\n}}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_standardfiltertest_test_url_encode_60c8b46a_2ee3e0846c50.yml"
+    },
+    {
+      "id": "5347d33a81a1",
+      "parent": "array_filter_uniq_wraps_scalar",
+      "source_file": "/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filter_argument_semantics.yml",
+      "mutations": [
+        "filter_boundary_extra_argument",
+        "trim_markers_output_close"
+      ],
+      "classification": "reference_ok_subject_error",
+      "template": "{{ 5 | uniq, nil | join: \",\" -}}",
+      "reference": {
+        "status": "ok",
+        "output": "5"
+      },
+      "subject": {
+        "status": "error",
+        "error_category": "syntax",
+        "error_message": "Liquid::Spec::JsonRpc::LiquidSyntaxError: Liquid error: Liquid syntax error (line 1): Expected end_of_string but found comma in \"{{ 5 | uniq, nil | join: \",\" }}\""
+      },
+      "saved_to": "/home/marco/lfc/results/eval/heldout-c/cases-fuzz-484061/adversarial_array_filter_uniq_wraps_scalar_5347d33a81a1.yml"
+    }
+  ]
+}

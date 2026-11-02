@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_sum_5d8d0b22_62a324f2876e
+  template: |-
+    {{ a0 | sum, nil
+    -}}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_sum_5d8d0b22 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:5299).
+    Mutations: delimiter_whitespace_output_close, trim_markers_output_close, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0:
+      foo: bar
+  expected: '0'

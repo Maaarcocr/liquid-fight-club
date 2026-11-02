@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_render_for_with_string_as_collection_7e5528d80c77
+  template: α{% render '0' for 'abd' as item item:item %}ω
+  complexity: 300
+  hint: |-
+    Differential case generated from Render for with string as collection (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/manual.yml:450).
+    Mutations: literal_boundary_string_2, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  environment:
+    items:
+    - 1
+    - 2
+    - 3
+  filesystem:
+    child: "{{ item }}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_size_of_string_24171e60357a
+  template: "{{ 'hello' | size, nil }}"
+  complexity: 125
+  hint: |-
+    Differential case generated from size_of_string (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/type-coercion.yml:251).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

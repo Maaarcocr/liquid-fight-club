@@ -1,0 +1,21 @@
+---
+specs:
+- name: adversarial_outputtest_test_variable_traversing_with_two_brackets_e2f623_d8a50e0301d5
+  template: |-
+    α{{
+    - site.data.menu[include.menu][include.locale] }}ω
+  complexity: 190
+  hint: |-
+    Differential case generated from OutputTest#test_variable_traversing_with_two_brackets_e2f6235e (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4489).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open, text_boundary_unicode.
+    Classification: reference_ok_subject_error.
+  environment:
+    site:
+      data:
+        menu:
+          foo:
+            bar: it works!
+    include:
+      menu: foo
+      locale: bar
+  expected: αω

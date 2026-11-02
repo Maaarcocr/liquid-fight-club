@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_render_allows_nested_render_dd4edb45aa70
+  template: "{% render 'é' -%}"
+  complexity: 239
+  hint: |-
+    Differential case generated from render_allows_nested_render (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:577).
+    Mutations: trim_markers_tag_close, literal_boundary_string_3.
+    Classification: error_category_mismatch.
+  filesystem:
+    outer: "{% render 'inner' %}"
+    inner: nested render works
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

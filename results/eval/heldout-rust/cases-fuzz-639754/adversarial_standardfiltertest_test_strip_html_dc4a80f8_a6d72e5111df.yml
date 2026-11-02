@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_strip_html_dc4a80f8_a6d72e5111df
+  template: |2
+
+    {{ a0 | strip_html, nil
+    }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_strip_html_dc4a80f8 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:5020).
+    Mutations: filter_boundary_extra_argument, text_boundary_newlines, delimiter_whitespace_output_close.
+    Classification: error_category_mismatch.
+  environment:
+    a0: "<<<script </script>script>foo;</script>"
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

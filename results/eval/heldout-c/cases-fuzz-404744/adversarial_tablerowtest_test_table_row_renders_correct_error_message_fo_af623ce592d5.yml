@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_tablerowtest_test_table_row_renders_correct_error_message_fo_af623ce592d5
+  template: |-
+    {% tablerow n in (1...10) limit:true %} {{-
+    n}} {% endtablerow %}
+  complexity: 180
+  hint: |-
+    Differential case generated from TableRowTest#test_table_row_renders_correct_error_message_for_invalid_parameters_3da5d491 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:7543).
+    Mutations: delimiter_whitespace_output_open, trim_markers_output_open.
+    Classification: reference_ok_subject_error.
+  features:
+  - inline_errors
+  error_mode: warn
+  expected: 'Liquid error (line 1): invalid integer'

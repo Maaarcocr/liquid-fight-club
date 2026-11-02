@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_recordedtest_test_array_raw_render_86e54cddf_fc6ddae25c5d
+  template: "{{-a | truncatewords, nil-}}"
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_array_raw_render_86e54cddf (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:3223).
+    Mutations: filter_boundary_extra_argument, trim_markers_output_open, trim_markers_output_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    a:
+    - foo
+    - bar
+  features:
+  - inline_errors
+  expected: 'Liquid error (line 1): invalid integer'

@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_rendertagtest_test_render_tag_for_1f290aec_30976cd3cdbe
+  template: "{%- render 'é' for products %}"
+  complexity: 190
+  hint: |-
+    Differential case generated from RenderTagTest#test_render_tag_for_1f290aec (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4948).
+    Mutations: trim_markers_tag_open, literal_boundary_string_3.
+    Classification: error_category_mismatch.
+  environment:
+    products:
+    - title: Draft 151cm
+    - title: Element 155cm
+  filesystem:
+    product: 'Product: {{ product.title }} '
+    product_alias: 'Product: {{ product.title }} '
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

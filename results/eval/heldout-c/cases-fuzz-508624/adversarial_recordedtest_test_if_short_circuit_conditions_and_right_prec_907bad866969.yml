@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_recordedtest_test_if_short_circuit_conditions_and_right_prec_907bad866969
+  template: |
+    {% if true or false and true or true and false -
+    %}matched if{% else %}matched else{% endif %}
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_if_short_circuit_conditions_and_right_precedence_93e5af202 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:18277).
+    Mutations: trim_markers_tag_close, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  features:
+  - inline_errors
+  expected: 'matched if
+
+    '

@@ -1,0 +1,35 @@
+---
+specs:
+- name: adversarial_recordedtest_test_for_loop_bounds_permutations_39a848289_73afbebf141e
+  template: |2+
+
+    {{ "rev: true, off: -1, lim: -1" }}
+    {% for i in array reversed, offset: -1, limit: -1 reversed %}
+      {{- i }}:::
+      length:{{ forloop.length -}}
+      ,index:{{ forloop.index -}}
+      ,index0:{{ forloop.index0 -}}
+      ,rindex:{{ forloop.rindex -}}
+      ,rindex0:{{ forloop.rindex0 -}}
+      ,first:{{ forloop.first -}}
+      ,last:{{ forloop.last -}}
+    {% endfor %}
+
+  complexity: 1000
+  hint: |-
+    Differential case generated from RecordedTest#test_for_loop_bounds_permutations_39a848289 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/shopify_production_recordings/recorded_specs.yml:8765).
+    Mutations: for_boundary_reversed, text_boundary_newlines.
+    Classification: reference_ok_subject_error.
+  environment:
+    array:
+    - 1
+    - 2
+    - 3
+  features:
+  - inline_errors
+  expected: |2+
+
+    rev: true, off: -1, lim: -1
+
+
+...

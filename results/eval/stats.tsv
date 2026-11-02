@@ -1,0 +1,10 @@
+metric	rust	c
+loc_library	8317	9766
+loc_glue_server_abi	598	268
+loc_tests_tools	215	689
+loc_total	9130	10723
+unsafe_outside_capi	0	-
+unsafe_in_capi	36	-
+clippy_warnings	43	-
+gcc_wall_wextra_warnings	-	0
+clang_wall_wextra_warnings	-	0

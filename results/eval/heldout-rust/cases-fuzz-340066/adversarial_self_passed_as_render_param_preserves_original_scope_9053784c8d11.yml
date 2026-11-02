@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_self_passed_as_render_param_preserves_original_scope_9053784c8d11
+  template: 'α{%- assign var = 42 -%}{%- assign s = self -%}{%- render '' '', other_self:
+    s -%}ω'
+  complexity: 300
+  hint: |-
+    Differential case generated from self_passed_as_render_param_preserves_original_scope (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/bare_bracket_self.yml:406).
+    Mutations: text_boundary_unicode, literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet1: "{%- assign var = 43 -%}{{- other_self.var }}|{{ self.var -}}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_casetagunittest_test_case_when_with_or_28032fa0_b2f8bf996466
+  template: |-
+    α{%- case 2147483648 -
+    %}
+      {%- when 2 or 1 -%}
+        one
+      {%- else -%}
+        two
+    {%- endcase -%}
+    ω
+  complexity: 120
+  hint: |-
+    Differential case generated from CaseTagUnitTest#test_case_when_with_or_28032fa0 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:622).
+    Mutations: literal_boundary_number_2, delimiter_whitespace_tag_close, text_boundary_unicode.
+    Classification: reference_ok_subject_error.
+  expected: αtwoω

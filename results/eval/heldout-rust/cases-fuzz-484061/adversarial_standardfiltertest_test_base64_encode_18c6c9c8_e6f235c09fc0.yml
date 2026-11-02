@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_base64_encode_18c6c9c8_e6f235c09fc0
+  template: "{{ a0 | base64_encode, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_base64_encode_18c6c9c8 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:226).
+    Mutations: filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0: -99999999
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

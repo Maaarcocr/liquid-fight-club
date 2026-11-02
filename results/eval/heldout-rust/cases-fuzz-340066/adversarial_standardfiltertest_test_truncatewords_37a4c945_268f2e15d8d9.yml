@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_truncatewords_37a4c945_268f2e15d8d9
+  template: |-
+    {{
+    - a0 }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_truncatewords_37a4c945 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:5835).
+    Mutations: filter_boundary_remove, trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: -99999999
+  expected: ''

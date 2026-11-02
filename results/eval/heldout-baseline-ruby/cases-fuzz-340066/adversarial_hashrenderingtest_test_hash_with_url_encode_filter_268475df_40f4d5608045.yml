@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_hashrenderingtest_test_hash_with_url_encode_filter_268475df_40f4d5608045
+  template: |-
+    {{
+    - my_hash | url_encode }}
+  complexity: 140
+  hint: |-
+    Differential case generated from HashRenderingTest#test_hash_with_url_encode_filter_268475df (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:3116).
+    Mutations: trim_markers_output_open, delimiter_whitespace_output_open.
+    Classification: reference_ok_subject_error.
+  environment:
+    my_hash:
+      Key: Value
+      AnotherKey: AnotherValue
+  expected: ''

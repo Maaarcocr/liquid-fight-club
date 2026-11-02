@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_escape_015bf946_f18eaf875d37
+  template: |-
+    {{ a0 -
+    }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_escape_015bf946 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:1526).
+    Mutations: filter_boundary_remove, trim_markers_output_close, delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: -99999999
+  expected: "-99999999"

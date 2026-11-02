@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_includetagtest_test_include_tag_with_local_variables_1cfb460_19ce8712882f
+  template: "{% include '' echo1: 'test123' %}"
+  complexity: 190
+  hint: |-
+    Differential case generated from IncludeTagTest#test_include_tag_with_local_variables_1cfb460f (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4025).
+    Mutations: literal_boundary_string_0.
+    Classification: error_category_mismatch.
+  filesystem:
+    locale_variables: 'Locale: {{echo1}} {{echo2}}'
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

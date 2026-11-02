@@ -1,0 +1,13 @@
+---
+specs:
+- name: adversarial_strip_on_nil_be6357fc69cd
+  template: α{{ missing | strip, nil }}ω
+  complexity: 45
+  hint: |-
+    Differential case generated from strip_on_nil (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-nil-safety.yml:28).
+    Mutations: filter_boundary_extra_argument, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

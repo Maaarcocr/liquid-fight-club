@@ -1,0 +1,16 @@
+---
+specs:
+- name: adversarial_dynamic_include_propagates_break_f6ca750e9fc3
+  template: "{% for i in (1..3) %}{{ i }}{% assign tpl = ' ' %}{% include tpl %}{{
+    i }}{% endfor %}"
+  complexity: 560
+  hint: |-
+    Differential case generated from dynamic_include_propagates_break (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic-partials.yml:728).
+    Mutations: literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  filesystem:
+    breaker: "{% break %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

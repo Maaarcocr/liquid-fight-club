@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_rstrip_96ef0d31_edf07306c8be
+  template: |2
+
+    {{ a0 | rstrip | rstrip, nil }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_rstrip_96ef0d31 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:3510).
+    Mutations: filter_boundary_extra_argument, filter_boundary_duplicate, text_boundary_newlines.
+    Classification: error_category_mismatch.
+  environment:
+    a0: 0.0
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

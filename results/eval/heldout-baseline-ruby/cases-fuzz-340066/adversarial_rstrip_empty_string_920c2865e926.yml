@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_rstrip_empty_string_920c2865e926
+  template: |-
+    {{
+    text | rstrip, nil -}}
+  complexity: 45
+  hint: |-
+    Differential case generated from rstrip_empty_string (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/filter-edge-cases.yml:411).
+    Mutations: trim_markers_output_close, delimiter_whitespace_output_open, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    text: ''
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

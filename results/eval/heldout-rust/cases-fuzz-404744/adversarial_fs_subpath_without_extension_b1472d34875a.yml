@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_fs_subpath_without_extension_b1472d34875a
+  template: |-
+    {%
+    include ' ' %}
+  complexity: 240
+  hint: |-
+    Differential case generated from fs_subpath_without_extension (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filesystem.yml:73).
+    Mutations: literal_boundary_string_1, delimiter_whitespace_tag_open.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippets/header.liquid: Header from subpath
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

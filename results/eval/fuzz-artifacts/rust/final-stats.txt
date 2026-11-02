@@ -1,0 +1,5 @@
+#23030643: cov: 15391 ft: 31045 corp: 8283 exec/s: 920 oom/timeout/crash: 0/2/0 time: 3479s job: 81 dft_time: 0
+#23149040: cov: 15391 ft: 31063 corp: 8293 exec/s: 1426 oom/timeout/crash: 0/2/0 time: 3563s job: 82 dft_time: 0
+#23398677: cov: 15393 ft: 31080 corp: 8303 exec/s: 2971 oom/timeout/crash: 0/2/0 time: 3648s job: 83 dft_time: 0
+INFO: fuzzed for 3648 seconds, wrapping up soon
+INFO: exiting: 0 time: 3648s

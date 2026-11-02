@@ -1,0 +1,22 @@
+---
+specs:
+- name: adversarial_render_for_forloop_rindex_a97ad6c086fb
+  template: |-
+    {% render '0' for items
+    %}
+  complexity: 205
+  hint: |-
+    Differential case generated from render_for_forloop_rindex (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:191).
+    Mutations: delimiter_whitespace_tag_close, literal_boundary_string_2.
+    Classification: error_category_mismatch.
+  environment:
+    items:
+    - a
+    - b
+    - c
+  filesystem:
+    item: "{{ forloop.rindex }}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

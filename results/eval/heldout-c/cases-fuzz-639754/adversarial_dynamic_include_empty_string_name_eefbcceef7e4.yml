@@ -1,0 +1,15 @@
+---
+specs:
+- name: adversarial_dynamic_include_empty_string_name_eefbcceef7e4
+  template: α{% assign tpl = '' %}{% include tpl %}ω
+  complexity: 550
+  hint: |-
+    Differential case generated from dynamic_include_empty_string_name (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic-partials.yml:516).
+    Mutations: text_boundary_unicode.
+    Classification: error_category_mismatch.
+  features:
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - unknown

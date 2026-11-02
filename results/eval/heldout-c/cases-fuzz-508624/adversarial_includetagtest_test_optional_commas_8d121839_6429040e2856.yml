@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_includetagtest_test_optional_commas_8d121839_6429040e2856
+  template: |2
+
+    {%- include " "  arg1: "value1", arg2: "value2" %}
+  complexity: 190
+  hint: |-
+    Differential case generated from IncludeTagTest#test_optional_commas_8d121839 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/specs.yml:4156).
+    Mutations: text_boundary_newlines, trim_markers_tag_open, literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  filesystem:
+    snippet: hello {{ arg1 }} {{ arg2 }}
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

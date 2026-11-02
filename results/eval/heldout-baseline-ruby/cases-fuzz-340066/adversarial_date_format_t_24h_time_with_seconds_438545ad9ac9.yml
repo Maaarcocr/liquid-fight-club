@@ -1,0 +1,10 @@
+---
+specs:
+- name: adversarial_date_format_t_24h_time_with_seconds_438545ad9ac9
+  template: "{{ '0' | date: '%T' -}}"
+  complexity: 360
+  hint: |-
+    Differential case generated from date_format_T_24h_time_with_seconds (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/date-filters.yml:479).
+    Mutations: literal_boundary_string_2, trim_markers_output_close.
+    Classification: output_mismatch.
+  expected: '00:00:00'

@@ -1,0 +1,19 @@
+case	impl	status	output_bytes	message	wall_s	peak_rss_kb	exit
+append_doubling	rust	render_error	0	Liquid error: Memory limits exceeded	0.18	346812	0
+append_doubling	c	render_error	0	Liquid error: Memory limits exceeded	0.08	165696	0
+append_doubling	ruby	render_error	0	NoMemoryError: failed to allocate memory	4.83	7376356	0
+for_100M_empty	rust	render_error	0	Liquid error: Memory limits exceeded	0.16	2664	0
+for_100M_empty	c	render_error	0	Liquid error: Memory limits exceeded	0.73	2012	0
+for_100M_empty	ruby	TIMEOUT(10s)	0		8.98	2012	137
+for_100M_output	rust	render_error	0	Liquid error: Memory limits exceeded	0.10	12420	0
+for_100M_output	c	render_error	0	Liquid error: Memory limits exceeded	0.53	50936	0
+for_100M_output	ruby	TIMEOUT(10s)	0		10.00	1924	137
+nested_if_10000	rust	parse_error	0	Liquid error: Nesting too deep	0.00	3552	0
+nested_if_10000	c	parse_error	0	Liquid error: Nesting too deep	0.00	2516	0
+nested_if_10000	ruby	parse_error	0	Liquid error: Nesting too deep	0.12	36428	0
+self_include	rust	render_error	0	Liquid error (loop line 1): Nesting too deep	0.00	3296	0
+self_include	c	render_error	0	Liquid error (loop line 1): Nesting too deep	0.00	2168	0
+self_include	ruby	render_error	0	Liquid::StackLevelError: Liquid error (loop line 1): Nesting too deep	0.12	35884	0
+self_render	rust	render_error	0	Liquid error (loop line 1): Nesting too deep	0.00	3248	0
+self_render	c	render_error	0	Liquid error (loop line 1): Nesting too deep	0.00	2360	0
+self_render	ruby	render_error	0	Liquid::StackLevelError: Liquid error (loop line 1): Nesting too deep	0.12	36092	0

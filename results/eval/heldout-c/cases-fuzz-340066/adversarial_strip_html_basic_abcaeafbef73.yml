@@ -1,0 +1,14 @@
+---
+specs:
+- name: adversarial_strip_html_basic_abcaeafbef73
+  template: |-
+    {{ text | strip_html | strip_html -
+    }}
+  complexity: 277
+  hint: |-
+    Differential case generated from strip_html_basic (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/string-filters.yml:49).
+    Mutations: trim_markers_output_close, delimiter_whitespace_output_close, filter_boundary_duplicate.
+    Classification: reference_ok_subject_error.
+  environment:
+    text: "<p>Hello <b>World</b></p>"
+  expected: Hello World

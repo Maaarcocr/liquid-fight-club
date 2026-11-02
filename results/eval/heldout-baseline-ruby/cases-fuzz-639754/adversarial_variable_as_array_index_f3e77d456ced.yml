@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_variable_as_array_index_f3e77d456ced
+  template: |-
+    {{ items[idx] -
+    }}
+  complexity: 90
+  hint: |-
+    Differential case generated from variable_as_array_index (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/expressions.yml:228).
+    Mutations: trim_markers_output_close, delimiter_whitespace_output_close.
+    Classification: reference_ok_subject_error.
+  environment:
+    items:
+    - a
+    - b
+    - c
+    idx: 2
+  expected: c

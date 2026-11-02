@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_url_encode_26a6b4f3_06dc07d32ac8
+  template: "{{ __liquid_spec_missing__ | __liquid_spec_unknown_filter__, nil }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_url_encode_26a6b4f3 (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:6647).
+    Mutations: filter_boundary_unknown, lookup_boundary_missing, filter_boundary_extra_argument.
+    Classification: reference_ok_subject_error.
+  environment:
+    a0: 0.0
+  expected: ''

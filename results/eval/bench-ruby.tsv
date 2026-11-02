@@ -1,0 +1,11 @@
+name	parse_us	context_us	render_us	output_bytes
+bench_dynamic_partials	41.06	3.90	379.35	1803
+bench_liquid_tag_inventory_report	354.88	0.14	613.16	467
+bench_liquid_tag_leaderboard	281.97	1.56	528.14	252
+bench_storefront_cart_page	757.30	4.37	390.68	6227
+bench_storefront_cms_page	102.19	8.14	469.49	8147
+bench_storefront_collection_page	885.69	12.71	1080.97	6101
+bench_storefront_order_email	776.59	4.61	260.79	5213
+bench_storefront_product_page	1219.38	13.09	970.05	15123
+shopify_theme_full_page	219.12	5722.25	71.15	13271
+shopify_theme_product_page	515.11	6477.33	421.00	9563

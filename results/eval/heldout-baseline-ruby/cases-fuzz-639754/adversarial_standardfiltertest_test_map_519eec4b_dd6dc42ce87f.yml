@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_map_519eec4b_dd6dc42ce87f
+  template: "{{ a0 | map: a1  | map: a1 }}"
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_map_519eec4b (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:2835).
+    Mutations: filter_boundary_duplicate, trim_markers_output_open, trim_markers_output_open.
+    Classification: error_category_mismatch.
+  environment:
+    a0:
+    - a: 1
+    - a: 2
+    - a: 3
+    - a: 4
+    a1: a
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

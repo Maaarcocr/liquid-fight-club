@@ -1,0 +1,15 @@
+time	arm	state	commits	last_commit	total_tokens
+2026-11-02T14:44:44+01:00	rust	working (/goal active; transcript idle 3s)	2	Scaffold: Liquid in Rust	851807
+2026-11-02T14:44:44+01:00	c	working (/goal active; transcript idle 4s)	2	Scaffold: Liquid in C	793770
+2026-11-02T14:45:24+01:00	rust	working (/goal active; transcript idle 1s)	2	Scaffold: Liquid in Rust	1535626
+2026-11-02T14:45:24+01:00	c	working (/goal active; transcript idle 1s)	2	Scaffold: Liquid in C	2131455
+2026-11-02T15:02:30+01:00	rust	idle (no goal shown; transcript idle 976s)	2	Scaffold: Liquid in Rust	3142037
+2026-11-02T15:02:30+01:00	c	working (/goal active; transcript idle 151s)	2	Scaffold: Liquid in C	7169624
+2026-11-02T15:32:30+01:00	rust	working (/goal active; transcript idle 43s)	2	Scaffold: Liquid in Rust	11821344
+2026-11-02T15:32:30+01:00	c	working (/goal active; transcript idle 3s)	4	Match Ruby Integer() parsing of NUL-terminated big literals	31601122
+2026-11-02T16:02:29+01:00	rust	working (/goal active; transcript idle 21s)	4	Static environments, self drop contexts, Integer() quirks, awk split	34840465
+2026-11-02T16:02:29+01:00	c	working (/goal active; transcript idle 6s)	8	Match Ruby indexing semantics in collection filters; grammar-based differential fuzzing	85006301
+2026-11-02T16:32:29+01:00	rust	idle (/goal clear; transcript idle 633s)	8	NOTES.md, README, render depth 300 (fits a 512 KB stack), replay tool	67866536
+2026-11-02T16:32:30+01:00	c	idle (/goal active; transcript idle 1100s)	18	date: support bignum Unix timestamps (whole-day offset)	115938283
+2026-11-02T16:50:52+01:00	rust	idle (/goal clear; transcript idle 585s)	8	NOTES.md, README, render depth 300 (fits a 512 KB stack), replay tool	67866536
+2026-11-02T16:50:52+01:00	c	idle (/goal clear; transcript idle 496s)	18	date: support bignum Unix timestamps (whole-day offset)	117501576

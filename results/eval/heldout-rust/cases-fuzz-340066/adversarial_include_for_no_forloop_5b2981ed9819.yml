@@ -1,0 +1,20 @@
+---
+specs:
+- name: adversarial_include_for_no_forloop_5b2981ed9819
+  template: αα{% include '0' for items %}ωω
+  complexity: 228
+  hint: |-
+    Differential case generated from include_for_no_forloop (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:442).
+    Mutations: text_boundary_unicode, literal_boundary_string_2, text_boundary_unicode.
+    Classification: error_category_mismatch.
+  environment:
+    items:
+    - a
+    - b
+    - c
+  filesystem:
+    item: "[{{ forloop.index }}]"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

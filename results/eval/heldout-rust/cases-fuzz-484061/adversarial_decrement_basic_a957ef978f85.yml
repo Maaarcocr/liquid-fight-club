@@ -1,0 +1,12 @@
+---
+specs:
+- name: adversarial_decrement_basic_a957ef978f85
+  template: |-
+    α{% decrement counter -
+    %}{% decrement counter %}{% decrement counter %}ω
+  complexity: 115
+  hint: |-
+    Differential case generated from decrement_basic (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/specs.yml:1199).
+    Mutations: text_boundary_unicode, trim_markers_tag_close, delimiter_whitespace_tag_close.
+    Classification: reference_ok_subject_error.
+  expected: α-1-1-2ω

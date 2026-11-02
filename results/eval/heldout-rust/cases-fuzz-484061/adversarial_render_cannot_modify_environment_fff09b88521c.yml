@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_render_cannot_modify_environment_fff09b88521c
+  template: "{% render 'é' %}{{ user.name -}}"
+  complexity: 270
+  hint: |-
+    Differential case generated from render_cannot_modify_environment (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:643).
+    Mutations: literal_boundary_string_3, trim_markers_output_close.
+    Classification: error_category_mismatch.
+  environment:
+    user:
+      name: Alice
+  filesystem:
+    modifier: "{% assign user = nil %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_standardfiltertest_test_first_c694417c_a16f1832bcad
+  template: |2
+
+    {{ __liquid_spec_missing__ | first, nil }}
+  complexity: 160
+  hint: |-
+    Differential case generated from StandardFilterTest#test_first_c694417c (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/standard_filters.yml:1967).
+    Mutations: text_boundary_newlines, lookup_boundary_missing, filter_boundary_extra_argument.
+    Classification: error_category_mismatch.
+  environment:
+    a0: ''
+  errors:
+    render_error:
+    - render
+  error_mode: strict2

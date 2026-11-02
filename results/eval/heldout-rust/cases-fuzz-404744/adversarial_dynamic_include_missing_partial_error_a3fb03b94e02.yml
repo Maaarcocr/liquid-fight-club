@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_dynamic_include_missing_partial_error_a3fb03b94e02
+  template: "{%- include tpl -%}"
+  complexity: 1000
+  hint: |-
+    Differential case generated from dynamic_include_missing_partial_error (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/dynamic_partials.yml:40).
+    Mutations: trim_markers_tag_open, trim_markers_tag_close.
+    Classification: error_category_mismatch.
+  environment:
+    tpl: missing
+  features:
+  - strict2_parsing
+  error_mode: strict2
+  errors:
+    render_error:
+    - unknown

@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_render_counter_resets_each_call_4a144e8a5d89
+  template: |2
+
+    {% render 'é' %}{% render 'incr' %}{% render 'incr' %}
+  complexity: 214
+  hint: |-
+    Differential case generated from render_counter_resets_each_call (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:293).
+    Mutations: text_boundary_newlines, literal_boundary_string_0, literal_boundary_string_3.
+    Classification: error_category_mismatch.
+  filesystem:
+    incr: "{% increment x %}"
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

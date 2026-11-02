@@ -1,0 +1,17 @@
+---
+specs:
+- name: adversarial_render_with_alias_54f9a3f1bdbb
+  template: "{% render ' ' with featured as item %}"
+  complexity: 197
+  hint: |-
+    Differential case generated from render_with_alias (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/basics/partials.yml:87).
+    Mutations: literal_boundary_string_1.
+    Classification: error_category_mismatch.
+  environment:
+    featured: Widget
+  filesystem:
+    card: 'Card: {{ item }}'
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

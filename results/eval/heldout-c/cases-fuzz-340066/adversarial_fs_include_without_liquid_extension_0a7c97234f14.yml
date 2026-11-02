@@ -1,0 +1,18 @@
+---
+specs:
+- name: adversarial_fs_include_without_liquid_extension_0a7c97234f14
+  template: |-
+    {%
+    include 'é'
+    %}
+  complexity: 190
+  hint: |-
+    Differential case generated from fs_include_without_liquid_extension (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/filesystem.yml:45).
+    Mutations: delimiter_whitespace_tag_open, literal_boundary_string_3, delimiter_whitespace_tag_close.
+    Classification: error_category_mismatch.
+  filesystem:
+    foo.liquid: Without ext
+  errors:
+    render_error:
+    - unknown
+  error_mode: strict2

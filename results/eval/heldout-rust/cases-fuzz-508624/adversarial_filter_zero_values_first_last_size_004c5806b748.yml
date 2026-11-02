@@ -1,0 +1,31 @@
+---
+specs:
+- name: adversarial_filter_zero_values_first_last_size_004c5806b748
+  template: |2+
+
+    zero_int, first:{{
+    - i | first
+    }}
+    zero_int, size:{{- i | size }}
+    zero_float, first:{{- f | first }}
+    zero_float, size:{{- f | size }}
+    empty_string, size:{{- s | size }}
+
+  complexity: 300
+  hint: |-
+    Differential case generated from filter_zero_values_first_last_size (/var/lib/gems/3.2.0/bundler/gems/liquid-spec-84bf25e0edbc/specs/liquid_ruby/variable_type_filters.yml:413).
+    Mutations: delimiter_whitespace_output_open, delimiter_whitespace_output_close, text_boundary_newlines.
+    Classification: reference_ok_subject_error.
+  environment:
+    i: 0
+    f: 0.0
+    s: ''
+  expected: |2+
+
+    zero_int, first:
+    zero_int, size:8
+    zero_float, first:
+    zero_float, size:0
+    empty_string, size:0
+
+...
