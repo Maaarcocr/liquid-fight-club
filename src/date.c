@@ -228,6 +228,7 @@ static bool parse_time_string(const char *src, size_t n, const lq_time *now, lq_
             }
             break;
         }
+        if (h > 1) i += h - 1; /* skip the rest of the digit run */
     }
     /* "3pm" style */
     if (!have_time) {
@@ -615,12 +616,12 @@ static int iso_week(const tm_parts *p, int64_t *iso_year) {
     return week;
 }
 
-static void strftime_rec(lq_buf *b, const char *f, size_t fn, const tm_parts *p, int depth);
+static void strftime_rec(lq_buf *b, const char *f, size_t fn, const tm_parts *p, int depth, size_t cap);
 
 static void put_composite(lq_buf *b, const char *sub, const tm_parts *p, const fmtopt *o, int depth) {
     lq_buf t;
     lq_buf_init(&t);
-    strftime_rec(&t, sub, strlen(sub), p, depth + 1);
+    strftime_rec(&t, sub, strlen(sub), p, depth + 1, (size_t)-1);
     lq_buf_putc(&t, 0);
     t.len--;
     put_text(b, t.p, o, true);
@@ -657,8 +658,9 @@ static void put_zone(lq_buf *b, const tm_parts *p, const fmtopt *o) {
     lq_buf_put(b, tmp, (size_t)n);
 }
 
-static void strftime_rec(lq_buf *b, const char *f, size_t fn, const tm_parts *p, int depth) {
+static void strftime_rec(lq_buf *b, const char *f, size_t fn, const tm_parts *p, int depth, size_t cap) {
     for (size_t i = 0; i < fn; i++) {
+        if (b->len > cap) return;
         if (f[i] != '%' || i + 1 >= fn) {
             lq_buf_putc(b, f[i]);
             continue;
@@ -775,10 +777,11 @@ static void strftime_rec(lq_buf *b, const char *f, size_t fn, const tm_parts *p,
     }
 }
 
-void lq_strftime(lq_buf *b, const char *fmt, size_t flen, const lq_time *t) {
+bool lq_strftime(lq_buf *b, const char *fmt, size_t flen, const lq_time *t, size_t max_len) {
     tm_parts p;
     breakdown(t, &p);
-    strftime_rec(b, fmt, flen, &p, 0);
+    strftime_rec(b, fmt, flen, &p, 0, max_len);
+    return b->len <= max_len;
 }
 
 bool lq_parse_time_text(const char *s, size_t n, lq_time *t) {

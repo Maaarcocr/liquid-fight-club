@@ -52,7 +52,7 @@ static void forloop_free(lq_drop *d) {
     free(f);
 }
 
-static const lq_drop_vt forloop_vt = {"Liquid::ForloopDrop", forloop_get, NULL, NULL, NULL, NULL, forloop_free};
+static const lq_drop_vt forloop_vt = {"Liquid::ForloopDrop", forloop_get, NULL, NULL, NULL, NULL, forloop_free, NULL};
 
 lq_value lq_forloop_new(lq_str *name, int64_t length, lq_value parent) {
     forloop *f = lq_xcalloc(1, sizeof(forloop));
@@ -100,7 +100,7 @@ static lq_value trloop_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
 
 static void trloop_free(lq_drop *d) { free(d->data); }
 
-static const lq_drop_vt trloop_vt = {"Liquid::TablerowloopDrop", trloop_get, NULL, NULL, NULL, NULL, trloop_free};
+static const lq_drop_vt trloop_vt = {"Liquid::TablerowloopDrop", trloop_get, NULL, NULL, NULL, NULL, trloop_free, NULL};
 
 lq_value lq_tablerowloop_new(int64_t length, int64_t cols) {
     trloop *t = lq_xcalloc(1, sizeof(trloop));
@@ -150,6 +150,8 @@ static lq_value self_ref(lq_drop *d) {
     return lq_retain(v);
 }
 
+static lq_value valdrop_child(lq_drop *d) { return ((valdrop *)d->data)->value; }
+
 static lq_value value_tlv(lq_drop *d, lq_ctx *ctx, bool *has) {
     (void)ctx;
     *has = true;
@@ -185,9 +187,9 @@ static lq_value number_to_number(lq_drop *d, lq_ctx *ctx, bool *has) {
     return lq_retain(((valdrop *)d->data)->value);
 }
 
-static const lq_drop_vt boolean_vt = {"StandardBooleanDrop", bool_get, value_tlv, bool_to_s, NULL, NULL, valdrop_free};
-static const lq_drop_vt number_vt = {"StandardNumberDrop", number_get, value_tlv, value_to_s, NULL, number_to_number, valdrop_free};
-static const lq_drop_vt string_vt = {"StandardStringDrop", bool_get, value_tlv, value_to_s, NULL, NULL, valdrop_free};
+static const lq_drop_vt boolean_vt = {"StandardBooleanDrop", bool_get, value_tlv, bool_to_s, NULL, NULL, valdrop_free, valdrop_child};
+static const lq_drop_vt number_vt = {"StandardNumberDrop", number_get, value_tlv, value_to_s, NULL, number_to_number, valdrop_free, valdrop_child};
+static const lq_drop_vt string_vt = {"StandardStringDrop", bool_get, value_tlv, value_to_s, NULL, NULL, valdrop_free, valdrop_child};
 
 /* MethodDrop: echo_N / square_N / double_N */
 static lq_value method_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
@@ -221,7 +223,7 @@ static lq_value method_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     return lq_nil();
 }
 
-static const lq_drop_vt method_vt = {"StandardMethodDrop", method_get, NULL, NULL, NULL, NULL, NULL};
+static const lq_drop_vt method_vt = {"StandardMethodDrop", method_get, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static const char *NUMBER_WORDS[] = {"zero", "one", "two", "three", "four", "five"};
 
@@ -237,7 +239,7 @@ static lq_value index_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     return lq_str_cstr("unknown");
 }
 
-static const lq_drop_vt index_vt = {"StandardIndexDrop", index_get, NULL, NULL, NULL, NULL, NULL};
+static const lq_drop_vt index_vt = {"StandardIndexDrop", index_get, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static lq_value seq_items(void) {
     lq_value a = lq_arr_new(3);
@@ -263,7 +265,7 @@ static lq_value seq_iterate(lq_drop *d, lq_ctx *ctx) {
     return seq_items();
 }
 
-static const lq_drop_vt sequence_vt = {"StandardSequenceDrop", seq_get, NULL, NULL, seq_iterate, NULL, NULL};
+static const lq_drop_vt sequence_vt = {"StandardSequenceDrop", seq_get, NULL, NULL, seq_iterate, NULL, NULL, NULL};
 
 static lq_value plain_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     (void)ctx;
@@ -271,7 +273,7 @@ static lq_value plain_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     return lq_nil();
 }
 
-static const lq_drop_vt nil_vt = {"StandardNilDrop", plain_get, NULL, NULL, NULL, NULL, NULL};
+static const lq_drop_vt nil_vt = {"StandardNilDrop", plain_get, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static lq_value opaque_to_s(lq_drop *d, lq_ctx *ctx) {
     (void)d;
@@ -279,7 +281,7 @@ static lq_value opaque_to_s(lq_drop *d, lq_ctx *ctx) {
     return lq_str_cstr("opaque");
 }
 
-static const lq_drop_vt opaque_vt = {"StandardOpaqueDrop", plain_get, NULL, opaque_to_s, NULL, NULL, NULL};
+static const lq_drop_vt opaque_vt = {"StandardOpaqueDrop", plain_get, NULL, opaque_to_s, NULL, NULL, NULL, NULL};
 
 static lq_value error_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     (void)d;
@@ -288,7 +290,7 @@ static lq_value error_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     return lq_nil();
 }
 
-static const lq_drop_vt error_vt = {"StandardErrorDrop", error_get, NULL, NULL, NULL, NULL, NULL};
+static const lq_drop_vt error_vt = {"StandardErrorDrop", error_get, NULL, NULL, NULL, NULL, NULL, NULL};
 
 static lq_value nested_new(lq_value v);
 
@@ -308,7 +310,7 @@ static lq_value nested_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     return lq_nil();
 }
 
-static const lq_drop_vt nestedvt = {"StandardNestedDrop", nested_get, value_tlv, value_to_s, NULL, NULL, valdrop_free};
+static const lq_drop_vt nestedvt = {"StandardNestedDrop", nested_get, value_tlv, value_to_s, NULL, NULL, valdrop_free, valdrop_child};
 
 static lq_value valdrop_new(const lq_drop_vt *vt, lq_value v) {
     valdrop *vd = lq_xcalloc(1, sizeof(valdrop));

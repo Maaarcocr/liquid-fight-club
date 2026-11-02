@@ -79,6 +79,10 @@ typedef struct lq_obj {
 } lq_obj;
 
 #define LQ_RC_STATIC ((size_t)1 << (sizeof(size_t) * 8 - 2))
+/* Pinned objects (parsed templates, render data) are never touched by
+   retain/release, so rendering never writes to them. The real count is kept
+   in the low bits and restored by lq_unpin. */
+#define LQ_RC_PINNED ((size_t)1 << (sizeof(size_t) * 8 - 3))
 
 typedef struct lq_str {
     lq_obj h;
@@ -152,6 +156,8 @@ typedef struct lq_drop_vt {
     /* to_number for numeric filters; has=false if not supported */
     lq_value (*to_number)(struct lq_drop *d, struct lq_ctx *ctx, bool *has);
     void (*free)(struct lq_drop *d);
+    /* internal value owned by the drop (for pinning), or NULL */
+    lq_value (*child)(struct lq_drop *d);
 } lq_drop_vt;
 
 typedef struct lq_drop {
@@ -173,13 +179,16 @@ static inline bool lq_is_heap(lq_value v) {
 }
 
 void lq_obj_free(lq_value v);
+/* Pin / unpin a value graph exclusively owned by the caller. */
+void lq_pin(lq_value v);
+void lq_unpin(lq_value v);
 
 static inline lq_value lq_retain(lq_value v) {
-    if (lq_is_heap(v) && v.u.o->rc < LQ_RC_STATIC) v.u.o->rc++;
+    if (lq_is_heap(v) && v.u.o->rc < LQ_RC_PINNED) v.u.o->rc++;
     return v;
 }
 static inline void lq_release(lq_value v) {
-    if (lq_is_heap(v) && v.u.o->rc < LQ_RC_STATIC) {
+    if (lq_is_heap(v) && v.u.o->rc < LQ_RC_PINNED) {
         if (--v.u.o->rc == 0) lq_obj_free(v);
     }
 }
@@ -192,7 +201,11 @@ lq_value lq_str_empty(void);
 static inline lq_value lq_str_val(lq_str *s) { lq_value v; v.type = LQ_STR; v.u.s = s; return v; }
 uint32_t lq_hash_bytes(const char *s, size_t n);
 static inline uint32_t lq_str_hash(lq_str *s) {
-    if (!s->hash) s->hash = lq_hash_bytes(s->data, s->len);
+    if (!s->hash) {
+        uint32_t h = lq_hash_bytes(s->data, s->len);
+        if (s->h.rc >= LQ_RC_STATIC) return h; /* never write immortal objects */
+        s->hash = h;
+    }
     return s->hash;
 }
 size_t lq_str_nchars(lq_str *s);

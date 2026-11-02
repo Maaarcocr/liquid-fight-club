@@ -19,7 +19,7 @@
 
 #define MAX_SCOPE_DEPTH 100
 #ifndef LQ_DEFAULT_MAX_OUTPUT
-#define LQ_DEFAULT_MAX_OUTPUT ((int64_t)256 * 1024 * 1024)
+#define LQ_DEFAULT_MAX_OUTPUT ((int64_t)64 * 1024 * 1024)
 #endif
 #ifndef LQ_MAX_RENDER_DEPTH
 #define LQ_MAX_RENDER_DEPTH 1000
@@ -221,7 +221,7 @@ static lq_value self_get(lq_drop *d, lq_value key, lq_ctx *ctx) {
     return lq_find_variable((lq_ctx *)d->data, key);
 }
 
-static const lq_drop_vt self_vt = {"Liquid::SelfDrop", self_get, NULL, NULL, NULL, NULL, NULL};
+static const lq_drop_vt self_vt = {"Liquid::SelfDrop", self_get, NULL, NULL, NULL, NULL, NULL, NULL};
 
 /* ------------------------------------------------------------------ */
 /* Variable lookup                                                     */
@@ -1508,13 +1508,15 @@ int lq_render_template(const lq_template *t, const lq_hash *env, const liquid_re
         }
     }
     ctx_destroy(&ctx);
+    /* containers may reference values owned (pinned) by partial templates:
+       release them before the templates */
+    lq_release(sh.fs_index);
+    lq_release(sh.partial_index);
     for (size_t i = 0; i < sh.npartials; i++) {
         free(sh.partials[i].name);
         lq_template_free(sh.partials[i].tpl);
         lq_error_info_clear(&sh.partials[i].err);
     }
     free(sh.partials);
-    lq_release(sh.fs_index);
-    lq_release(sh.partial_index);
     return rc;
 }

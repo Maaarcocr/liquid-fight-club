@@ -38,7 +38,10 @@ void lq_arena_free(lq_arena *a) {
         free(c);
         c = n;
     }
-    for (size_t i = 0; i < a->nvals; i++) lq_release(a->vals[i]);
+    for (size_t i = 0; i < a->nvals; i++) {
+        lq_unpin(a->vals[i]);
+        lq_release(a->vals[i]);
+    }
     free(a->vals);
     memset(a, 0, sizeof *a);
 }
@@ -1994,6 +1997,8 @@ lq_template *lq_template_parse(const char *src, size_t len, bool line_numbers, l
         lq_template_free(t);
         return NULL;
     }
+    /* literals become read-only: rendering never writes template memory */
+    for (size_t i = 0; i < t->arena.nvals; i++) lq_pin(t->arena.vals[i]);
     return t;
 }
 

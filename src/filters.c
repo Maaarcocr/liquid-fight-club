@@ -1883,7 +1883,9 @@ static lq_value f_date(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     }
     lq_buf b;
     lq_buf_init(&b);
-    lq_strftime(&b, fmt.u.s->data, fmt.u.s->len, &t);
+    size_t cap = MAX_STRING_BYTES;
+    if (ctx->sh->max_output > 0 && (uint64_t)ctx->sh->max_output < cap) cap = (size_t)ctx->sh->max_output;
+    lq_strftime(&b, fmt.u.s->data, fmt.u.s->len, &t, cap);
     lq_release(fmt);
     if (!size_ok(ctx, b.len)) {
         lq_buf_free(&b);

@@ -86,6 +86,7 @@ liquid_data *liquid_data_from_json(const char *json, size_t len, const liquid_da
         return NULL;
     }
     liquid_data *d = lq_xmalloc(sizeof(liquid_data));
+    lq_pin(v); /* render data is read-only while rendering */
     d->v = v;
     return d;
 }
@@ -94,6 +95,7 @@ int liquid_data_is_object(const liquid_data *d) { return d && d->v.type == LQ_HA
 
 void liquid_data_free(liquid_data *d) {
     if (!d) return;
+    lq_unpin(d->v);
     lq_release(d->v);
     free(d);
 }

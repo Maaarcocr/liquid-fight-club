@@ -166,7 +166,7 @@ static lq_value host_to_s(lq_drop *d, lq_ctx *ctx) {
     return lq_str_cstr(h->type ? h->type : "Liquid::Drop");
 }
 
-static const lq_drop_vt host_vt = {"Liquid::Drop", host_get, NULL, host_to_s, host_iterate, NULL, host_free};
+static const lq_drop_vt host_vt = {"Liquid::Drop", host_get, NULL, host_to_s, host_iterate, NULL, host_free, NULL};
 
 static lq_value convert_special(jp *p, lq_value obj) {
     lq_hash *h = obj.u.h;

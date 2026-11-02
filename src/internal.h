@@ -341,7 +341,7 @@ typedef struct lq_time {
 
 /* Utils.to_date: false if not convertible */
 bool lq_to_date(lq_ctx *ctx, lq_value v, lq_time *t);
-void lq_strftime(lq_buf *b, const char *fmt, size_t flen, const lq_time *t);
+bool lq_strftime(lq_buf *b, const char *fmt, size_t flen, const lq_time *t, size_t max_len);
 bool lq_parse_time_text(const char *s, size_t n, lq_time *t);
 
 /* ------------------------------------------------------------------ */

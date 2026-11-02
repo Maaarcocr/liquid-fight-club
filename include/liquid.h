@@ -120,8 +120,9 @@ typedef struct liquid_render_options {
     int64_t render_length_limit;
     /* Hard safety limits that also apply when the above are 0.
        0 selects the built-in defaults. */
-    int64_t max_output_bytes;    /* default 256 MiB */
-    int64_t max_steps;           /* default 200 million node evaluations */
+    int64_t max_output_bytes;    /* default 64 MiB (output and any single string) */
+    int64_t max_steps;           /* default 100 million steps (nodes, loop
+                                    iterations, 32-byte units of filter output) */
 } liquid_render_options;
 
 void liquid_render_options_init(liquid_render_options *o);

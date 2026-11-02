@@ -358,7 +358,7 @@ void lq_hash_set_take(lq_hash *h, lq_str *key, lq_value v) {
         h->ents = lq_xrealloc(h->ents, nc * sizeof(lq_hent));
         h->cap = nc;
     }
-    key->h.rc < LQ_RC_STATIC ? (void)key->h.rc++ : (void)0;
+    key->h.rc < LQ_RC_PINNED ? (void)key->h.rc++ : (void)0;
     h->ents[h->len].key = key;
     h->ents[h->len].val = v;
     h->len++;
@@ -434,7 +434,7 @@ void lq_obj_free(lq_value v) {
             lq_arr *a = x.u.a;
             for (size_t i = 0; i < a->len; i++) {
                 lq_value c = a->items[i];
-                if (lq_is_heap(c) && c.u.o->rc < LQ_RC_STATIC && --c.u.o->rc == 0) {
+                if (lq_is_heap(c) && c.u.o->rc < LQ_RC_PINNED && --c.u.o->rc == 0) {
                     if (sp == scap) {
                         scap *= 2;
                         if (stack == stack_small) {
@@ -454,7 +454,7 @@ void lq_obj_free(lq_value v) {
             for (size_t i = 0; i < h->len; i++) {
                 lq_release(lq_str_val(h->ents[i].key));
                 lq_value c = h->ents[i].val;
-                if (lq_is_heap(c) && c.u.o->rc < LQ_RC_STATIC && --c.u.o->rc == 0) {
+                if (lq_is_heap(c) && c.u.o->rc < LQ_RC_PINNED && --c.u.o->rc == 0) {
                     if (sp == scap) {
                         scap *= 2;
                         if (stack == stack_small) {
@@ -865,3 +865,54 @@ uint64_t lq_value_hash(lq_value v, int depth) {
     default: return h;
     }
 }
+
+/* ------------------------------------------------------------------ */
+/* Pinning                                                             */
+/* ------------------------------------------------------------------ */
+
+static void walk(lq_value root, bool pin) {
+    lq_value small[64];
+    lq_value *stack = small;
+    size_t sp = 0, cap = 64;
+    stack[sp++] = root;
+    while (sp) {
+        lq_value v = stack[--sp];
+        if (!lq_is_heap(v) || v.u.o->rc >= LQ_RC_STATIC) continue;
+        bool pinned = (v.u.o->rc & LQ_RC_PINNED) != 0;
+        if (pin == pinned) continue;
+        if (pin) {
+            if (v.type == LQ_STR) {
+                lq_str_hash(v.u.s);
+                lq_str_nchars(v.u.s);
+            }
+            v.u.o->rc |= LQ_RC_PINNED;
+        } else {
+            v.u.o->rc &= ~LQ_RC_PINNED;
+        }
+        size_t need = 0;
+        if (v.type == LQ_ARR) need = v.u.a->len;
+        else if (v.type == LQ_HASH) need = v.u.h->len * 2;
+        else if (v.type == LQ_DROP) need = 1;
+        if (sp + need > cap) {
+            while (sp + need > cap) cap *= 2;
+            if (stack == small) {
+                stack = lq_xmalloc(cap * sizeof(lq_value));
+                memcpy(stack, small, sp * sizeof(lq_value));
+            } else stack = lq_xrealloc(stack, cap * sizeof(lq_value));
+        }
+        if (v.type == LQ_ARR) {
+            for (size_t i = 0; i < v.u.a->len; i++) stack[sp++] = v.u.a->items[i];
+        } else if (v.type == LQ_HASH) {
+            for (size_t i = 0; i < v.u.h->len; i++) {
+                stack[sp++] = lq_str_val(v.u.h->ents[i].key);
+                stack[sp++] = v.u.h->ents[i].val;
+            }
+        } else if (v.type == LQ_DROP && v.u.d->vt->child) {
+            stack[sp++] = v.u.d->vt->child(v.u.d);
+        }
+    }
+    if (stack != small) free(stack);
+}
+
+void lq_pin(lq_value v) { walk(v, true); }
+void lq_unpin(lq_value v) { walk(v, false); }
