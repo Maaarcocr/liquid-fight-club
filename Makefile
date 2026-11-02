@@ -41,3 +41,9 @@ asan:
 
 clean:
 	rm -rf build build-debug build-asan
+
+# Developer tools (not part of the release build)
+$(BUILD)/lqrender: tests/lqrender.c $(BUILD)/libliquid_fc.a
+	$(CC) $(ALLCFLAGS) -o $@ $^ $(LDLIBS)
+
+tools: $(BUILD)/lqrender

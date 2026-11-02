@@ -26,7 +26,7 @@ static void fill_error(liquid_error *err, liquid_error_type type, const lq_error
         lq_buf_puts(&b, info->markup_ctx);
     }
     err->core = lq_buf_detach(&b, NULL);
-    err->line = info->line;
+    err->line = info->has_line ? info->line : 0;
 }
 
 static void fill_simple(liquid_error *err, liquid_error_type type, const char *msg) {

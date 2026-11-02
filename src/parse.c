@@ -149,7 +149,8 @@ static void set_error(P *p, lq_err_kind kind, int line, const char *ctx, const c
     p->err->kind = kind;
     p->err->msg = lq_xstrndup(msg, mlen);
     p->err->markup_ctx = ctx ? lq_xstrndup(ctx, strlen(ctx)) : NULL;
-    p->err->line = p->line_numbers ? line : 0;
+    p->err->line = line;
+    p->err->has_line = p->line_numbers && kind == LQ_ERR_SYNTAX;
 }
 
 /* Raise a syntax error. Inside tag markup parsing the tag's line and markup
@@ -1834,10 +1835,13 @@ static void body_parse_liquid(P *p, tokenizer *t, lq_body *b, endtag *out) {
 }
 
 static void parse_liquid_tag(P *p, lq_body *b, sv markup) {
+    if (p->depth >= MAX_BLOCK_DEPTH) raise_nesting(p);
     tokenizer lt;
     tok_init_liquid(&lt, markup.s, markup.n, p->line);
     endtag et;
+    p->depth++;
     body_parse_liquid(p, &lt, b, &et);
+    p->depth--;
     if (!et.eof) {
         sv nm = {et.name, et.nlen};
         raise_unknown_tag(p, nm, "liquid");

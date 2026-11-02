@@ -97,7 +97,7 @@ static lq_value input_iter(lq_ctx *ctx, lq_value input) {
         out = lq_arr_new(0);
         if (b >= a) {
             uint64_t n = (uint64_t)b - (uint64_t)a + 1;
-            if (n == 0 || n > 50000000) {
+            if (n == 0 || n > 10000000) {
                 lq_raise(ctx, LQ_ERR_MEMORY, "Memory limits exceeded");
                 return out;
             }
@@ -161,10 +161,7 @@ static lq_value ruby_index(lq_ctx *ctx, lq_value obj, lq_value key, int *status)
             /* substring match */
             lq_str *h = obj.u.s, *n = key.u.s;
             if (n->len == 0) return lq_str_empty();
-            if (n->len <= h->len) {
-                for (size_t i = 0; i + n->len <= h->len; i++)
-                    if (memcmp(h->data + i, n->data, n->len) == 0) return lq_retain(key);
-            }
+            if (lq_memfind(h->data, h->len, n->data, n->len) >= 0) return lq_retain(key);
             return lq_nil();
         }
         if (key.type == LQ_INT) {
@@ -731,14 +728,16 @@ static lq_value ruby_split(lq_str *s, lq_str *pat) {
         }
         return out;
     }
-    size_t i = 0, st = 0;
-    while (i + pat->len <= len) {
-        if (memcmp(p + i, pat->data, pat->len) == 0) {
-            lq_arr_push_take(out.u.a, lq_str_new(p + st, i - st));
-            i += pat->len;
-            st = i;
-        } else i++;
+    size_t st = 0;
+    lq_finder f;
+    lq_finder_init(&f, pat->data, pat->len);
+    for (;;) {
+        long m = lq_finder_next(&f, p, len, st);
+        if (m < 0) break;
+        lq_arr_push_take(out.u.a, lq_str_new(p + st, (size_t)m - st));
+        st = (size_t)m + pat->len;
     }
+    lq_finder_free(&f);
     lq_arr_push_take(out.u.a, lq_str_new(p + st, len - st));
     /* drop trailing empty strings */
     lq_arr *a = out.u.a;
@@ -794,15 +793,8 @@ static lq_value f_squish(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
 }
 
 static const char *memmem_c(const char *h, size_t hn, const char *nd, size_t nn) {
-    if (nn == 0) return h;
-    if (nn > hn) return NULL;
-    for (size_t i = 0; i + nn <= hn; i++) {
-        const char *q = memchr(h + i, nd[0], hn - nn - i + 1);
-        if (!q) return NULL;
-        i = (size_t)(q - h);
-        if (memcmp(q, nd, nn) == 0) return q;
-    }
-    return NULL;
+    long r = lq_memfind(h, hn, nd, nn);
+    return r < 0 ? NULL : h + r;
 }
 
 static lq_value f_strip_html(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
@@ -815,19 +807,23 @@ static lq_value f_strip_html(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     lq_buf b1;
     lq_buf_init(&b1);
     size_t i = 0;
+    bool no_script = false, no_comment = false, no_style = false;
     while (i < len) {
         if (p[i] == '<') {
             const char *endp = NULL;
             size_t endlen = 0;
-            if (len - i >= 7 && memcmp(p + i, "<script", 7) == 0) {
+            if (!no_script && len - i >= 7 && memcmp(p + i, "<script", 7) == 0) {
                 endp = memmem_c(p + i + 7, len - i - 7, "</script>", 9);
                 endlen = 9;
-            } else if (len - i >= 4 && memcmp(p + i, "<!--", 4) == 0) {
+                no_script = !endp;
+            } else if (!no_comment && len - i >= 4 && memcmp(p + i, "<!--", 4) == 0) {
                 endp = memmem_c(p + i + 4, len - i - 4, "-->", 3);
                 endlen = 3;
-            } else if (len - i >= 6 && memcmp(p + i, "<style", 6) == 0) {
+                no_comment = !endp;
+            } else if (!no_style && len - i >= 6 && memcmp(p + i, "<style", 6) == 0) {
                 endp = memmem_c(p + i + 6, len - i - 6, "</style>", 8);
                 endlen = 8;
+                no_style = !endp;
             }
             if (endp) {
                 i = (size_t)(endp - p) + endlen;
@@ -844,13 +840,15 @@ static lq_value f_strip_html(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     const char *q = b1.p ? b1.p : "";
     size_t ql = b1.len;
     i = 0;
+    bool no_close = false;
     while (i < ql) {
-        if (q[i] == '<') {
+        if (q[i] == '<' && !no_close) {
             const char *e = memchr(q + i + 1, '>', ql - i - 1);
             if (e) {
                 i = (size_t)(e - q) + 1;
                 continue;
             }
+            no_close = true;
         }
         lq_buf_putc(&b2, q[i]);
         i++;
@@ -947,19 +945,19 @@ static lq_value do_replace(lq_ctx *ctx, lq_value in, lq_value pat, lq_value rep,
             if (b.len > MAX_STRING_BYTES) { ok = false; break; }
         }
     } else {
-        size_t i = 0, st = 0;
-        bool replaced = false;
-        while (i + pl <= len) {
-            if (memcmp(p + i, ps.u.s->data, pl) == 0 && (all || !replaced)) {
-                lq_buf_put(&b, p + st, i - st);
-                put_replacement(&b, rs.u.s->data, rs.u.s->len, p, len, i, pl);
-                i += pl;
-                st = i;
-                replaced = true;
-                if (!all) break;
-                if (b.len > MAX_STRING_BYTES) { ok = false; break; }
-            } else i++;
+        size_t st = 0;
+        lq_finder f;
+        lq_finder_init(&f, ps.u.s->data, pl);
+        for (;;) {
+            long m = lq_finder_next(&f, p, len, st);
+            if (m < 0) break;
+            lq_buf_put(&b, p + st, (size_t)m - st);
+            put_replacement(&b, rs.u.s->data, rs.u.s->len, p, len, (size_t)m, pl);
+            st = (size_t)m + pl;
+            if (!all) break;
+            if (b.len > MAX_STRING_BYTES) { ok = false; break; }
         }
+        lq_finder_free(&f);
         lq_buf_put(&b, p + st, len - st);
     }
     lq_release(ps);
@@ -993,15 +991,10 @@ static lq_value do_replace_last(lq_ctx *ctx, lq_value in, lq_value pat, lq_value
     lq_value s = S(ctx, in), ps = S(ctx, pat), rs = S(ctx, rep);
     const char *p = s.u.s->data;
     size_t len = s.u.s->len, pl = ps.u.s->len;
-    long found = -1;
-    if (pl <= len) {
-        for (size_t i = len - pl + 1; i-- > 0;) {
-            if (memcmp(p + i, ps.u.s->data, pl) == 0) {
-                found = (long)i;
-                break;
-            }
-        }
-    }
+    lq_finder f;
+    lq_finder_init(&f, ps.u.s->data, pl);
+    long found = lq_finder_last(&f, p, len);
+    lq_finder_free(&f);
     lq_value r;
     if (found < 0) r = lq_retain(s);
     else {
@@ -1322,6 +1315,11 @@ static lq_value f_uniq(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     if (has_prop && len == 0) return arr;
     lq_value out = lq_arr_new(0);
     lq_value keys = lq_arr_new(0);
+    /* open addressing table of indices into keys (by eql?-consistent hash) */
+    size_t tcap = 16;
+    while (tcap < len * 2 + 2) tcap *= 2;
+    size_t *table = lq_xcalloc(tcap, sizeof(size_t));
+    uint64_t *hashes = lq_xmalloc((len ? len : 1) * sizeof(uint64_t));
     for (size_t i = 0; i < len; i++) {
         lq_value item = arr.u.a->items[i];
         lq_value key;
@@ -1333,17 +1331,32 @@ static lq_value f_uniq(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
                 lq_release(out);
                 lq_release(keys);
                 lq_release(arr);
+                free(table);
+                free(hashes);
                 if (st == 1) raise_property_error(ctx, a[0]);
                 return lq_nil();
             }
         } else key = lq_liquid_value(item, ctx);
+        uint64_t hv = lq_value_hash(key, 0);
+        size_t slot = (size_t)hv & (tcap - 1);
         bool seen = false;
-        for (size_t j = 0; j < keys.u.a->len && !seen; j++) seen = eql_rec(keys.u.a->items[j], key, 0);
+        while (table[slot]) {
+            size_t j = table[slot] - 1;
+            if (hashes[j] == hv && eql_rec(keys.u.a->items[j], key, 0)) {
+                seen = true;
+                break;
+            }
+            slot = (slot + 1) & (tcap - 1);
+        }
         if (!seen) {
+            hashes[keys.u.a->len] = hv;
+            table[slot] = keys.u.a->len + 1;
             lq_arr_push_take(keys.u.a, key);
             lq_arr_push(out.u.a, item);
         } else lq_release(key);
     }
+    free(table);
+    free(hashes);
     lq_release(keys);
     lq_release(arr);
     return out;
@@ -1665,6 +1678,13 @@ static lq_value f_round(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
         digits = clamp_int(di);
         lq_release(di);
     } else digits = clamp_int(d.i);
+    if (digits > INT32_MAX || digits < INT32_MIN) {
+        /* Ruby raises RangeError (rendered as an internal error) */
+        lq_num_free(&x);
+        lq_num_free(&d);
+        lq_raise(ctx, LQ_ERR_INTERNAL, "internal");
+        return lq_nil();
+    }
     if (digits > 100000) digits = 100000;
     if (digits < -100000) digits = -100000;
     lq_value r = lq_nil();

@@ -3,3 +3,6 @@
 *.o
 *.a
 *.so
+/build-debug/
+/build-asan/
+/build-fuzz/

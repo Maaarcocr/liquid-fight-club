@@ -188,10 +188,18 @@ bool lq_regex_space(unsigned char c) {
 /* Strings                                                             */
 /* ------------------------------------------------------------------ */
 
-static uint32_t g_hash_seed = 0x9747b28cu;
+/* Per-process seed derived from ASLR so hostile keys cannot be precomputed
+   to collide; constant within a process (no initialization race). */
+static const char g_seed_anchor = 0;
+
+static uint32_t hash_seed(void) {
+    uintptr_t a = (uintptr_t)&g_seed_anchor ^ (uintptr_t)&lq_hash_bytes;
+    uint64_t x = (uint64_t)a * 0x9E3779B97F4A7C15ull;
+    return (uint32_t)(x >> 32) ^ (uint32_t)x;
+}
 
 uint32_t lq_hash_bytes(const char *s, size_t n) {
-    uint32_t h = 2166136261u ^ g_hash_seed;
+    uint32_t h = 2166136261u ^ hash_seed();
     for (size_t i = 0; i < n; i++) {
         h ^= (unsigned char)s[i];
         h *= 16777619u;
@@ -202,12 +210,10 @@ uint32_t lq_hash_bytes(const char *s, size_t n) {
     return h ? h : 1;
 }
 
-static struct {
-    lq_str s;
-    char nul;
-} g_empty_str = {{{LQ_RC_STATIC}, 0, 0, 0}, 0};
+static char g_empty_bytes[1];
+static lq_str g_empty_str = {{LQ_RC_STATIC}, 0, 0, 0, g_empty_bytes};
 
-lq_value lq_str_empty(void) { return lq_str_val(&g_empty_str.s); }
+lq_value lq_str_empty(void) { return lq_str_val(&g_empty_str); }
 
 lq_value lq_str_new(const char *s, size_t n) {
     if (n == 0) return lq_str_empty();
@@ -217,6 +223,7 @@ lq_value lq_str_new(const char *s, size_t n) {
     str->len = n;
     str->hash = 0;
     str->nchars = -1;
+    str->data = (char *)(str + 1);
     memcpy(str->data, s, n);
     str->data[n] = 0;
     return lq_str_val(str);
@@ -730,7 +737,7 @@ char *lq_error_format(const lq_error_info *e) {
     lq_buf b;
     lq_buf_init(&b);
     lq_buf_puts(&b, e->kind == LQ_ERR_SYNTAX ? "Liquid syntax error" : "Liquid error");
-    if (e->line > 0) {
+    if (e->has_line) {
         lq_buf_puts(&b, " (");
         if (e->template_name) {
             lq_buf_puts(&b, e->template_name);
@@ -745,4 +752,116 @@ char *lq_error_format(const lq_error_info *e) {
         lq_buf_puts(&b, e->markup_ctx);
     }
     return lq_buf_detach(&b, NULL);
+}
+
+/* ------------------------------------------------------------------ */
+/* Substring search with a linear worst case                           */
+/* ------------------------------------------------------------------ */
+
+#define FINDER_NAIVE_MAX 16
+
+void lq_finder_init(lq_finder *f, const char *pat, size_t n) {
+    f->pat = pat;
+    f->n = n;
+    f->fail = NULL;
+    if (n > FINDER_NAIVE_MAX) {
+        f->fail = lq_xmalloc(n * sizeof(size_t));
+        f->fail[0] = 0;
+        size_t k = 0;
+        for (size_t i = 1; i < n; i++) {
+            while (k && pat[i] != pat[k]) k = f->fail[k - 1];
+            if (pat[i] == pat[k]) k++;
+            f->fail[i] = k;
+        }
+    }
+}
+
+void lq_finder_free(lq_finder *f) {
+    free(f->fail);
+    f->fail = NULL;
+}
+
+long lq_finder_next(const lq_finder *f, const char *h, size_t hn, size_t start) {
+    size_t n = f->n;
+    if (n == 0) return start <= hn ? (long)start : -1;
+    if (start > hn || hn - start < n) return -1;
+    if (!f->fail) {
+        const char *end = h + hn - n;
+        for (const char *p = h + start; p <= end; p++) {
+            p = memchr(p, f->pat[0], (size_t)(end - p) + 1);
+            if (!p) return -1;
+            if (memcmp(p, f->pat, n) == 0) return (long)(p - h);
+        }
+        return -1;
+    }
+    size_t k = 0;
+    for (size_t i = start; i < hn; i++) {
+        while (k && h[i] != f->pat[k]) k = f->fail[k - 1];
+        if (h[i] == f->pat[k]) k++;
+        if (k == n) return (long)(i + 1 - n);
+    }
+    return -1;
+}
+
+long lq_finder_last(const lq_finder *f, const char *h, size_t hn) {
+    size_t n = f->n;
+    if (n == 0) return (long)hn;
+    if (hn < n) return -1;
+    if (!f->fail) {
+        for (size_t i = hn - n + 1; i-- > 0;)
+            if (h[i] == f->pat[0] && memcmp(h + i, f->pat, n) == 0) return (long)i;
+        return -1;
+    }
+    long last = -1;
+    size_t k = 0;
+    for (size_t i = 0; i < hn; i++) {
+        while (k && h[i] != f->pat[k]) k = f->fail[k - 1];
+        if (h[i] == f->pat[k]) k++;
+        if (k == n) {
+            last = (long)(i + 1 - n);
+            k = f->fail[k - 1];
+        }
+    }
+    return last;
+}
+
+long lq_memfind(const char *h, size_t hn, const char *nd, size_t nn) {
+    lq_finder f;
+    lq_finder_init(&f, nd, nn);
+    long r = lq_finder_next(&f, h, hn, 0);
+    lq_finder_free(&f);
+    return r;
+}
+
+/* Hash consistent with Ruby eql? (Integer 1 and Float 1.0 differ). */
+uint64_t lq_value_hash(lq_value v, int depth) {
+    uint64_t h = 0x100000001B3ull * (v.type + 1);
+    if (depth > 64) return h;
+    switch (v.type) {
+    case LQ_BOOL: return h ^ (v.u.b ? 1 : 2);
+    case LQ_INT: return h ^ ((uint64_t)v.u.i * 0x9E3779B97F4A7C15ull);
+    case LQ_FLOAT: {
+        double d = v.u.f == 0 ? 0.0 : v.u.f;
+        uint64_t bits;
+        memcpy(&bits, &d, sizeof bits);
+        return h ^ (bits * 0x9E3779B97F4A7C15ull);
+    }
+    case LQ_BIGINT: {
+        for (size_t i = 0; i < v.u.bi->n; i++) h = (h ^ v.u.bi->limb[i]) * 0x100000001B3ull;
+        return h ^ (uint64_t)v.u.bi->neg;
+    }
+    case LQ_STR: return h ^ lq_str_hash(v.u.s);
+    case LQ_ARR:
+        for (size_t i = 0; i < v.u.a->len; i++) h = (h ^ lq_value_hash(v.u.a->items[i], depth + 1)) * 0x100000001B3ull;
+        return h;
+    case LQ_HASH: {
+        uint64_t acc = 0;
+        for (size_t i = 0; i < v.u.h->len; i++)
+            acc += (lq_str_hash(v.u.h->ents[i].key) * 31u) ^ lq_value_hash(v.u.h->ents[i].val, depth + 1);
+        return h ^ acc;
+    }
+    case LQ_RANGE: return h ^ ((uint64_t)v.u.r->first * 31u + (uint64_t)v.u.r->last);
+    case LQ_DROP: return h ^ (uint64_t)(uintptr_t)v.u.d;
+    default: return h;
+    }
 }

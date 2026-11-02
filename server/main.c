@@ -15,6 +15,8 @@ typedef struct tpl_entry {
     liquid_data *fs; /* may be NULL */
 } tpl_entry;
 
+#define MAX_TEMPLATES 4096
+
 static tpl_entry *g_tpls;
 static size_t g_ntpls, g_captpls;
 static long g_next_tpl = 1;
@@ -136,6 +138,14 @@ static void handle_compile(lq_value id, lq_value params) {
         lq_buf_puts(&b, "}}}");
         liquid_error_clear(&err);
     } else {
+        if (g_ntpls >= MAX_TEMPLATES) {
+            /* evict the oldest template to bound memory in long sessions */
+            free(g_tpls[0].id);
+            liquid_template_free(g_tpls[0].tpl);
+            liquid_data_free(g_tpls[0].fs);
+            memmove(g_tpls, g_tpls + 1, (g_ntpls - 1) * sizeof(tpl_entry));
+            g_ntpls--;
+        }
         if (g_ntpls == g_captpls) {
             g_captpls = g_captpls ? g_captpls * 2 : 64;
             g_tpls = lq_xrealloc(g_tpls, g_captpls * sizeof(tpl_entry));

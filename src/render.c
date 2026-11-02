@@ -18,8 +18,15 @@
 #include <stdlib.h>
 
 #define MAX_SCOPE_DEPTH 100
-#define DEFAULT_MAX_OUTPUT ((int64_t)256 * 1024 * 1024)
-#define DEFAULT_MAX_STEPS ((int64_t)200 * 1000 * 1000)
+#ifndef LQ_DEFAULT_MAX_OUTPUT
+#define LQ_DEFAULT_MAX_OUTPUT ((int64_t)256 * 1024 * 1024)
+#endif
+#ifndef LQ_MAX_RENDER_DEPTH
+#define LQ_MAX_RENDER_DEPTH 1000
+#endif
+#ifndef LQ_DEFAULT_MAX_STEPS
+#define LQ_DEFAULT_MAX_STEPS ((int64_t)100 * 1000 * 1000)
+#endif
 
 /* ------------------------------------------------------------------ */
 /* Errors                                                              */
@@ -54,19 +61,11 @@ static void raise_memory(lq_ctx *ctx) { lq_raise(ctx, LQ_ERR_MEMORY, "Memory lim
 /* Resource accounting                                                 */
 /* ------------------------------------------------------------------ */
 
-static bool add_render_score(lq_ctx *ctx, int64_t n) {
+/* Safety budget, independent of Liquid's own resource limits: every node
+   rendered and every loop iteration costs one step. */
+static bool tick(lq_ctx *ctx, int64_t n) {
     lq_shared *sh = ctx->sh;
-    sh->render_score += n;
     sh->steps += n;
-    const liquid_render_options *o = sh->opts;
-    if (o->render_score_limit && sh->render_score > o->render_score_limit) {
-        raise_memory(ctx);
-        return false;
-    }
-    if (o->cumulative_render_score_limit && sh->steps > o->cumulative_render_score_limit) {
-        raise_memory(ctx);
-        return false;
-    }
     if (sh->steps > sh->max_steps) {
         raise_memory(ctx);
         return false;
@@ -74,14 +73,34 @@ static bool add_render_score(lq_ctx *ctx, int64_t n) {
     return true;
 }
 
-static int64_t g_cumulative_assign_dummy;
+/* ResourceLimits#increment_render_score */
+static bool add_render_score(lq_ctx *ctx, int64_t n) {
+    lq_shared *sh = ctx->sh;
+    sh->render_score += n;
+    sh->cum_render_score += n;
+    const liquid_render_options *o = sh->opts;
+    if (o->render_score_limit && sh->render_score > o->render_score_limit) {
+        raise_memory(ctx);
+        return false;
+    }
+    if (o->cumulative_render_score_limit && sh->cum_render_score > o->cumulative_render_score_limit) {
+        raise_memory(ctx);
+        return false;
+    }
+    return tick(ctx, n);
+}
 
+/* ResourceLimits#increment_assign_score */
 static bool add_assign_score(lq_ctx *ctx, int64_t n) {
     lq_shared *sh = ctx->sh;
     sh->assign_score += n;
-    g_cumulative_assign_dummy += 0;
+    sh->cum_assign_score += n;
     const liquid_render_options *o = sh->opts;
     if (o->assign_score_limit && sh->assign_score > o->assign_score_limit) {
+        raise_memory(ctx);
+        return false;
+    }
+    if (o->cumulative_assign_score_limit && sh->cum_assign_score > o->cumulative_assign_score_limit) {
         raise_memory(ctx);
         return false;
     }
@@ -506,15 +525,7 @@ static bool method_literal_check(lq_value lit, lq_value v) {
 }
 
 static bool str_contains(const char *h, size_t hn, const char *n, size_t nn) {
-    if (nn == 0) return true;
-    if (nn > hn) return false;
-    const char *end = h + hn - nn;
-    for (const char *p = h; p <= end; p++) {
-        p = memchr(p, n[0], (size_t)(end - p) + 1);
-        if (!p) return false;
-        if (memcmp(p, n, nn) == 0) return true;
-    }
-    return false;
+    return lq_memfind(h, hn, n, nn) >= 0;
 }
 
 /* returns a new reference */
@@ -861,7 +872,7 @@ static void render_for(lq_ctx *ctx, const lq_node *n, lq_buf *out) {
             uint8_t k = pop_interrupt(ctx);
             if (k == INTR_BREAK) break;
         }
-        if (!add_render_score(ctx, 0)) break;
+        if (!tick(ctx, 1)) break;
     }
     /* for_stack.pop */
     fs = ctx->reg.for_stack.u.a;
@@ -972,7 +983,7 @@ static void render_tablerow(lq_ctx *ctx, const lq_node *n, lq_buf *out) {
         if (lq_tablerowloop_col_last(loop) && !lq_tablerowloop_last(loop))
             lq_buf_printf(out, "</tr>\n<tr class=\"row%lld\">", (long long)lq_tablerowloop_row(loop) + 1);
         lq_tablerowloop_increment(loop);
-        if (!add_render_score(ctx, 0)) break;
+        if (!tick(ctx, 1)) break;
     }
     lq_release(loop);
     ctx_pop_scope(ctx);
@@ -1065,23 +1076,45 @@ static void render_ifchanged(lq_ctx *ctx, const lq_node *n, lq_buf *out) {
 
 /* ---- partials ---- */
 
-static bool name_matches(lq_str *key, const char *name, size_t n) {
-    /* case-insensitive compare of key (normalized with .liquid) */
-    const char *k = key->data;
-    size_t kl = key->len;
-    bool kext = kl >= 7 && strncasecmp(k + kl - 7, ".liquid", 7) == 0;
-    bool next = n >= 7 && strncasecmp(name + n - 7, ".liquid", 7) == 0;
-    size_t kb = kext ? kl - 7 : kl, nb = next ? n - 7 : n;
-    if (kb != nb) return false;
-    return strncasecmp(k, name, kb) == 0;
+/* File system key normalization: ASCII-lowercased, ".liquid" appended. */
+static lq_value normalize_fs_name(const char *s, size_t n) {
+    lq_buf b;
+    lq_buf_init(&b);
+    for (size_t i = 0; i < n; i++) {
+        char c = s[i];
+        if (c >= 'A' && c <= 'Z') c = (char)(c + 32);
+        lq_buf_putc(&b, c);
+    }
+    if (!(b.len >= 7 && memcmp(b.p + b.len - 7, ".liquid", 7) == 0)) lq_buf_puts(&b, ".liquid");
+    return lq_str_take_buf(&b);
+}
+
+static const lq_str *fs_lookup(lq_shared *sh, lq_str *name) {
+    if (!sh->fs) return NULL;
+    if (sh->fs_index.type != LQ_HASH) {
+        sh->fs_index = lq_hash_new(sh->fs->len);
+        for (size_t i = 0; i < sh->fs->len; i++) {
+            lq_hent *h = &sh->fs->ents[i];
+            if (h->val.type != LQ_STR) continue;
+            lq_value k = normalize_fs_name(h->key->data, h->key->len);
+            lq_hash_set(sh->fs_index.u.h, k.u.s, h->val);
+            lq_release(k);
+        }
+    }
+    lq_value k = normalize_fs_name(name->data, name->len);
+    lq_value v;
+    const lq_str *r = NULL;
+    if (lq_hash_get_str(sh->fs_index.u.h, k.u.s, &v)) r = v.u.s;
+    lq_release(k);
+    return r;
 }
 
 static const lq_partial_entry *load_partial(lq_ctx *ctx, lq_str *name) {
     lq_shared *sh = ctx->sh;
-    for (size_t i = 0; i < sh->npartials; i++) {
-        lq_partial_entry *e = &sh->partials[i];
-        if (strlen(e->name) == name->len && memcmp(e->name, name->data, name->len) == 0) return e;
-    }
+    if (sh->partial_index.type != LQ_HASH) sh->partial_index = lq_hash_new(0);
+    lq_value idx;
+    if (lq_hash_get_str(sh->partial_index.u.h, name, &idx)) return &sh->partials[idx.u.i];
+    lq_hash_set_take(sh->partial_index.u.h, name, lq_int((int64_t)sh->npartials));
     if (sh->npartials == sh->cappartials) {
         sh->cappartials = sh->cappartials ? sh->cappartials * 2 : 4;
         sh->partials = lq_xrealloc(sh->partials, sh->cappartials * sizeof(lq_partial_entry));
@@ -1089,16 +1122,7 @@ static const lq_partial_entry *load_partial(lq_ctx *ctx, lq_str *name) {
     lq_partial_entry *e = &sh->partials[sh->npartials++];
     memset(e, 0, sizeof *e);
     e->name = lq_xstrndup(name->data, name->len);
-    const lq_str *src = NULL;
-    if (sh->fs) {
-        for (size_t i = 0; i < sh->fs->len; i++) {
-            lq_hent *h = &sh->fs->ents[i];
-            if (h->val.type == LQ_STR && name_matches(h->key, name->data, name->len)) {
-                src = h->val.u.s;
-                break;
-            }
-        }
-    }
+    const lq_str *src = fs_lookup(sh, name);
     if (!src) {
         e->err.kind = LQ_ERR_FILESYSTEM;
         if (!sh->fs && sh->opts->no_file_system_message) {
@@ -1128,6 +1152,7 @@ static void raise_copy(lq_ctx *ctx, const lq_error_info *src) {
     ctx->err.markup_ctx = src->markup_ctx ? lq_xstrndup(src->markup_ctx, strlen(src->markup_ctx)) : NULL;
     ctx->err.template_name = src->template_name ? lq_xstrndup(src->template_name, strlen(src->template_name)) : NULL;
     ctx->err.line = src->line;
+    ctx->err.has_line = src->has_line;
     ctx->has_err = true;
 }
 
@@ -1289,7 +1314,7 @@ static void render_render(lq_ctx *ctx, const lq_node *n, lq_buf *out) {
                 lq_release(item);
                 lq_forloop_increment(loop);
                 if (ctx->has_err) break;
-                if (!add_render_score(ctx, 0)) break;
+                if (!tick(ctx, 1)) break;
             }
             lq_release(loop);
             seq_free(&s);
@@ -1386,7 +1411,10 @@ static void handle_node_error(lq_ctx *ctx, const lq_node *n, lq_buf *out) {
     if (ctx->err.kind == LQ_ERR_MEMORY) return; /* re-raised as-is */
     if (!ctx->err.template_name && ctx->template_name)
         ctx->err.template_name = lq_xstrndup(ctx->template_name, strlen(ctx->template_name));
-    if (!ctx->err.line && ctx->sh->line_numbers) ctx->err.line = n->line;
+    if (!ctx->err.has_line && ctx->sh->line_numbers) {
+        ctx->err.line = n->line;
+        ctx->err.has_line = true;
+    }
     if (ctx->sh->strict) return; /* propagate */
     bool blank_tag = n->kind != N_VAR && n->blank;
     ctx->sh->nerrors++;
@@ -1399,7 +1427,22 @@ static void handle_node_error(lq_ctx *ctx, const lq_node *n, lq_buf *out) {
     ctx->has_err = false;
 }
 
+static void render_body_inner(lq_ctx *ctx, const lq_body *b, lq_buf *out);
+
+/* Bounds total render recursion (nested blocks across nested partials) so
+   hostile templates cannot exhaust the C stack. */
 static void render_body(lq_ctx *ctx, const lq_body *b, lq_buf *out) {
+    lq_shared *sh = ctx->sh;
+    if (sh->depth >= LQ_MAX_RENDER_DEPTH) {
+        lq_raise(ctx, LQ_ERR_STACK, "Nesting too deep");
+        return;
+    }
+    sh->depth++;
+    render_body_inner(ctx, b, out);
+    sh->depth--;
+}
+
+static void render_body_inner(lq_ctx *ctx, const lq_body *b, lq_buf *out) {
     if (!add_render_score(ctx, (int64_t)b->n)) return;
     for (size_t i = 0; i < b->n; i++) {
         const lq_node *n = b->nodes[i];
@@ -1428,12 +1471,14 @@ int lq_render_template(const lq_template *t, const lq_hash *env, const liquid_re
     sh.opts = opts;
     sh.strict = opts->strict_errors != 0;
     sh.line_numbers = true;
-    sh.max_steps = opts->max_steps > 0 ? opts->max_steps : DEFAULT_MAX_STEPS;
-    sh.max_output = opts->max_output_bytes > 0 ? opts->max_output_bytes : DEFAULT_MAX_OUTPUT;
+    sh.max_steps = opts->max_steps > 0 ? opts->max_steps : LQ_DEFAULT_MAX_STEPS;
+    sh.max_output = opts->max_output_bytes > 0 ? opts->max_output_bytes : LQ_DEFAULT_MAX_OUTPUT;
     if (opts->file_system) {
         const lq_value *fsv = (const lq_value *)opts->file_system;
         if (fsv->type == LQ_HASH) sh.fs = fsv->u.h;
     }
+    sh.fs_index = lq_nil();
+    sh.partial_index = lq_nil();
     sh.has_now = opts->has_current_time != 0;
     sh.now = opts->current_time;
     sh.now_off = opts->current_time_offset;
@@ -1464,5 +1509,7 @@ int lq_render_template(const lq_template *t, const lq_hash *env, const liquid_re
         lq_error_info_clear(&sh.partials[i].err);
     }
     free(sh.partials);
+    lq_release(sh.fs_index);
+    lq_release(sh.partial_index);
     return rc;
 }

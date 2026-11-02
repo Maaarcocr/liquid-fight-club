@@ -239,6 +239,7 @@ typedef struct lq_shared {
     bool line_numbers;
     /* resource accounting */
     int64_t render_score, assign_score;
+    int64_t cum_render_score, cum_assign_score;
     int64_t steps;
     int64_t max_steps;
     int64_t max_output;
@@ -246,6 +247,9 @@ typedef struct lq_shared {
     /* partial cache */
     lq_partial_entry *partials;
     size_t npartials, cappartials;
+    lq_value partial_index; /* hash: name -> index into partials */
+    lq_value fs_index;      /* hash: normalized name -> source */
+    int depth;              /* render_body recursion depth */
     /* current time */
     bool has_now;
     int64_t now;

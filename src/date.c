@@ -249,10 +249,31 @@ static bool parse_time_string(const char *src, size_t n, const lq_time *now, lq_
             i += h;
         }
     }
-    /* date: yyyy-mm-dd, yyyy/mm/dd */
+    /* date: [+-]y+-mm-dd (any year length), yyyy/mm/dd */
     for (size_t i = 0; i < n && !have_date; i++) {
         if (ps.used[i]) continue;
         size_t y = digit_run(s, n, i);
+        if (y >= 1 && (i == 0 || !isdigit((unsigned char)s[i - 1])) && i + y < n && s[i + y] == '-' &&
+            digit_run(s, n, i + y + 1) >= 1) {
+            size_t j = i + y + 1;
+            size_t m = digit_run(s, n, j);
+            if (m >= 1 && m <= 2 && j + m < n && s[j + m] == '-') {
+                size_t k = j + m + 1;
+                size_t d = digit_run(s, n, k);
+                if (d >= 1 && d <= 2) {
+                    bool sign = i > 0 && (s[i - 1] == '-' || s[i - 1] == '+') && (i < 2 || !isdigit((unsigned char)s[i - 2]));
+                    if (y > 12) { ok = false; break; }
+                    year = num_at(s, i, y);
+                    if (!sign && y <= 2) year += year >= 69 ? 1900 : 2000;
+                    if (sign && s[i - 1] == '-') year = -year;
+                    mon = (int)num_at(s, j, m);
+                    day = (int)num_at(s, k, d);
+                    have_date = have_year = have_mon = have_day = true;
+                    mark(&ps, sign ? i - 1 : i, k + d);
+                    break;
+                }
+            }
+        }
         if (y == 4 && (i == 0 || !isdigit((unsigned char)s[i - 1])) && i + y < n && (s[i + y] == '-' || s[i + y] == '/')) {
             char sep = s[i + y];
             size_t j = i + y + 1;
@@ -373,22 +394,50 @@ static bool parse_time_string(const char *src, size_t n, const lq_time *now, lq_
             }
         }
     }
-    /* yyyymmdd[hhmmss] */
+    /* bare digit runs (Date._parse "ddd" forms): dd, ddd (yday), mmdd,
+       yyddd, yymmdd, yyyyddd, yyyymmdd[hh[mm[ss]]] */
+    int yday = 0;
     if (!have_date) {
         for (size_t i = 0; i < n; i++) {
             if (ps.used[i] || !isdigit((unsigned char)s[i])) continue;
             size_t d = digit_run(s, n, i);
-            if (d == 8 || d == 14) {
+            bool hit = true;
+            switch (d) {
+            case 1: if (have_time) { day = (int)num_at(s, i, 1); have_day = true; } else hit = false; break;
+            case 2: day = (int)num_at(s, i, 2); have_day = true; break;
+            case 3: yday = (int)num_at(s, i, 3); break;
+            case 4: mon = (int)num_at(s, i, 2); day = (int)num_at(s, i + 2, 2); have_mon = have_day = true; break;
+            case 5:
+                year = num_at(s, i, 2);
+                year += year >= 69 ? 1900 : 2000;
+                yday = (int)num_at(s, i + 2, 3);
+                have_year = true;
+                break;
+            case 6:
+                year = num_at(s, i, 2);
+                year += year >= 69 ? 1900 : 2000;
+                mon = (int)num_at(s, i + 2, 2);
+                day = (int)num_at(s, i + 4, 2);
+                have_year = have_mon = have_day = true;
+                break;
+            case 7:
+                year = num_at(s, i, 4);
+                yday = (int)num_at(s, i + 4, 3);
+                have_year = true;
+                break;
+            case 8: case 10: case 12: case 14:
                 year = num_at(s, i, 4);
                 mon = (int)num_at(s, i + 4, 2);
                 day = (int)num_at(s, i + 6, 2);
-                have_date = have_year = have_mon = have_day = true;
-                if (d == 14) {
-                    hour = (int)num_at(s, i + 8, 2);
-                    min = (int)num_at(s, i + 10, 2);
-                    sec = (int)num_at(s, i + 12, 2);
-                    have_time = true;
-                }
+                have_year = have_mon = have_day = true;
+                if (d >= 10) { hour = (int)num_at(s, i + 8, 2); have_time = true; }
+                if (d >= 12) min = (int)num_at(s, i + 10, 2);
+                if (d >= 14) sec = (int)num_at(s, i + 12, 2);
+                break;
+            default: hit = false;
+            }
+            if (hit) {
+                have_date = true;
                 mark(&ps, i, i + d);
                 break;
             }
@@ -412,14 +461,22 @@ static bool parse_time_string(const char *src, size_t n, const lq_time *now, lq_
     }
     free(ps.s);
     free(ps.used);
+    if (!ok) return false;
     if (!have_date && !have_time) return false;
 
     tm_parts np;
     breakdown(now, &np);
     if (!have_year) year = np.year;
+    if (yday) {
+        if (yday < 1 || yday > (is_leap(year) ? 366 : 365)) return false;
+        int64_t dd = days_from_civil(year, 1, 1) + (yday - 1);
+        int64_t yy;
+        civil_from_days(dd, &yy, &mon, &day);
+        have_mon = have_day = true;
+    }
     if (!have_mon) mon = have_day ? np.mon : (have_date ? 1 : np.mon);
     if (!have_day) day = have_date ? 1 : np.mday;
-    if (!have_date) {
+    if (!have_date && !have_day) {
         year = np.year;
         mon = np.mon;
         day = np.mday;
@@ -427,6 +484,8 @@ static bool parse_time_string(const char *src, size_t n, const lq_time *now, lq_
     if (mon < 1 || mon > 12) ok = false;
     if (day < 1 || day > 31) ok = false;
     if (hour > 24 || min > 59 || sec > 60) ok = false;
+    /* keep epoch arithmetic within int64 */
+    if (year > 100000000000LL || year < -100000000000LL) ok = false;
     if (!ok) return false;
     /* Time.local normalizes e.g. Feb 30 -> Mar 1 */
     int64_t days = days_from_civil(year, mon, 1) + (day - 1);
@@ -686,7 +745,7 @@ static void strftime_rec(lq_buf *b, const char *f, size_t fn, const tm_parts *p,
         case 'G': {
             int64_t iy;
             iso_week(p, &iy);
-            put_num(b, iy, 4, '0', &o);
+            put_num(b, iy, iy < 0 ? 5 : 4, '0', &o);
             break;
         }
         case 'g': {

@@ -85,7 +85,7 @@ typedef struct lq_str {
     size_t len;
     uint32_t hash;   /* 0 = not computed yet */
     int32_t nchars;  /* cached UTF-8 char count, -1 = unknown */
-    char data[];     /* NUL terminated */
+    char *data;      /* NUL terminated; points into the same allocation */
 } lq_str;
 
 typedef struct lq_value {
@@ -243,6 +243,18 @@ lq_value lq_liquid_value(lq_value v, struct lq_ctx *ctx);
 bool lq_is_blank(lq_value v);
 bool lq_is_empty(lq_value v);
 const char *lq_class_name(lq_value v);
+/* Substring search with linear worst-case time */
+typedef struct lq_finder {
+    const char *pat;
+    size_t n;
+    size_t *fail; /* KMP table for long patterns */
+} lq_finder;
+void lq_finder_init(lq_finder *f, const char *pat, size_t n);
+void lq_finder_free(lq_finder *f);
+long lq_finder_next(const lq_finder *f, const char *h, size_t hn, size_t start);
+long lq_finder_last(const lq_finder *f, const char *h, size_t hn);
+long lq_memfind(const char *h, size_t hn, const char *nd, size_t nn);
+uint64_t lq_value_hash(lq_value v, int depth);
 /* Ruby String predicates */
 bool lq_ruby_space(unsigned char c); /* strip whitespace: \0 \t \n \v \f \r space */
 bool lq_regex_space(unsigned char c); /* \s : \t \n \v \f \r space */
@@ -294,7 +306,8 @@ typedef struct lq_error_info {
     char *msg;           /* core message (malloc'd) */
     char *markup_ctx;    /* e.g. in "{{ x }}" or NULL */
     char *template_name; /* partial name or NULL */
-    int line;            /* 0 = unknown */
+    int line;
+    bool has_line;
 } lq_error_info;
 
 void lq_error_info_clear(lq_error_info *e);
