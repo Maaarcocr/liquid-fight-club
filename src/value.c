@@ -505,8 +505,18 @@ const char *lq_class_name(lq_value v) {
     return "Object";
 }
 
-static bool is_noncharacter(int32_t cp) {
-    return (cp >= 0xFDD0 && cp <= 0xFDEF) || (cp & 0xFFFE) == 0xFFFE;
+#include "printable.inc"
+
+/* true when Ruby's String#inspect escapes this code point */
+static bool inspect_escapes(int32_t cp) {
+    size_t lo = 0, hi = sizeof INSPECT_ESCAPED / sizeof INSPECT_ESCAPED[0];
+    while (lo < hi) {
+        size_t mid = (lo + hi) / 2;
+        if (INSPECT_ESCAPED[mid][1] < cp) lo = mid + 1;
+        else if (INSPECT_ESCAPED[mid][0] > cp) hi = mid;
+        else return true;
+    }
+    return false;
 }
 
 void lq_inspect_str(lq_buf *b, const char *s, size_t n) {
@@ -547,7 +557,7 @@ void lq_inspect_str(lq_buf *b, const char *s, size_t n) {
             i++;
             continue;
         }
-        if ((cp >= 0x80 && cp < 0xA0) || cp == 0x2028 || cp == 0x2029 || is_noncharacter(cp)) {
+        if (inspect_escapes(cp)) {
             if (cp > 0xFFFF) lq_buf_printf(b, "\\u{%X}", (unsigned)cp);
             else lq_buf_printf(b, "\\u%04X", (unsigned)cp);
         } else {
