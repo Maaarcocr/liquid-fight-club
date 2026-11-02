@@ -637,8 +637,16 @@ bool lq_ruby_Integer(const char *s, size_t n, lq_value *out) {
         }
     }
     if (ok) {
-        size_t small_digits = base == 10 ? 19 : base == 16 ? 15 : base == 8 ? 21 : 63;
-        bool big = has_us || d.len > small_digits;
+        /* "small" = fits in an unsigned 64-bit integer */
+        bool fits = true;
+        uint64_t acc = 0;
+        for (size_t k = 0; k < d.len && fits; k++) {
+            char c = d.p[k];
+            uint64_t dv = (uint64_t)(c <= '9' ? c - '0' : (c | 0x20) - 'a' + 10);
+            if (acc > (UINT64_MAX - dv) / (uint64_t)base) fits = false;
+            else acc = acc * (uint64_t)base + dv;
+        }
+        bool big = has_us || !fits;
         while (i < n && lq_regex_space((unsigned char)s[i])) i++;
         if (i < n && !(big && s[i] == 0)) ok = false;
     }
