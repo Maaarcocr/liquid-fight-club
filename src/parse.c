@@ -18,6 +18,7 @@
 #include "lq.h"
 #include "internal.h"
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -224,8 +225,15 @@ static bool all_regex_space(const char *s, size_t n) {
 static int count_nl(const char *s, size_t n) {
     int c = 0;
     for (size_t i = 0; i < n; i++)
-        if (s[i] == '\n') c++;
+        if (s[i] == '\n' && c < INT_MAX) c++;
     return c;
+}
+
+/* saturating line arithmetic: huge templates must not overflow */
+static int line_add(int line, int n) {
+    if (n > 0 && line > INT_MAX - n) return INT_MAX;
+    if (n < 0 && line < INT_MIN - n) return INT_MIN;
+    return line + n;
 }
 
 static const char *find2(const char *s, size_t n, char a, char b) {
@@ -303,7 +311,7 @@ static bool tok_shift(tokenizer *t, const char **out, size_t *olen) {
         *olen = n;
         t->pos += n + (nl ? 1 : 0);
         if (!nl) t->pos = t->len + 1;
-        t->line += 1;
+        t->line = line_add(t->line, 1);
         return true;
     }
     if (t->pos >= t->len) return false;
@@ -383,7 +391,7 @@ static bool tok_shift(tokenizer *t, const char **out, size_t *olen) {
         tlen = pos - start;
     }
     t->pos = pos;
-    t->line += count_nl(tok, tlen);
+    t->line = line_add(t->line, count_nl(tok, tlen));
     *out = tok;
     *olen = tlen;
     return true;
@@ -1816,7 +1824,7 @@ static void body_parse_liquid(P *p, tokenizer *t, lq_body *b, endtag *out) {
                 return;
             }
             if (sv_eq(name.s, name.n, "liquid")) {
-                p->line -= 1;
+                p->line = line_add(p->line, -1);
                 parse_liquid_tag(p, b, markup);
                 continue;
             }
@@ -1880,7 +1888,7 @@ static void body_parse(P *p, tokenizer *t, lq_body *b, endtag *out) {
                 lq_buf_puts(&eb, "' was not properly terminated with regexp: /\\%\\}/");
                 perr_buf(p, LQ_ERR_SYNTAX, &eb);
             }
-            p->line += count_nl(ws1.s, ws1.n) + count_nl(ws3.s, ws3.n);
+            p->line = line_add(line_add(p->line, count_nl(ws1.s, ws1.n)), count_nl(ws3.s, ws3.n));
             if (sv_eq(name.s, name.n, "liquid")) {
                 parse_liquid_tag(p, b, markup);
                 continue;
