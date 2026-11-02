@@ -30,7 +30,7 @@ def reference(c)
     t = Liquid::Template.parse(c["template"], error_mode: :strict2, line_numbers: true)
     ctx = Liquid::Context.build(static_environments: c["environment"] || {}, registers: { file_system: FS.new(c["filesystem"]) })
     def Time.now; NOW; end
-    t.render(ctx)
+    ENV["STRICT"] ? t.render!(ctx) : t.render(ctx)
   end
 rescue Timeout::Error
   :timeout
@@ -46,9 +46,9 @@ adapter.start
 
 def subject(adapter, c)
   id = adapter.compile(c["template"], { error_mode: :strict2, line_numbers: true, file_system: c["filesystem"] || {} })
-  adapter.render(id, c["environment"] || {}, { strict_errors: false, registers: { current_time: NOW } })
+  adapter.render(id, c["environment"] || {}, { strict_errors: !ENV["STRICT"].nil?, registers: { current_time: NOW } })
 rescue => e
-  e.message.sub(/\ALiquid error: /, "")
+  e.message.sub(/\ALiquid error: /, "").sub(/\ARender error: /, "")
 end
 
 mismatch = 0

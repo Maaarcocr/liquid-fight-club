@@ -1631,7 +1631,7 @@ void lq_to_number(lq_ctx *ctx, lq_value v, lq_num *out) {
         return;
     case LQ_FLOAT:
         out->is_dec = true;
-        dec_from_double(&out->d, v.u.f);
+        lq_dec_from_double(&out->d, v.u.f);
         return;
     case LQ_STR: {
         const char *s = v.u.s->data;
@@ -1639,14 +1639,14 @@ void lq_to_number(lq_ctx *ctx, lq_value v, lq_num *out) {
         if (decimal_string(s, n)) {
             while (n && lq_ruby_space((unsigned char)*s)) { s++; n--; }
             out->is_dec = true;
-            dec_from_text(&out->d, s, n);
+            lq_dec_from_text(&out->d, s, n);
         } else {
             out->i = lq_str_to_i(s, n);
             if (out->i.type == LQ_FLOAT) {
                 double d = out->i.u.f;
                 out->i = lq_int(0);
                 out->is_dec = true;
-                dec_from_double(&out->d, d);
+                lq_dec_from_double(&out->d, d);
             }
         }
         return;
@@ -1670,20 +1670,20 @@ void lq_to_number(lq_ctx *ctx, lq_value v, lq_num *out) {
 
 void lq_num_free(lq_num *n) {
     lq_release(n->i);
-    if (n->is_dec) dec_free(&n->d);
+    if (n->is_dec) lq_dec_free(&n->d);
 }
 
 static void num_to_dec(const lq_num *n, dec *d) {
     if (n->is_dec) {
-        dec_init(d);
+        lq_dec_init(d);
         d->special = n->d.special;
         d->neg = n->d.neg;
         d->e = n->d.e;
-        mag_copy(&d->m, &n->d.m);
-    } else dec_from_int(d, n->i);
+        lq_mag_copy(&d->m, &n->d.m);
+    } else lq_dec_from_int(d, n->i);
 }
 
-static lq_value dec_result(const dec *d) { return lq_float(dec_to_double(d)); }
+static lq_value lq_dec_result(const dec *d) { return lq_float(lq_dec_to_double(d)); }
 
 enum { OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD };
 
@@ -1713,22 +1713,22 @@ static lq_value arith(lq_ctx *ctx, lq_value x, lq_value y, int op) {
         num_to_dec(&b, &db);
         bool ok = true;
         switch (op) {
-        case OP_ADD: dec_add(&dr, &da, &db, false); break;
-        case OP_SUB: dec_add(&dr, &da, &db, true); break;
-        case OP_MUL: dec_mul(&dr, &da, &db); break;
-        case OP_DIV: dec_div(&dr, &da, &db); break;
+        case OP_ADD: lq_dec_add(&dr, &da, &db, false); break;
+        case OP_SUB: lq_dec_add(&dr, &da, &db, true); break;
+        case OP_MUL: lq_dec_mul(&dr, &da, &db); break;
+        case OP_DIV: lq_dec_div(&dr, &da, &db); break;
         case OP_MOD:
-            if (!dec_mod(&dr, &da, &db)) {
+            if (!lq_dec_mod(&dr, &da, &db)) {
                 ok = false;
-                dec_init(&dr);
+                lq_dec_init(&dr);
             }
             break;
         }
-        if (ok) r = dec_result(&dr);
+        if (ok) r = lq_dec_result(&dr);
         else lq_raise(ctx, LQ_ERR_ZERODIV, "divided by 0");
-        dec_free(&da);
-        dec_free(&db);
-        dec_free(&dr);
+        lq_dec_free(&da);
+        lq_dec_free(&db);
+        lq_dec_free(&dr);
     }
     lq_num_free(&a);
     lq_num_free(&b);
@@ -1749,7 +1749,7 @@ static lq_value f_abs(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     lq_value r;
     if (x.is_dec) {
         x.d.neg = 0;
-        r = dec_result(&x.d);
+        r = lq_dec_result(&x.d);
     } else if (x.i.type == LQ_INT) {
         if (x.i.u.i == INT64_MIN) r = lq_int_mul(x.i, lq_int(-1));
         else r = lq_int(x.i.u.i < 0 ? -x.i.u.i : x.i.u.i);
@@ -1772,7 +1772,7 @@ static lq_value f_round(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     lq_to_number(ctx, nv, &d);
     int64_t digits = 0;
     if (d.is_dec) {
-        lq_value di = dec_to_int(&d.d);
+        lq_value di = lq_dec_to_int(&d.d);
         digits = clamp_int(di);
         lq_release(di);
     } else digits = clamp_int(d.i);
@@ -1789,24 +1789,24 @@ static lq_value f_round(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     bool n_is_zero = (nv.type == LQ_INT && nv.u.i == 0) || (nv.type == LQ_FLOAT && nv.u.f == 0);
     if (x.is_dec) {
         if (x.d.special != DEC_FINITE) {
-            if (digits > 0) r = dec_result(&x.d);
+            if (digits > 0) r = lq_dec_result(&x.d);
             else float_domain(ctx, &x.d);
         } else {
             dec rr;
-            dec_round(&rr, &x.d, digits, 0);
-            if (digits > 0) r = dec_result(&rr);
-            else r = dec_to_int(&rr);
-            dec_free(&rr);
+            lq_dec_round(&rr, &x.d, digits, 0);
+            if (digits > 0) r = lq_dec_result(&rr);
+            else r = lq_dec_to_int(&rr);
+            lq_dec_free(&rr);
         }
     } else {
         if (digits >= 0) r = lq_retain(x.i);
         else {
             dec xd, rr;
-            dec_from_int(&xd, x.i);
-            dec_round(&rr, &xd, digits, 0);
-            r = dec_to_int(&rr);
-            dec_free(&xd);
-            dec_free(&rr);
+            lq_dec_from_int(&xd, x.i);
+            lq_dec_round(&rr, &xd, digits, 0);
+            r = lq_dec_to_int(&rr);
+            lq_dec_free(&xd);
+            lq_dec_free(&rr);
         }
     }
     if (!ctx->has_err && n_is_zero && r.type == LQ_FLOAT) {
@@ -1816,9 +1816,9 @@ static lq_value f_round(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
             r = lq_nil();
         } else {
             dec t;
-            dec_from_double(&t, f);
-            r = dec_to_int(&t);
-            dec_free(&t);
+            lq_dec_from_double(&t, f);
+            r = lq_dec_to_int(&t);
+            lq_dec_free(&t);
         }
     }
     lq_num_free(&x);
@@ -1836,9 +1836,9 @@ static lq_value ceil_floor(lq_ctx *ctx, lq_value in, int mode) {
         r = lq_nil();
     } else {
         dec rr;
-        dec_round(&rr, &x.d, 0, mode);
-        r = dec_to_int(&rr);
-        dec_free(&rr);
+        lq_dec_round(&rr, &x.d, 0, mode);
+        r = lq_dec_to_int(&rr);
+        lq_dec_free(&rr);
     }
     lq_num_free(&x);
     return r;
@@ -1852,14 +1852,14 @@ static int num_cmp(const lq_num *a, const lq_num *b) {
     dec x, y;
     num_to_dec(a, &x);
     num_to_dec(b, &y);
-    int r = dec_cmp(&x, &y);
-    dec_free(&x);
-    dec_free(&y);
+    int r = lq_dec_cmp(&x, &y);
+    lq_dec_free(&x);
+    lq_dec_free(&y);
     return r;
 }
 
 static lq_value num_value(const lq_num *n) {
-    if (n->is_dec) return dec_result(&n->d);
+    if (n->is_dec) return lq_dec_result(&n->d);
     return lq_retain(n->i);
 }
 
@@ -1912,7 +1912,7 @@ static lq_value f_sum(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     lq_value acc_i = lq_int(0);
     bool is_dec = false;
     dec acc_d;
-    dec_init(&acc_d);
+    lq_dec_init(&acc_d);
     for (size_t i = 0; i < flat.u.a->len; i++) {
         lq_num x;
         lq_to_number(ctx, flat.u.a->items[i], &x);
@@ -1922,15 +1922,15 @@ static lq_value f_sum(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
             acc_i = t;
         } else {
             if (!is_dec) {
-                dec_free(&acc_d);
-                dec_from_int(&acc_d, acc_i);
+                lq_dec_free(&acc_d);
+                lq_dec_from_int(&acc_d, acc_i);
                 is_dec = true;
             }
             dec xd, t;
             num_to_dec(&x, &xd);
-            dec_add(&t, &acc_d, &xd, false);
-            dec_free(&acc_d);
-            dec_free(&xd);
+            lq_dec_add(&t, &acc_d, &xd, false);
+            lq_dec_free(&acc_d);
+            lq_dec_free(&xd);
             acc_d = t;
         }
         lq_num_free(&x);
@@ -1938,10 +1938,10 @@ static lq_value f_sum(lq_ctx *ctx, lq_value in, lq_value *a, size_t n) {
     lq_release(flat);
     lq_value r;
     if (is_dec) {
-        r = dec_result(&acc_d);
+        r = lq_dec_result(&acc_d);
         lq_release(acc_i);
     } else r = acc_i;
-    dec_free(&acc_d);
+    lq_dec_free(&acc_d);
     return r;
 }
 

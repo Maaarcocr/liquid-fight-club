@@ -18,13 +18,13 @@ typedef struct mag {
     size_t n, cap;
 } mag;
 
-void mag_init(mag *m);
-void mag_free(mag *m);
-void mag_set_u64(mag *m, uint64_t v);
-void mag_copy(mag *dst, const mag *src);
-int mag_cmp(const mag *a, const mag *b);
-void mag_divmod(mag *q, mag *r, const mag *a, const mag *b);
-void mag_to_dec(lq_buf *b, const mag *m);
+void lq_mag_init(mag *m);
+void lq_mag_free(mag *m);
+void lq_mag_set_u64(mag *m, uint64_t v);
+void lq_mag_copy(mag *dst, const mag *src);
+int lq_mag_cmp(const mag *a, const mag *b);
+void lq_mag_divmod(mag *q, mag *r, const mag *a, const mag *b);
+void lq_mag_to_dec(lq_buf *b, const mag *m);
 
 enum { DEC_FINITE = 0, DEC_INF = 1, DEC_NAN = 2 };
 
@@ -35,19 +35,19 @@ typedef struct dec {
     int64_t e;
 } dec;
 
-void dec_init(dec *d);
-void dec_free(dec *d);
-void dec_from_int(dec *d, lq_value v);
-void dec_from_text(dec *d, const char *s, size_t n);
-void dec_from_double(dec *d, double f);
-double dec_to_double(const dec *d);
-void dec_add(dec *r, const dec *a, const dec *b, bool sub);
-void dec_mul(dec *r, const dec *a, const dec *b);
-void dec_div(dec *r, const dec *a, const dec *b);
-bool dec_mod(dec *r, const dec *a, const dec *b);
-int dec_cmp(const dec *a, const dec *b);
-void dec_round(dec *r, const dec *a, int64_t digits, int mode);
-lq_value dec_to_int(const dec *d);
+void lq_dec_init(dec *d);
+void lq_dec_free(dec *d);
+void lq_dec_from_int(dec *d, lq_value v);
+void lq_dec_from_text(dec *d, const char *s, size_t n);
+void lq_dec_from_double(dec *d, double f);
+double lq_dec_to_double(const dec *d);
+void lq_dec_add(dec *r, const dec *a, const dec *b, bool sub);
+void lq_dec_mul(dec *r, const dec *a, const dec *b);
+void lq_dec_div(dec *r, const dec *a, const dec *b);
+bool lq_dec_mod(dec *r, const dec *a, const dec *b);
+int lq_dec_cmp(const dec *a, const dec *b);
+void lq_dec_round(dec *r, const dec *a, int64_t digits, int mode);
+lq_value lq_dec_to_int(const dec *d);
 
 lq_value lq_int_add(lq_value a, lq_value b, bool sub);
 lq_value lq_int_mul(lq_value a, lq_value b);

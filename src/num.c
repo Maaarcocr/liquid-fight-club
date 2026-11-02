@@ -22,17 +22,17 @@
 /* Magnitudes                                                          */
 /* ------------------------------------------------------------------ */
 
-void mag_init(mag *m) {
+void lq_mag_init(mag *m) {
     m->d = NULL;
     m->n = m->cap = 0;
 }
 
-void mag_free(mag *m) {
+void lq_mag_free(mag *m) {
     free(m->d);
-    mag_init(m);
+    lq_mag_init(m);
 }
 
-static void mag_reserve(mag *m, size_t n) {
+static void lq_mag_reserve(mag *m, size_t n) {
     if (n <= m->cap) return;
     size_t nc = m->cap ? m->cap : 4;
     while (nc < n) nc *= 2;
@@ -40,27 +40,25 @@ static void mag_reserve(mag *m, size_t n) {
     m->cap = nc;
 }
 
-static void mag_trim(mag *m) {
+static void lq_mag_trim(mag *m) {
     while (m->n && m->d[m->n - 1] == 0) m->n--;
 }
 
-void mag_set_u64(mag *m, uint64_t v) {
-    mag_reserve(m, 2);
+void lq_mag_set_u64(mag *m, uint64_t v) {
+    lq_mag_reserve(m, 2);
     m->d[0] = (uint32_t)v;
     m->d[1] = (uint32_t)(v >> 32);
     m->n = 2;
-    mag_trim(m);
+    lq_mag_trim(m);
 }
 
-void mag_copy(mag *dst, const mag *src) {
-    mag_reserve(dst, src->n);
+void lq_mag_copy(mag *dst, const mag *src) {
+    lq_mag_reserve(dst, src->n);
     if (src->n) memcpy(dst->d, src->d, src->n * sizeof(uint32_t));
     dst->n = src->n;
 }
 
-bool mag_is_zero(const mag *m) { return m->n == 0; }
-
-int mag_cmp(const mag *a, const mag *b) {
+int lq_mag_cmp(const mag *a, const mag *b) {
     if (a->n != b->n) return a->n < b->n ? -1 : 1;
     for (size_t i = a->n; i-- > 0;) {
         if (a->d[i] != b->d[i]) return a->d[i] < b->d[i] ? -1 : 1;
@@ -69,7 +67,7 @@ int mag_cmp(const mag *a, const mag *b) {
 }
 
 /* r = a + b (r may alias a or b) */
-void mag_add(mag *r, const mag *a, const mag *b) {
+static void lq_mag_add(mag *r, const mag *a, const mag *b) {
     size_t n = a->n > b->n ? a->n : b->n;
     uint32_t *tmp = lq_xmalloc((n + 1) * sizeof(uint32_t));
     uint64_t carry = 0;
@@ -85,11 +83,11 @@ void mag_add(mag *r, const mag *a, const mag *b) {
     r->d = tmp;
     r->cap = n + 1;
     r->n = n + 1;
-    mag_trim(r);
+    lq_mag_trim(r);
 }
 
 /* r = a - b, requires a >= b (r may alias) */
-void mag_sub(mag *r, const mag *a, const mag *b) {
+static void lq_mag_sub(mag *r, const mag *a, const mag *b) {
     size_t n = a->n;
     uint32_t *tmp = lq_xmalloc((n ? n : 1) * sizeof(uint32_t));
     int64_t borrow = 0;
@@ -106,10 +104,10 @@ void mag_sub(mag *r, const mag *a, const mag *b) {
     r->d = tmp;
     r->cap = n ? n : 1;
     r->n = n;
-    mag_trim(r);
+    lq_mag_trim(r);
 }
 
-void mag_mul(mag *r, const mag *a, const mag *b) {
+static void lq_mag_mul(mag *r, const mag *a, const mag *b) {
     if (!a->n || !b->n) {
         r->n = 0;
         return;
@@ -135,10 +133,10 @@ void mag_mul(mag *r, const mag *a, const mag *b) {
     r->d = tmp;
     r->cap = n;
     r->n = n;
-    mag_trim(r);
+    lq_mag_trim(r);
 }
 
-void mag_mul_small(mag *m, uint32_t f) {
+static void lq_mag_mul_small(mag *m, uint32_t f) {
     uint64_t carry = 0;
     for (size_t i = 0; i < m->n; i++) {
         uint64_t t = (uint64_t)m->d[i] * f + carry;
@@ -146,12 +144,12 @@ void mag_mul_small(mag *m, uint32_t f) {
         carry = t >> 32;
     }
     if (carry) {
-        mag_reserve(m, m->n + 1);
+        lq_mag_reserve(m, m->n + 1);
         m->d[m->n++] = (uint32_t)carry;
     }
 }
 
-void mag_add_small(mag *m, uint32_t s) {
+static void lq_mag_add_small(mag *m, uint32_t s) {
     uint64_t carry = s;
     for (size_t i = 0; i < m->n && carry; i++) {
         uint64_t t = (uint64_t)m->d[i] + carry;
@@ -159,23 +157,23 @@ void mag_add_small(mag *m, uint32_t s) {
         carry = t >> 32;
     }
     if (carry) {
-        mag_reserve(m, m->n + 1);
+        lq_mag_reserve(m, m->n + 1);
         m->d[m->n++] = (uint32_t)carry;
     }
 }
 
-uint32_t mag_divmod_small(mag *m, uint32_t d) {
+static uint32_t lq_mag_divmod_small(mag *m, uint32_t d) {
     uint64_t rem = 0;
     for (size_t i = m->n; i-- > 0;) {
         uint64_t cur = (rem << 32) | m->d[i];
         m->d[i] = (uint32_t)(cur / d);
         rem = cur % d;
     }
-    mag_trim(m);
+    lq_mag_trim(m);
     return (uint32_t)rem;
 }
 
-static size_t mag_bits(const mag *m) {
+static size_t lq_mag_bits(const mag *m) {
     if (!m->n) return 0;
     uint32_t top = m->d[m->n - 1];
     size_t b = 0;
@@ -187,21 +185,21 @@ static size_t mag_bits(const mag *m) {
 }
 
 /* q = a / b, r = a % b (b != 0). q or r may be NULL. */
-void mag_divmod(mag *q, mag *r, const mag *a, const mag *b) {
+void lq_mag_divmod(mag *q, mag *r, const mag *a, const mag *b) {
     if (b->n == 1) {
         mag t;
-        mag_init(&t);
-        mag_copy(&t, a);
-        uint32_t rem = mag_divmod_small(&t, b->d[0]);
-        if (q) { mag_free(q); *q = t; } else mag_free(&t);
-        if (r) mag_set_u64(r, rem);
+        lq_mag_init(&t);
+        lq_mag_copy(&t, a);
+        uint32_t rem = lq_mag_divmod_small(&t, b->d[0]);
+        if (q) { lq_mag_free(q); *q = t; } else lq_mag_free(&t);
+        if (r) lq_mag_set_u64(r, rem);
         return;
     }
     mag qq, rr;
-    mag_init(&qq);
-    mag_init(&rr);
-    size_t nb = mag_bits(a);
-    mag_reserve(&qq, a->n ? a->n : 1);
+    lq_mag_init(&qq);
+    lq_mag_init(&rr);
+    size_t nb = lq_mag_bits(a);
+    lq_mag_reserve(&qq, a->n ? a->n : 1);
     memset(qq.d, 0, (a->n ? a->n : 1) * sizeof(uint32_t));
     qq.n = a->n;
     for (size_t i = nb; i-- > 0;) {
@@ -213,40 +211,40 @@ void mag_divmod(mag *q, mag *r, const mag *a, const mag *b) {
             carry = nc;
         }
         if (carry) {
-            mag_reserve(&rr, rr.n + 1);
+            lq_mag_reserve(&rr, rr.n + 1);
             rr.d[rr.n++] = carry;
         }
-        if (mag_cmp(&rr, b) >= 0) {
-            mag_sub(&rr, &rr, b);
+        if (lq_mag_cmp(&rr, b) >= 0) {
+            lq_mag_sub(&rr, &rr, b);
             qq.d[i / 32] |= (uint32_t)1 << (i % 32);
         }
     }
-    mag_trim(&qq);
-    if (q) { mag_free(q); *q = qq; } else mag_free(&qq);
-    if (r) { mag_free(r); *r = rr; } else mag_free(&rr);
+    lq_mag_trim(&qq);
+    if (q) { lq_mag_free(q); *q = qq; } else lq_mag_free(&qq);
+    if (r) { lq_mag_free(r); *r = rr; } else lq_mag_free(&rr);
 }
 
 /* append decimal digits of m */
-void mag_to_dec(lq_buf *b, const mag *m) {
+void lq_mag_to_dec(lq_buf *b, const mag *m) {
     if (!m->n) {
         lq_buf_putc(b, '0');
         return;
     }
     mag t;
-    mag_init(&t);
-    mag_copy(&t, m);
+    lq_mag_init(&t);
+    lq_mag_copy(&t, m);
     size_t cap = m->n * 10 + 1;
     uint32_t *chunks = lq_xmalloc(cap * sizeof(uint32_t));
     size_t nc = 0;
-    while (t.n) chunks[nc++] = mag_divmod_small(&t, 1000000000u);
+    while (t.n) chunks[nc++] = lq_mag_divmod_small(&t, 1000000000u);
     lq_buf_printf(b, "%u", chunks[nc - 1]);
     for (size_t i = nc - 1; i-- > 0;) lq_buf_printf(b, "%09u", chunks[i]);
     free(chunks);
-    mag_free(&t);
+    lq_mag_free(&t);
 }
 
 /* parse decimal digits (only '0'-'9') */
-void mag_from_dec(mag *m, const char *s, size_t n) {
+static void lq_mag_from_dec(mag *m, const char *s, size_t n) {
     m->n = 0;
     size_t i = 0;
     while (i < n) {
@@ -258,21 +256,21 @@ void mag_from_dec(mag *m, const char *s, size_t n) {
             i++;
             k++;
         }
-        mag_mul_small(m, mul);
-        mag_add_small(m, chunk);
+        lq_mag_mul_small(m, mul);
+        lq_mag_add_small(m, chunk);
     }
 }
 
-void mag_pow10_mul(mag *m, int64_t k) {
+static void lq_mag_pow10_mul(mag *m, int64_t k) {
     while (k >= 9) {
-        mag_mul_small(m, 1000000000u);
+        lq_mag_mul_small(m, 1000000000u);
         k -= 9;
     }
     static const uint32_t p10[] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
-    if (k > 0) mag_mul_small(m, p10[k]);
+    if (k > 0) lq_mag_mul_small(m, p10[k]);
 }
 
-static double mag_to_double(const mag *m) {
+static double lq_mag_to_double(const mag *m) {
     double r = 0;
     for (size_t i = m->n; i-- > 0;) r = r * 4294967296.0 + m->d[i];
     return r;
@@ -293,7 +291,7 @@ static lq_value bigint_from_mag(int neg, const mag *m) {
         if (neg && v <= (uint64_t)INT64_MAX + 1) return lq_int(v == (uint64_t)INT64_MAX + 1 ? INT64_MIN : -(int64_t)v);
     }
     if (m->n > BIGINT_MAX_LIMBS) {
-        double d = mag_to_double(m);
+        double d = lq_mag_to_double(m);
         return lq_float(neg ? -d : d);
     }
     lq_bigint *b = lq_xmalloc(sizeof(lq_bigint) + m->n * sizeof(uint32_t));
@@ -314,14 +312,14 @@ lq_value lq_bigint_normalize(lq_bigint *b) {
 
 /* integer value (INT/BIGINT) -> sign + magnitude (caller frees mag) */
 static void int_to_mag(lq_value v, int *neg, mag *m) {
-    mag_init(m);
+    lq_mag_init(m);
     if (v.type == LQ_INT) {
         *neg = v.u.i < 0;
         uint64_t u = v.u.i < 0 ? (uint64_t)0 - (uint64_t)v.u.i : (uint64_t)v.u.i;
-        mag_set_u64(m, u);
+        lq_mag_set_u64(m, u);
     } else {
         *neg = v.u.bi->neg;
-        mag_reserve(m, v.u.bi->n);
+        lq_mag_reserve(m, v.u.bi->n);
         memcpy(m->d, v.u.bi->limb, v.u.bi->n * sizeof(uint32_t));
         m->n = v.u.bi->n;
     }
@@ -330,12 +328,12 @@ static void int_to_mag(lq_value v, int *neg, mag *m) {
 void lq_bigint_fmt(lq_buf *b, const lq_bigint *x) {
     if (x->neg) lq_buf_putc(b, '-');
     mag m = {(uint32_t *)x->limb, x->n, x->n};
-    mag_to_dec(b, &m);
+    lq_mag_to_dec(b, &m);
 }
 
 double lq_bigint_to_double(const lq_bigint *x) {
     mag m = {(uint32_t *)x->limb, x->n, x->n};
-    double d = mag_to_double(&m);
+    double d = lq_mag_to_double(&m);
     return x->neg ? -d : d;
 }
 
@@ -366,11 +364,11 @@ static int cmp_ints(lq_value a, lq_value b) {
     int r;
     if (an != bn) r = an ? -1 : 1;
     else {
-        r = mag_cmp(&am, &bm);
+        r = lq_mag_cmp(&am, &bm);
         if (an) r = -r;
     }
-    mag_free(&am);
-    mag_free(&bm);
+    lq_mag_free(&am);
+    lq_mag_free(&bm);
     return r;
 }
 
@@ -499,10 +497,10 @@ static lq_value int_from_digits(int neg, const char *s, size_t n) {
         return lq_float(d);
     }
     mag m;
-    mag_init(&m);
-    mag_from_dec(&m, s, n);
+    lq_mag_init(&m);
+    lq_mag_from_dec(&m, s, n);
     lq_value v = bigint_from_mag(neg, &m);
-    mag_free(&m);
+    lq_mag_free(&m);
     return v;
 }
 
@@ -564,16 +562,16 @@ lq_value lq_str_to_i(const char *s, size_t n) {
 static lq_value int_from_base(int neg, const char *dig, size_t n, int base) {
     if (base == 10) return int_from_digits(neg, dig, n);
     mag m;
-    mag_init(&m);
+    lq_mag_init(&m);
     for (size_t i = 0; i < n; i++) {
         char c = dig[i];
         int dv = c <= '9' ? c - '0' : (c | 0x20) - 'a' + 10;
-        mag_mul_small(&m, (uint32_t)base);
-        mag_add_small(&m, (uint32_t)dv);
+        lq_mag_mul_small(&m, (uint32_t)base);
+        lq_mag_add_small(&m, (uint32_t)dv);
         if (m.n > BIGINT_MAX_LIMBS + 1) break;
     }
     lq_value v = bigint_from_mag(neg, &m);
-    mag_free(&m);
+    lq_mag_free(&m);
     return v;
 }
 
@@ -677,22 +675,22 @@ lq_value lq_int_add(lq_value a, lq_value b, bool sub) {
     int_to_mag(a, &an, &am);
     int_to_mag(b, &bn, &bm);
     if (sub) bn = !bn;
-    mag_init(&rm);
+    lq_mag_init(&rm);
     int rn;
     if (an == bn) {
-        mag_add(&rm, &am, &bm);
+        lq_mag_add(&rm, &am, &bm);
         rn = an;
-    } else if (mag_cmp(&am, &bm) >= 0) {
-        mag_sub(&rm, &am, &bm);
+    } else if (lq_mag_cmp(&am, &bm) >= 0) {
+        lq_mag_sub(&rm, &am, &bm);
         rn = an;
     } else {
-        mag_sub(&rm, &bm, &am);
+        lq_mag_sub(&rm, &bm, &am);
         rn = bn;
     }
     lq_value v = bigint_from_mag(rm.n ? rn : 0, &rm);
-    mag_free(&am);
-    mag_free(&bm);
-    mag_free(&rm);
+    lq_mag_free(&am);
+    lq_mag_free(&bm);
+    lq_mag_free(&rm);
     return v;
 }
 
@@ -705,12 +703,12 @@ lq_value lq_int_mul(lq_value a, lq_value b) {
     mag am, bm, rm;
     int_to_mag(a, &an, &am);
     int_to_mag(b, &bn, &bm);
-    mag_init(&rm);
-    mag_mul(&rm, &am, &bm);
+    lq_mag_init(&rm);
+    lq_mag_mul(&rm, &am, &bm);
     lq_value v = bigint_from_mag(rm.n ? (an != bn) : 0, &rm);
-    mag_free(&am);
-    mag_free(&bm);
-    mag_free(&rm);
+    lq_mag_free(&am);
+    lq_mag_free(&bm);
+    lq_mag_free(&rm);
     return v;
 }
 
@@ -730,21 +728,21 @@ void lq_int_divmod(lq_value a, lq_value b, lq_value *q, lq_value *r) {
     mag am, bm, qm, rm;
     int_to_mag(a, &an, &am);
     int_to_mag(b, &bn, &bm);
-    mag_init(&qm);
-    mag_init(&rm);
-    mag_divmod(&qm, &rm, &am, &bm);
+    lq_mag_init(&qm);
+    lq_mag_init(&rm);
+    lq_mag_divmod(&qm, &rm, &am, &bm);
     int qneg = an != bn;
     if (qneg && rm.n) {
         /* floor: q = -(|a|/|b|) - 1, r = |b| - r with sign of b */
-        mag_add_small(&qm, 1);
-        mag_sub(&rm, &bm, &rm);
+        lq_mag_add_small(&qm, 1);
+        lq_mag_sub(&rm, &bm, &rm);
     }
     if (q) *q = bigint_from_mag(qm.n ? qneg : 0, &qm);
     if (r) *r = bigint_from_mag(rm.n ? bn : 0, &rm);
-    mag_free(&am);
-    mag_free(&bm);
-    mag_free(&qm);
-    mag_free(&rm);
+    lq_mag_free(&am);
+    lq_mag_free(&bm);
+    lq_mag_free(&qm);
+    lq_mag_free(&rm);
 }
 
 /* ------------------------------------------------------------------ */
@@ -756,25 +754,25 @@ void lq_int_divmod(lq_value a, lq_value b, lq_value *q, lq_value *r) {
 /* Digits computed for quotients. */
 #define DEC_DIV_DIGITS 40
 
-void dec_init(dec *d) {
+void lq_dec_init(dec *d) {
     d->special = DEC_FINITE;
     d->neg = 0;
-    mag_init(&d->m);
+    lq_mag_init(&d->m);
     d->e = 0;
 }
 
-void dec_free(dec *d) { mag_free(&d->m); }
+void lq_dec_free(dec *d) { lq_mag_free(&d->m); }
 
-void dec_from_int(dec *d, lq_value v) {
-    dec_init(d);
-    mag_free(&d->m);
+void lq_dec_from_int(dec *d, lq_value v) {
+    lq_dec_init(d);
+    lq_mag_free(&d->m);
     int_to_mag(v, &d->neg, &d->m);
     if (!d->m.n) d->neg = 0;
 }
 
 /* parse [-]digits[.digits][e[+-]digits] */
-void dec_from_text(dec *d, const char *s, size_t n) {
-    dec_init(d);
+void lq_dec_from_text(dec *d, const char *s, size_t n) {
+    lq_dec_init(d);
     size_t i = 0;
     if (i < n && (s[i] == '-' || s[i] == '+')) {
         d->neg = s[i] == '-';
@@ -811,20 +809,20 @@ void dec_from_text(dec *d, const char *s, size_t n) {
             break;
         }
     }
-    mag_from_dec(&d->m, dig.p ? dig.p : "", dig.len);
+    lq_mag_from_dec(&d->m, dig.p ? dig.p : "", dig.len);
     d->e = exp;
     if (!d->m.n) d->e = 0; /* keep the sign: BigDecimal("-0.0") is -0 */
     lq_buf_free(&dig);
 }
 
-void dec_from_double(dec *d, double f) {
+void lq_dec_from_double(dec *d, double f) {
     if (f != f) {
-        dec_init(d);
+        lq_dec_init(d);
         d->special = DEC_NAN;
         return;
     }
     if (isinf(f)) {
-        dec_init(d);
+        lq_dec_init(d);
         d->special = DEC_INF;
         d->neg = f < 0;
         return;
@@ -832,29 +830,29 @@ void dec_from_double(dec *d, double f) {
     lq_buf b;
     lq_buf_init(&b);
     lq_fmt_float(&b, f);
-    dec_from_text(d, b.p, b.len);
+    lq_dec_from_text(d, b.p, b.len);
     if (f == 0 && signbit(f)) d->neg = 1;
     lq_buf_free(&b);
 }
 
-static size_t mag_digits(const mag *m) {
+static size_t lq_mag_digits(const mag *m) {
     if (!m->n) return 0;
     lq_buf b;
     lq_buf_init(&b);
-    mag_to_dec(&b, m);
+    lq_mag_to_dec(&b, m);
     size_t n = b.len;
     lq_buf_free(&b);
     return n;
 }
 
-double dec_to_double(const dec *d) {
+double lq_dec_to_double(const dec *d) {
     if (d->special == DEC_NAN) return NAN;
     if (d->special == DEC_INF) return d->neg ? -INFINITY : INFINITY;
     if (!d->m.n) return d->neg ? -0.0 : 0.0;
     lq_buf b;
     lq_buf_init(&b);
     if (d->neg) lq_buf_putc(&b, '-');
-    mag_to_dec(&b, &d->m);
+    lq_mag_to_dec(&b, &d->m);
     lq_buf_printf(&b, "e%lld", (long long)d->e);
     double r = strtod(b.p, NULL);
     lq_buf_free(&b);
@@ -863,29 +861,29 @@ double dec_to_double(const dec *d) {
 
 /* align exponents: returns copies scaled to common exponent */
 static bool dec_align(const dec *a, const dec *b, mag *am, mag *bm, int64_t *e) {
-    mag_init(am);
-    mag_init(bm);
-    mag_copy(am, &a->m);
-    mag_copy(bm, &b->m);
+    lq_mag_init(am);
+    lq_mag_init(bm);
+    lq_mag_copy(am, &a->m);
+    lq_mag_copy(bm, &b->m);
     int64_t ea = a->e, eb = b->e;
     if (a->m.n == 0) ea = eb;
     if (b->m.n == 0) eb = ea;
     if (ea - eb > 2000 || eb - ea > 2000) return false;
     if (ea > eb) {
-        mag_pow10_mul(am, ea - eb);
+        lq_mag_pow10_mul(am, ea - eb);
         *e = eb;
     } else {
-        mag_pow10_mul(bm, eb - ea);
+        lq_mag_pow10_mul(bm, eb - ea);
         *e = ea;
     }
     return true;
 }
 
-static int64_t dec_adjexp(const dec *d) { return d->e + (int64_t)mag_digits(&d->m); }
+static int64_t dec_adjexp(const dec *d) { return d->e + (int64_t)lq_mag_digits(&d->m); }
 
-void dec_add(dec *r, const dec *a, const dec *b, bool sub) {
+void lq_dec_add(dec *r, const dec *a, const dec *b, bool sub) {
     int bneg = sub ? !b->neg : b->neg;
-    dec_init(r);
+    lq_dec_init(r);
     if (a->special == DEC_NAN || b->special == DEC_NAN) { r->special = DEC_NAN; return; }
     if (a->special == DEC_INF || b->special == DEC_INF) {
         if (a->special == DEC_INF && b->special == DEC_INF && a->neg != bneg) { r->special = DEC_NAN; return; }
@@ -904,31 +902,31 @@ void dec_add(dec *r, const dec *a, const dec *b, bool sub) {
         /* magnitudes too far apart: the smaller is negligible */
         bool a_big = a->m.n && (!b->m.n || dec_adjexp(a) > dec_adjexp(b));
         const dec *big = a_big ? a : b;
-        mag_copy(&r->m, &big->m);
+        lq_mag_copy(&r->m, &big->m);
         r->e = big->e;
         r->neg = a_big ? a->neg : bneg;
-        mag_free(&am);
-        mag_free(&bm);
+        lq_mag_free(&am);
+        lq_mag_free(&bm);
         return;
     }
     r->e = e;
     if (a->neg == bneg) {
-        mag_add(&r->m, &am, &bm);
+        lq_mag_add(&r->m, &am, &bm);
         r->neg = a->neg;
-    } else if (mag_cmp(&am, &bm) >= 0) {
-        mag_sub(&r->m, &am, &bm);
+    } else if (lq_mag_cmp(&am, &bm) >= 0) {
+        lq_mag_sub(&r->m, &am, &bm);
         r->neg = a->neg;
     } else {
-        mag_sub(&r->m, &bm, &am);
+        lq_mag_sub(&r->m, &bm, &am);
         r->neg = bneg;
     }
     if (!r->m.n) r->neg = 0;
-    mag_free(&am);
-    mag_free(&bm);
+    lq_mag_free(&am);
+    lq_mag_free(&bm);
 }
 
-void dec_mul(dec *r, const dec *a, const dec *b) {
-    dec_init(r);
+void lq_dec_mul(dec *r, const dec *a, const dec *b) {
+    lq_dec_init(r);
     if (a->special == DEC_NAN || b->special == DEC_NAN) { r->special = DEC_NAN; return; }
     if (a->special == DEC_INF || b->special == DEC_INF) {
         if ((a->special == DEC_FINITE && !a->m.n) || (b->special == DEC_FINITE && !b->m.n)) {
@@ -939,14 +937,14 @@ void dec_mul(dec *r, const dec *a, const dec *b) {
         r->neg = a->neg != b->neg;
         return;
     }
-    mag_mul(&r->m, &a->m, &b->m);
+    lq_mag_mul(&r->m, &a->m, &b->m);
     r->e = a->e + b->e;
     r->neg = a->neg != b->neg; /* BigDecimal keeps signed zeros */
 }
 
 /* r = a / b with DEC_DIV_DIGITS significant digits (truncated). */
-void dec_div(dec *r, const dec *a, const dec *b) {
-    dec_init(r);
+void lq_dec_div(dec *r, const dec *a, const dec *b) {
+    lq_dec_init(r);
     if (a->special == DEC_NAN || b->special == DEC_NAN) { r->special = DEC_NAN; return; }
     if (a->special == DEC_INF) {
         if (b->special == DEC_INF) { r->special = DEC_NAN; return; }
@@ -967,22 +965,22 @@ void dec_div(dec *r, const dec *a, const dec *b) {
         r->neg = a->neg != b->neg;
         return;
     }
-    int64_t da = (int64_t)mag_digits(&a->m), db = (int64_t)mag_digits(&b->m);
+    int64_t da = (int64_t)lq_mag_digits(&a->m), db = (int64_t)lq_mag_digits(&b->m);
     int64_t k = DEC_DIV_DIGITS - (da - db);
     if (k < 0) k = 0;
     mag num;
-    mag_init(&num);
-    mag_copy(&num, &a->m);
-    mag_pow10_mul(&num, k);
-    mag_divmod(&r->m, NULL, &num, &b->m);
-    mag_free(&num);
+    lq_mag_init(&num);
+    lq_mag_copy(&num, &a->m);
+    lq_mag_pow10_mul(&num, k);
+    lq_mag_divmod(&r->m, NULL, &num, &b->m);
+    lq_mag_free(&num);
     r->e = a->e - b->e - k;
     r->neg = r->m.n ? a->neg != b->neg : 0;
 }
 
 /* floor(a / b) as decimal integer and remainder a - b*q (exact). */
-bool dec_mod(dec *r, const dec *a, const dec *b) {
-    dec_init(r);
+bool lq_dec_mod(dec *r, const dec *a, const dec *b) {
+    lq_dec_init(r);
     if (a->special != DEC_FINITE || b->special != DEC_FINITE) {
         r->special = DEC_NAN;
         return true;
@@ -991,26 +989,26 @@ bool dec_mod(dec *r, const dec *a, const dec *b) {
     mag am, bm, qm, rm;
     int64_t e;
     if (!dec_align(a, b, &am, &bm, &e)) {
-        mag_free(&am);
-        mag_free(&bm);
+        lq_mag_free(&am);
+        lq_mag_free(&bm);
         r->special = DEC_NAN;
         return true;
     }
-    mag_init(&qm);
-    mag_init(&rm);
-    mag_divmod(&qm, &rm, &am, &bm);
-    if (a->neg != b->neg && rm.n) mag_sub(&rm, &bm, &rm);
-    mag_copy(&r->m, &rm);
+    lq_mag_init(&qm);
+    lq_mag_init(&rm);
+    lq_mag_divmod(&qm, &rm, &am, &bm);
+    if (a->neg != b->neg && rm.n) lq_mag_sub(&rm, &bm, &rm);
+    lq_mag_copy(&r->m, &rm);
     r->e = e;
     r->neg = rm.n ? b->neg : 0;
-    mag_free(&am);
-    mag_free(&bm);
-    mag_free(&qm);
-    mag_free(&rm);
+    lq_mag_free(&am);
+    lq_mag_free(&bm);
+    lq_mag_free(&qm);
+    lq_mag_free(&rm);
     return true;
 }
 
-int dec_cmp(const dec *a, const dec *b) {
+int lq_dec_cmp(const dec *a, const dec *b) {
     if (a->special == DEC_NAN || b->special == DEC_NAN) return 2;
     int sa = a->special == DEC_INF ? (a->neg ? -2 : 2) : (a->m.n ? (a->neg ? -1 : 1) : 0);
     int sb = b->special == DEC_INF ? (b->neg ? -2 : 2) : (b->m.n ? (b->neg ? -1 : 1) : 0);
@@ -1022,17 +1020,17 @@ int dec_cmp(const dec *a, const dec *b) {
         mag am, bm;
         int64_t e;
         dec_align(a, b, &am, &bm, &e);
-        r = mag_cmp(&am, &bm);
-        mag_free(&am);
-        mag_free(&bm);
+        r = lq_mag_cmp(&am, &bm);
+        lq_mag_free(&am);
+        lq_mag_free(&bm);
     }
     return sa < 0 ? -r : r;
 }
 
 /* Round to `digits` decimal places using ROUND_HALF_UP (away from zero on
    ties) or floor/ceil. mode: 0 half-up, 1 floor, 2 ceil. */
-void dec_round(dec *r, const dec *a, int64_t digits, int mode) {
-    dec_init(r);
+void lq_dec_round(dec *r, const dec *a, int64_t digits, int mode) {
+    lq_dec_init(r);
     if (a->special != DEC_FINITE) {
         r->special = a->special;
         r->neg = a->neg;
@@ -1040,86 +1038,86 @@ void dec_round(dec *r, const dec *a, int64_t digits, int mode) {
     }
     int64_t drop = -digits - a->e; /* number of trailing digits to remove */
     if (drop <= 0) {
-        mag_copy(&r->m, &a->m);
+        lq_mag_copy(&r->m, &a->m);
         r->e = a->e;
         r->neg = a->neg;
         return;
     }
-    int64_t nd = (int64_t)mag_digits(&a->m);
+    int64_t nd = (int64_t)lq_mag_digits(&a->m);
     mag q, rem, p;
-    mag_init(&q);
-    mag_init(&rem);
-    mag_init(&p);
+    lq_mag_init(&q);
+    lq_mag_init(&rem);
+    lq_mag_init(&p);
     bool round_up;
     if (drop > nd + 1) {
         /* everything is dropped */
-        mag_set_u64(&q, 0);
+        lq_mag_set_u64(&q, 0);
         bool nonzero = a->m.n != 0;
         round_up = mode == 1 ? (a->neg && nonzero) : mode == 2 ? (!a->neg && nonzero) : false;
     } else {
-        mag_set_u64(&p, 1);
-        mag_pow10_mul(&p, drop);
-        mag_divmod(&q, &rem, &a->m, &p);
+        lq_mag_set_u64(&p, 1);
+        lq_mag_pow10_mul(&p, drop);
+        lq_mag_divmod(&q, &rem, &a->m, &p);
         if (mode == 0) {
             mag twice;
-            mag_init(&twice);
-            mag_add(&twice, &rem, &rem);
-            round_up = mag_cmp(&twice, &p) >= 0;
-            mag_free(&twice);
+            lq_mag_init(&twice);
+            lq_mag_add(&twice, &rem, &rem);
+            round_up = lq_mag_cmp(&twice, &p) >= 0;
+            lq_mag_free(&twice);
         } else if (mode == 1) {
             round_up = a->neg && rem.n;
         } else {
             round_up = !a->neg && rem.n;
         }
     }
-    if (round_up) mag_add_small(&q, 1);
-    mag_copy(&r->m, &q);
+    if (round_up) lq_mag_add_small(&q, 1);
+    lq_mag_copy(&r->m, &q);
     r->e = a->e + drop;
     r->neg = r->m.n ? a->neg : 0;
-    mag_free(&q);
-    mag_free(&rem);
-    mag_free(&p);
+    lq_mag_free(&q);
+    lq_mag_free(&rem);
+    lq_mag_free(&p);
 }
 
 /* integer value of a finite decimal with e >= 0 (or truncated) */
-lq_value dec_to_int(const dec *d) {
+lq_value lq_dec_to_int(const dec *d) {
     if (d->special != DEC_FINITE) return lq_int(0);
     mag m;
-    mag_init(&m);
-    mag_copy(&m, &d->m);
+    lq_mag_init(&m);
+    lq_mag_copy(&m, &d->m);
     if (d->e > 0) {
         if (d->e > BIGINT_MAX_LIMBS * 10) {
-            mag_free(&m);
+            lq_mag_free(&m);
             return lq_float(d->neg ? -INFINITY : INFINITY);
         }
-        mag_pow10_mul(&m, d->e);
+        lq_mag_pow10_mul(&m, d->e);
     } else if (d->e < 0) {
         mag p;
-        mag_init(&p);
-        mag_set_u64(&p, 1);
-        mag_pow10_mul(&p, -d->e);
+        lq_mag_init(&p);
+        lq_mag_set_u64(&p, 1);
+        lq_mag_pow10_mul(&p, -d->e);
         mag q;
-        mag_init(&q);
-        mag_divmod(&q, NULL, &m, &p);
-        mag_free(&m);
+        lq_mag_init(&q);
+        lq_mag_divmod(&q, NULL, &m, &p);
+        lq_mag_free(&m);
         m = q;
-        mag_free(&p);
+        lq_mag_free(&p);
     }
     lq_value v = bigint_from_mag(m.n ? d->neg : 0, &m);
-    mag_free(&m);
+    lq_mag_free(&m);
     return v;
 }
 
 /* 2^k as an integer value (k <= 4096) */
 lq_value lq_pow2(int64_t k) {
     mag m;
-    mag_init(&m);
+    lq_mag_init(&m);
     size_t limbs = (size_t)(k / 32) + 1;
-    mag_reserve(&m, limbs);
+    lq_mag_reserve(&m, limbs);
     memset(m.d, 0, limbs * sizeof(uint32_t));
     m.d[k / 32] = (uint32_t)1 << (k % 32);
     m.n = limbs;
     lq_value v = bigint_from_mag(0, &m);
-    mag_free(&m);
+    lq_mag_free(&m);
     return v;
 }
