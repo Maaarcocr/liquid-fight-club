@@ -311,80 +311,47 @@ static void raise_index_error(lq_ctx *ctx, lq_value property, int status) {
 
 
 /* ------------------------------------------------------------------ */
-/* Case mapping (Unicode subset: Latin, Greek, Cyrillic, Armenian)     */
+/* Case mapping (full Unicode, no locale rules)                         */
 /* ------------------------------------------------------------------ */
 
-static int32_t cp_upper(int32_t c) {
-    if (c < 0x80) return (c >= 'a' && c <= 'z') ? c - 32 : c;
-    if ((c >= 0xE0 && c <= 0xFE && c != 0xF7)) return c - 32;
-    if (c == 0xFF) return 0x178;
-    if (c == 0xB5) return 0x39C;
-    if ((c >= 0x100 && c <= 0x137) || (c >= 0x14A && c <= 0x177)) return (c & 1) ? c - 1 : c;
-    if ((c >= 0x139 && c <= 0x148) || (c >= 0x179 && c <= 0x17E)) return (c & 1) ? c : c - 1;
-    if (c == 0x17F) return 0x53;
-    if (c == 0x131) return 0x49;
-    if (c >= 0x1CD && c <= 0x1DC) return (c & 1) ? c : c - 1;
-    if (c >= 0x1DE && c <= 0x1EF) return (c & 1) ? c - 1 : c;
-    if (c >= 0x1F8 && c <= 0x21F) return (c & 1) ? c - 1 : c;
-    if (c == 0x1C5 || c == 0x1C6) return 0x1C4;
-    if (c == 0x1C8 || c == 0x1C9) return 0x1C7;
-    if (c == 0x1CB || c == 0x1CC) return 0x1CA;
-    if (c == 0x1F2 || c == 0x1F3) return 0x1F1;
-    if (c >= 0x3B1 && c <= 0x3C9 && c != 0x3C2) return c - 32;
-    if (c == 0x3C2) return 0x3A3;
-    if (c == 0x3AC) return 0x386;
-    if (c >= 0x3AD && c <= 0x3AF) return c - 37;
-    if (c == 0x3CC) return 0x38C;
-    if (c == 0x3CD || c == 0x3CE) return c - 63;
-    if (c >= 0x3CA && c <= 0x3CB) return c - 32;
-    if (c >= 0x430 && c <= 0x44F) return c - 32;
-    if (c >= 0x450 && c <= 0x45F) return c - 80;
-    if ((c >= 0x460 && c <= 0x481) || (c >= 0x48A && c <= 0x4BF) || (c >= 0x4D0 && c <= 0x52F))
-        return (c & 1) ? c - 1 : c;
-    if (c >= 0x4C1 && c <= 0x4CE) return (c & 1) ? c : c - 1;
-    if (c == 0x4CF) return 0x4C0;
-    if (c >= 0x561 && c <= 0x586) return c - 48;
-    if (c >= 0x1E00 && c <= 0x1E95) return (c & 1) ? c - 1 : c;
-    if (c >= 0x1EA0 && c <= 0x1EFF) return (c & 1) ? c - 1 : c;
-    if (c >= 0x24D0 && c <= 0x24E9) return c - 26;
-    if (c >= 0xFF41 && c <= 0xFF5A) return c - 32;
-    return c;
+typedef struct lq_case_run {
+    int32_t start, end, stride, delta;
+} lq_case_run;
+
+typedef struct lq_case_special {
+    int32_t cp;
+    const char *s; /* UTF-8 replacement */
+} lq_case_special;
+
+#include "casemap.inc"
+
+static int32_t case_simple(const lq_case_run *runs, size_t n, int32_t cp) {
+    size_t lo = 0, hi = n;
+    while (lo < hi) {
+        size_t mid = (lo + hi) / 2;
+        if (runs[mid].start <= cp) lo = mid + 1;
+        else hi = mid;
+    }
+    if (lo == 0) return cp;
+    const lq_case_run *r = &runs[lo - 1];
+    if (cp > r->end) return cp;
+    if (r->stride == 2 && ((cp - r->start) & 1)) return cp;
+    return cp + r->delta;
 }
 
-static int32_t cp_lower(int32_t c) {
-    if (c < 0x80) return (c >= 'A' && c <= 'Z') ? c + 32 : c;
-    if (c >= 0xC0 && c <= 0xDE && c != 0xD7) return c + 32;
-    if (c == 0x178) return 0xFF;
-    if ((c >= 0x100 && c <= 0x137) || (c >= 0x14A && c <= 0x177)) return (c & 1) ? c : c + 1;
-    if ((c >= 0x139 && c <= 0x148) || (c >= 0x179 && c <= 0x17E)) return (c & 1) ? c + 1 : c;
-    if (c == 0x130) return 0x69;
-    if (c >= 0x1CD && c <= 0x1DC) return (c & 1) ? c + 1 : c;
-    if (c >= 0x1DE && c <= 0x1EF) return (c & 1) ? c : c + 1;
-    if (c >= 0x1F8 && c <= 0x21F) return (c & 1) ? c : c + 1;
-    if (c == 0x1C4 || c == 0x1C5) return 0x1C6;
-    if (c == 0x1C7 || c == 0x1C8) return 0x1C9;
-    if (c == 0x1CA || c == 0x1CB) return 0x1CC;
-    if (c == 0x1F1 || c == 0x1F2) return 0x1F3;
-    if (c >= 0x391 && c <= 0x3A9 && c != 0x3A2) return c + 32;
-    if (c == 0x386) return 0x3AC;
-    if (c >= 0x388 && c <= 0x38A) return c + 37;
-    if (c == 0x38C) return 0x3CC;
-    if (c == 0x38E || c == 0x38F) return c + 63;
-    if (c >= 0x3AA && c <= 0x3AB) return c + 32;
-    if (c >= 0x410 && c <= 0x42F) return c + 32;
-    if (c >= 0x400 && c <= 0x40F) return c + 80;
-    if ((c >= 0x460 && c <= 0x481) || (c >= 0x48A && c <= 0x4BF) || (c >= 0x4D0 && c <= 0x52F))
-        return (c & 1) ? c : c + 1;
-    if (c >= 0x4C1 && c <= 0x4CE) return (c & 1) ? c + 1 : c;
-    if (c == 0x4C0) return 0x4CF;
-    if (c >= 0x531 && c <= 0x556) return c + 48;
-    if (c >= 0x1E00 && c <= 0x1E95) return (c & 1) ? c : c + 1;
-    if (c == 0x1E9E) return 0xDF;
-    if (c >= 0x1EA0 && c <= 0x1EFF) return (c & 1) ? c : c + 1;
-    if (c >= 0x24B6 && c <= 0x24CF) return c + 26;
-    if (c >= 0xFF21 && c <= 0xFF3A) return c + 32;
-    return c;
+static const char *case_special(const lq_case_special *t, int32_t cp) {
+    size_t lo = 0, hi = 0;
+    while (t[hi].cp) hi++;
+    while (lo < hi) {
+        size_t mid = (lo + hi) / 2;
+        if (t[mid].cp == cp) return t[mid].s;
+        if (t[mid].cp < cp) lo = mid + 1;
+        else hi = mid;
+    }
+    return NULL;
 }
+
+#define NRUNS(a) (sizeof(a) / sizeof((a)[0]))
 
 /* mode: 0 upcase, 1 downcase, 2 capitalize */
 static lq_value case_map(lq_ctx *ctx, lq_value input, int mode) {
@@ -396,38 +363,37 @@ static lq_value case_map(lq_ctx *ctx, lq_value input, int mode) {
     size_t n = s.u.s->len, i = 0;
     bool first = true;
     while (i < n) {
+        int which = mode == 2 ? (first ? 2 : 1) : mode;
+        first = false;
+        if (p[i] < 0x80) {
+            char c = (char)p[i];
+            if (which == 1) { if (c >= 'A' && c <= 'Z') c = (char)(c + 32); }
+            else if (c >= 'a' && c <= 'z') c = (char)(c - 32);
+            lq_buf_putc(&b, c);
+            i++;
+            continue;
+        }
         int32_t cp;
         size_t k = lq_utf8_decode(p + i, n - i, &cp);
         if (cp < 0) {
             lq_buf_putc(&b, (char)p[i]);
             i++;
-            first = false;
             continue;
         }
-        bool up = mode == 0 || (mode == 2 && first);
-        char enc[8];
-        if (up && cp == 0xDF) {
-            lq_buf_put(&b, mode == 2 ? "Ss" : "SS", 2);
-        } else if (up && cp == 0xFB00) {
-            lq_buf_put(&b, mode == 2 ? "Ff" : "FF", 2);
-        } else if (up && cp == 0xFB01) {
-            lq_buf_put(&b, mode == 2 ? "Fi" : "FI", 2);
-        } else if (up && cp == 0xFB02) {
-            lq_buf_put(&b, mode == 2 ? "Fl" : "FL", 2);
-        } else if (mode == 2 && first && (cp == 0x1C4 || cp == 0x1C5 || cp == 0x1C6)) {
-            lq_buf_put(&b, enc, lq_utf8_encode(enc, 0x1C5));
-        } else if (mode == 2 && first && (cp == 0x1C7 || cp == 0x1C8 || cp == 0x1C9)) {
-            lq_buf_put(&b, enc, lq_utf8_encode(enc, 0x1C8));
-        } else if (mode == 2 && first && (cp == 0x1CA || cp == 0x1CB || cp == 0x1CC)) {
-            lq_buf_put(&b, enc, lq_utf8_encode(enc, 0x1CB));
-        } else if (mode == 2 && first && (cp == 0x1F1 || cp == 0x1F2 || cp == 0x1F3)) {
-            lq_buf_put(&b, enc, lq_utf8_encode(enc, 0x1F2));
+        const lq_case_special *sp = which == 0 ? CASE_UPPER_SPECIAL : which == 1 ? CASE_LOWER_SPECIAL : CASE_TITLE_SPECIAL;
+        const char *rep = case_special(sp, cp);
+        if (rep) {
+            lq_buf_puts(&b, rep);
         } else {
-            int32_t m = up ? cp_upper(cp) : cp_lower(cp);
+            int32_t m = which == 0 ? case_simple(CASE_UPPER_RUNS, NRUNS(CASE_UPPER_RUNS), cp)
+                      : which == 1 ? case_simple(CASE_LOWER_RUNS, NRUNS(CASE_LOWER_RUNS), cp)
+                                   : case_simple(CASE_TITLE_RUNS, NRUNS(CASE_TITLE_RUNS), cp);
             if (m == cp) lq_buf_put(&b, (const char *)p + i, k);
-            else lq_buf_put(&b, enc, lq_utf8_encode(enc, m));
+            else {
+                char enc[4];
+                lq_buf_put(&b, enc, lq_utf8_encode(enc, m));
+            }
         }
-        first = false;
         i += k;
     }
     lq_release(s);

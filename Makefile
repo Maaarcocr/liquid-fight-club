@@ -12,7 +12,7 @@ BUILD   := build
 SRCS    := src/value.c src/num.c src/parse.c src/render.c src/filters.c src/date.c \
            src/drops.c src/json.c src/api.c src/fc_abi.c
 OBJS    := $(SRCS:src/%.c=$(BUILD)/obj/%.o)
-HDRS    := src/lq.h src/internal.h include/liquid.h harness/liquid_fc.h
+HDRS    := src/lq.h src/internal.h src/casemap.inc include/liquid.h harness/liquid_fc.h
 
 .PHONY: all clean debug asan
 all: $(BUILD)/libliquid_fc.a $(BUILD)/liquid-server
