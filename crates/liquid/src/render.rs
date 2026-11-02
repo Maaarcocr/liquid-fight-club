@@ -31,6 +31,52 @@ impl FileSystem for BlankFileSystem {
     }
 }
 
+/// A file system backed by an in-memory map, with liquid-spec's lookup rules:
+/// names are case-insensitive and `.liquid` is appended when missing.
+pub struct MemoryFileSystem {
+    files: Vec<(String, String)>,
+}
+
+impl MemoryFileSystem {
+    pub fn new() -> MemoryFileSystem {
+        MemoryFileSystem { files: Vec::new() }
+    }
+
+    fn normalize(name: &str) -> String {
+        let mut key = name.to_lowercase();
+        if !key.ends_with(".liquid") {
+            key.push_str(".liquid");
+        }
+        key
+    }
+
+    pub fn insert(&mut self, name: &str, source: String) {
+        let key = Self::normalize(name);
+        match self.files.iter_mut().find(|(k, _)| *k == key) {
+            Some(slot) => slot.1 = source,
+            None => self.files.push((key, source)),
+        }
+    }
+}
+
+impl Default for MemoryFileSystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl FileSystem for MemoryFileSystem {
+    fn read_template_file(&self, name: &str) -> Result<String> {
+        let path = Self::normalize(name);
+        for (k, v) in &self.files {
+            if k.eq_ignore_ascii_case(&path) {
+                return Ok(v.clone());
+            }
+        }
+        Err(Error::new(ErrorKind::FileSystem, format!("Could not find asset {}", name)))
+    }
+}
+
 /// Resource limits (all optional, like Ruby's `ResourceLimits`), plus the
 /// engine's own safety caps.
 #[derive(Clone, Debug)]

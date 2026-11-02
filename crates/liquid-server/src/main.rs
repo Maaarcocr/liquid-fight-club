@@ -7,7 +7,7 @@
 
 use liquid::convert::{json_to_assigns, json_to_value, value_to_json};
 use liquid::json::{self, Json};
-use liquid::{Error, ErrorKind, FileSystem, Limits, RenderOptions, Template, Timestamp, Value};
+use liquid::{Error, FileSystem, Limits, MemoryFileSystem, RenderOptions, Template, Timestamp, Value};
 use std::cell::RefCell;
 use std::collections::{HashMap, VecDeque};
 use std::io::{BufRead, BufReader, Read, Write};
@@ -54,47 +54,17 @@ fn s(v: &str) -> Json {
     Json::Str(v.to_string())
 }
 
-// ---------------------------------------------------------------------------
-// File system from the compile request
-// ---------------------------------------------------------------------------
-
-struct MapFileSystem {
-    files: Vec<(String, String)>,
-}
-
-impl MapFileSystem {
-    fn new(j: Option<&Json>) -> Option<MapFileSystem> {
-        let members = match j {
-            Some(Json::Object(m)) => m.as_slice(),
-            _ => &[],
-        };
-        let mut files = Vec::new();
+/// Builds the partial file system from a compile request's `filesystem`.
+fn file_system(j: Option<&Json>) -> MemoryFileSystem {
+    let mut fs = MemoryFileSystem::new();
+    if let Some(Json::Object(members)) = j {
         for (k, v) in members {
             if let Json::Str(content) = v {
-                let mut key = k.to_lowercase();
-                if !key.ends_with(".liquid") {
-                    key.push_str(".liquid");
-                }
-                files.push((key, content.clone()));
+                fs.insert(k, content.clone());
             }
         }
-        Some(MapFileSystem { files })
     }
-}
-
-impl FileSystem for MapFileSystem {
-    fn read_template_file(&self, name: &str) -> liquid::Result<String> {
-        let mut path = name.to_lowercase();
-        if !path.ends_with(".liquid") {
-            path.push_str(".liquid");
-        }
-        for (k, v) in &self.files {
-            if k.eq_ignore_ascii_case(&path) {
-                return Ok(v.clone());
-            }
-        }
-        Err(Error::new(ErrorKind::FileSystem, format!("Could not find asset {}", name)))
-    }
+    fs
 }
 
 // ---------------------------------------------------------------------------
@@ -231,7 +201,7 @@ fn marker(j: &Json, io: &Rc<RefCell<Io>>) -> Option<Value> {
 
 struct Compiled {
     template: Template,
-    fs: Option<MapFileSystem>,
+    fs: MemoryFileSystem,
 }
 
 struct Server {
@@ -268,7 +238,7 @@ impl Server {
                     Ok(t) => {
                         self.next_template += 1;
                         let id = format!("t{}", self.next_template);
-                        let fs = MapFileSystem::new(params.get("filesystem"));
+                        let fs = file_system(params.get("filesystem"));
                         self.templates.insert(id.clone(), Compiled { template: t, fs });
                         self.order.push_back(id.clone());
                         while self.order.len() > MAX_TEMPLATES {
@@ -311,7 +281,7 @@ impl Server {
                     strict_errors: strict,
                     limits,
                     now,
-                    file_system: compiled.fs.as_ref().map(|f| f as &dyn FileSystem),
+                    file_system: Some(&compiled.fs as &dyn FileSystem),
                     template_name: None,
                 };
                 match compiled.template.render(assigns, &opts) {

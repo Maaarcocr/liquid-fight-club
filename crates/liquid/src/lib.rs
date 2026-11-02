@@ -28,7 +28,7 @@ pub mod value;
 pub use date::Timestamp;
 pub use drop::Drop;
 pub use error::{Error, ErrorKind, Result};
-pub use render::{BlankFileSystem, FileSystem, Limits, RenderOptions, RenderResult};
+pub use render::{BlankFileSystem, FileSystem, Limits, MemoryFileSystem, RenderOptions, RenderResult};
 pub use value::{Hash, Value};
 
 use std::rc::Rc;
