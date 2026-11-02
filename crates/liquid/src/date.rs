@@ -102,6 +102,7 @@ struct Parts {
     sec: Option<i64>,
     nanos: u32,
     offset: Option<i32>,
+    yday: Option<i64>,
 }
 
 fn zone_offset(name: &str) -> Option<i32> {
@@ -333,7 +334,18 @@ fn parse_parts(s: &str) -> Option<Parts> {
                     let c = if sym(i + 3, sep) { num(i + 4) } else { None };
                     match (sep, c) {
                         ('-', Some(c)) => {
-                            p.year = Some(expand_year(a));
+                            let signed = i > 0
+                                && (sym(i - 1, '-') || sym(i - 1, '+'))
+                                && !used[i - 1]
+                                && (i == 1 || !matches!(t[i - 2], Tk::Num(_)));
+                            let y = if signed {
+                                used[i - 1] = true;
+                                let v: i64 = a.parse().ok()?;
+                                if sym(i - 1, '-') { -v } else { v }
+                            } else {
+                                expand_year(a)
+                            };
+                            p.year = Some(y);
                             p.mon = Some(b.parse().ok()?);
                             p.mday = Some(c.parse().ok()?);
                         }
@@ -443,6 +455,25 @@ fn parse_parts(s: &str) -> Option<Parts> {
         }
     }
 
+    if !found_date {
+        // A lone 3-digit number is a day of the year; 1-2 digits a day of the month.
+        for i in 0..n {
+            if !used[i] {
+                if let Some(d) = num(i) {
+                    if d.len() == 3 {
+                        p.yday = Some(d.parse().ok()?);
+                        used[i] = true;
+                        break;
+                    } else if d.len() <= 2 && p.hour.is_some() {
+                        p.mday = Some(d.parse().ok()?);
+                        used[i] = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     // Anything left must be ignorable: weekday names, punctuation, "T", "at".
     for i in 0..n {
         if used[i] {
@@ -462,7 +493,13 @@ fn parse_parts(s: &str) -> Option<Parts> {
             Tk::Num(_) => {}
         }
     }
-    if p.year.is_none() && p.mon.is_none() && p.mday.is_none() && p.hour.is_none() && p.min.is_none() && p.sec.is_none()
+    if p.year.is_none()
+        && p.mon.is_none()
+        && p.mday.is_none()
+        && p.hour.is_none()
+        && p.min.is_none()
+        && p.sec.is_none()
+        && p.yday.is_none()
     {
         return None;
     }
@@ -488,6 +525,9 @@ pub fn parse_time(s: &str, now: Timestamp) -> Option<Timestamp> {
             break 'fill;
         }
         year = Some(nc.year);
+        if p.yday.is_some() {
+            break 'fill;
+        }
         if mon.is_some() {
             break 'fill;
         }
@@ -514,10 +554,19 @@ pub fn parse_time(s: &str, now: Timestamp) -> Option<Timestamp> {
     if !(0..=60).contains(&sec) {
         return None;
     }
-    if year.abs() > 1_000_000_000 {
+    if year.abs() > 100_000_000_000 {
         return None;
     }
-    let days = days_from_civil(year, mon as u32, 1) + day - 1;
+    let days = match p.yday {
+        Some(yd) => {
+            let len = days_from_civil(year + 1, 1, 1) - days_from_civil(year, 1, 1);
+            if !(1..=len).contains(&yd) {
+                return None;
+            }
+            days_from_civil(year, 1, 1) + yd - 1
+        }
+        None => days_from_civil(year, mon as u32, 1) + day - 1,
+    };
     let local = days * 86400 + hour * 3600 + min * 60 + sec;
     let offset = off.unwrap_or(0);
     Some(Timestamp { secs: local - offset as i64, nanos: p.nanos, offset, utc: offset == 0 })
@@ -704,7 +753,7 @@ pub fn strftime(t: &Timestamp, fmt: &str) -> String {
             }
             'G' => {
                 let (y, _) = iso_week(&c);
-                push_num(&mut out, y, w(4), &pad, '0')
+                push_num(&mut out, y, w(if y < 0 { 5 } else { 4 }), &pad, '0')
             }
             'g' => {
                 let (y, _) = iso_week(&c);

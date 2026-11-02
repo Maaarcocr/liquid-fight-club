@@ -3,7 +3,7 @@
 use crate::date::{self, Timestamp};
 use crate::error::{Error, ErrorKind, Result};
 use crate::expression::{ruby_lstrip, ruby_rstrip, ruby_strip};
-use crate::num::{self, to_number, Num};
+use crate::num::{to_number, Num};
 use crate::render::{ruby_to_s, to_integer, to_liquid, Context, MAX_ARRAY_LEN, MAX_STRING_BYTES};
 use crate::value::{self, format_float, is_ruby_space, ruby_cmp, ruby_eq, to_s, Hash, RcStr, Value};
 use std::cmp::Ordering;
@@ -288,12 +288,15 @@ fn invoke_inner(ctx: &mut Context, name: &str, input: Value, args: &[Value]) -> 
             let n_val = a0.cloned().unwrap_or(Value::Int(0));
             let n = match to_number(&n_val) {
                 Num::Int(i) => i,
-                Num::Big(b) => num::clamp_bigint(&b),
+                Num::Big(_) => return Err(Error::new(ErrorKind::Internal, "internal")),
                 Num::Dec(d) => {
                     let f = d.to_f64();
                     if f.is_finite() { f.trunc() as i64 } else { 0 }
                 }
             };
+            if !(i32::MIN as i64..=i32::MAX as i64).contains(&n) {
+                return Err(Error::new(ErrorKind::Internal, "internal"));
+            }
             let r = to_number(&input).round(n)?;
             let is_zero = matches!(n_val, Value::Int(0)) || matches!(n_val, Value::Float(f) if f == 0.0);
             let v = r.into_value();
@@ -1307,7 +1310,7 @@ fn date_filter(ctx: &Context, input: Value, format: &Value) -> Result<Value> {
     match ts {
         Some(t) => {
             // Keep years within a range strftime can print sanely.
-            if t.secs.abs() > 100_000_000_000_000 {
+            if t.secs.abs() > 3_200_000_000_000_000_000 {
                 return Ok(input);
             }
             Ok(Value::from(date::strftime(&t, &fmt)))
