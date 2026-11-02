@@ -1,0 +1,16 @@
+{
+ "seed": 103,
+ "cases": 5989,
+ "ruby_unusable": 11,
+ "rust": {
+  "ok->render_error": 17,
+  "message_mismatch": 8,
+  "output_mismatch": 24,
+  "render_error->ok": 2
+ },
+ "c": {
+  "message_mismatch": 2,
+  "output_mismatch": 4,
+  "render_error->ok": 2
+ }
+}

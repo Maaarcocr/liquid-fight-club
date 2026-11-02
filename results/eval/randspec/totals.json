@@ -1,0 +1,17 @@
+{
+ "cases": 47919,
+ "rust": {
+  "output_mismatch": 167,
+  "ok->render_error": 124,
+  "message_mismatch": 44,
+  "render_error->ok": 16,
+  "TOTAL": 351
+ },
+ "c": {
+  "output_mismatch": 42,
+  "message_mismatch": 14,
+  "ok->render_error": 1,
+  "render_error->ok": 17,
+  "TOTAL": 74
+ }
+}

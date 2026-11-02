@@ -1,0 +1,8 @@
+matches Ruby: "{% echo m | remove_last: '&amp;&lt;'   | date: '%B %e, %Y at %l:%M %p' -%}"
+matches Ruby: "{{ 'the quick brown fox jumps over the lazy dog' | find: 'title', f.c.last }}{{ "
+matches Ruby: "{% assign arr = 100 | h %}{% liquid\n  assign x = date | date: '%s' | base64_url_"
+matches Ruby: '{% decrement c -%}{{- "abc123" | date: \'%D %F %T\' }}'
+matches Ruby: '{% liquid\n  assign x = date.first.size  | default: p[1.5], allow_false: false\n  '
+matches Ruby: "{{ '2025-03-15T14:30:00Z'  | escape_once | date: '%U %W %u %w' }}"
+matches Ruby: "{% liquid\n  assign x = (n..42) | h | uniq: 'id'\n  echo date | date: '%-d/%-m/%Y'"
+c: 7 match Ruby on this build, 65 still diverge

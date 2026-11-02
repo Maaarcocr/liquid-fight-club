@@ -1,0 +1,16 @@
+c / arm-only: 7 cases
+      5  C1 date strings misparsed (regression in 76b2ba4)
+      1  C2 url_decode on invalid UTF-8 raises
+      1  C3 float modulo after divide by blank prints NaN
+c / both-differ: 8 cases
+c / shared: 57 cases
+rust / arm-only: 288 cases
+    212  R1 sort / sort_natural / uniq with a property on a non-array input
+     56  R2 negative zero printed as 0.0
+      9  R3 .size of a big integer
+      5  R4 date leaves big-integer timestamps and junk strings unparsed
+      4  R5 invalid UTF-8 from base64_decode collapsed differently
+      1  R6 slice with a false length raises
+      1  R7 truncate with a huge negative length
+rust / both-differ: 8 cases
+rust / shared: 55 cases

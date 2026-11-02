@@ -1,0 +1,392 @@
+== rust: 351 minimized cases, 147 clusters
+   24  ok->render_error | filters: sort_natural
+       e.g. "{{ m | sort_natural: 'id' }}"
+   24  output_mismatch | filters: times
+       e.g. '{{ -0.0 | times: 0 }}'
+   23  output_mismatch | filters: divided_by
+       e.g. '{{ t | divided_by: -2.5 }}'
+   18  output_mismatch | filters: uniq
+       e.g. "{{ f | uniq: 'n'   -}}"
+   17  ok->render_error | filters: uniq
+       e.g. "{{ n  | uniq: 'n' -}}"
+   13  output_mismatch | tags: -
+       e.g. '{{- (n..m) }}'
+   13  ok->render_error | filters: sort
+       e.g. "{{ 1  | sort: 'n'  }}"
+   12  output_mismatch | filters: sort_natural
+       e.g. "{{ 42  | sort_natural: 'n' }}"
+    6  output_mismatch | tags: cycle
+       e.g. "{% cycle ('3'..n) %}"
+    5  output_mismatch | filters: date
+       e.g. "{% echo big | date: '%z' -%}"
+    4  ok->render_error | filters: at_most,sort
+       e.g. '{{- " " | at_most: 0 | sort: \'available\' }}'
+    4  ok->render_error | filters: plus,uniq
+       e.g. "{% echo t | plus: nil | uniq: 'id' %}"
+    4  output_mismatch | filters: sort
+       e.g. "{{ h.size | sort: 'name' }}"
+    4  ok->render_error | filters: size,sort_natural
+       e.g. '{{ "0x1F" | size | sort_natural: \'n\' -}}'
+    4  output_mismatch | filters: at_most
+       e.g. '{{ -0.0 | at_most: 1 }}'
+    4  ok->render_error | filters: ceil,sort
+       e.g. "{{- y  | ceil | sort: 'missing' }}"
+    3  ok->render_error | filters: round,sort
+       e.g. "{{ blank | round: '2' | sort: 'price' }}"
+    3  output_mismatch | tags: echo
+       e.g. '{% echo (x..n) %}'
+    3  output_mismatch | filters: modulo
+       e.g. '{{ -0.0  | modulo: -2.5   }}'
+    3  ok->render_error | filters: sort,times
+       e.g. "{{ x | times: 1 | sort: 'name' }}"
+    3  ok->render_error | filters: sum,uniq
+       e.g. "{{ f | sum: 'id'  | uniq: 'price' }}"
+    3  render_error->ok | tags: case
+       e.g. "{% case nums[n].last['name'] %}{% when e %}{% endcase %}"
+    3  ok->render_error | filters: at_least,sort
+       e.g. '{{ "a b  c" | at_least: -1 | sort: \'price\' }}'
+    3  ok->render_error | filters: divided_by,uniq
+       e.g. '{{ products["a"]  | divided_by: 10 | uniq: \'name\' }}'
+    2  message_mismatch | filters: round
+       e.g. '{{ 1000 | round: 9007199254740993  -}}'
+    2  ok->render_error | filters: at_least,sort_natural
+       e.g. "{{ h.id.size | at_least: 3 | sort_natural: 'id' }}"
+    2  ok->render_error | filters: sort,sum
+       e.g. '{% liquid\n  assign x = "March 5, 2021 10:00" | sum | sort: \'available\'\n  echo true  %}'
+    2  output_mismatch | filters: base64_decode
+       e.g. '{{ big | base64_decode }}'
+    2  ok->render_error | filters: at_most,sort_natural
+       e.g. "{{ words.size  | at_most: -1  | sort_natural: 'price' }}"
+    2  ok->render_error | filters: round,uniq
+       e.g. '{% echo " 42 " | round | uniq: \'title\' -%}'
+    2  render_error->ok | tags: include
+       e.g. "{% include 'list', a: words[n], b: 2 %}"
+    2  output_mismatch | tags: liquid
+       e.g. '{% liquid\n  assign x = big  \n  echo z \n  if h\n  echo x.size\n  endif\n-%}'
+    2  message_mismatch | filters: base64_url_safe_decode,uniq
+       e.g. "{{ 100 | uniq: 'tags'   | base64_url_safe_decode }}"
+    2  ok->render_error | filters: abs,sort
+       e.g. "{% echo e.d | abs | sort: 'n' %}"
+    2  ok->render_error | filters: modulo,sort_natural
+       e.g. '{% echo "2025-03-15T14:30:00Z" | modulo: 100 | sort_natural: \'name\' %}'
+    2  message_mismatch | filters: sort
+       e.g. "{% echo 1 | sort: 'available' %}{%- render 'missing' -%}"
+    2  output_mismatch | filters: size,uniq
+       e.g. "{{ y | size  | uniq: 'id'  -}}"
+    2  output_mismatch | filters: sort,times
+       e.g. "{% echo y.a | times: 0 | sort: 'n' %}"
+    2  ok->render_error | filters: size,uniq
+       e.g. '{{ "emoji 🎉👍" | size | uniq: \'name\' }}'
+    2  message_mismatch | filters: find
+       e.g. "{% echo (n..'3') | find: 'tags' %}"
+    2  output_mismatch | filters: at_least
+       e.g. '{{ f | at_least: empty_h[-1].available }}'
+    2  ok->render_error | filters: plus,sort_natural
+       e.g. "{% echo arr   | plus: 3 | sort_natural: 'id' %}"
+    2  ok->render_error | filters: floor,sort
+       e.g. "{{ i | floor | sort: 'id' -}}"
+    2  ok->render_error | filters: floor,sort_natural
+       e.g. "{% echo missing | floor | sort_natural: 'price' %}"
+    2  output_mismatch | filters: round,sort_natural
+       e.g. "{{ forloop | round | sort_natural: 'tags' }}"
+    2  output_mismatch | filters: base64_url_safe_decode
+       e.g. '{{ 9007199254740993 | base64_url_safe_decode -}}'
+    2  output_mismatch | filters: times,uniq
+       e.g. "{%- liquid\n  assign x = 0  | times: i[1]\n  echo 2147483647 | uniq: 'tags' %}"
+    2  ok->render_error | filters: abs,uniq
+       e.g. "{% echo e | abs | uniq: '0x1F' %}"
+    2  render_error->ok | tags: -
+       e.g. '{{- arr[n] }}'
+    1  ok->render_error | filters: plus,sort
+       e.g. "{%- liquid\n  assign x = t | plus: false | sort: 'available'  %}"
+    1  message_mismatch | filters: slice,sort
+       e.g. "{% assign arr = 1 | sort: 'id' | slice: 7, 'Hello World' %}"
+    1  message_mismatch | filters: find,slice,uniq
+       e.g. '{% liquid\n  assign x = s[1.5]  | slice: 2\n  echo 2147483647   | uniq: \'tags\'\n  if m[1.5] and n\n  echo "3.50"\n  endif\n-%}{{ 7  | find: \'title\' }}'
+    1  render_error->ok | filters: remove
+       e.g. '{% assign y = "true"   | remove: empty_arr[n][1].last %}'
+    1  output_mismatch | filters: date,remove_last
+       e.g. "{% echo m | remove_last: '&amp;&lt;'   | date: '%B %e, %Y at %l:%M %p' -%}"
+    1  ok->render_error | filters: ceil,sort_natural
+       e.g. "{% echo empty_h | ceil | sort_natural: 'id' -%}"
+    1  message_mismatch | filters: default,reject,uniq
+       e.g. "{% liquid\n  assign x = forloop.available | default: 'école', allow_false: false\n  echo -99999999999999999999 | uniq: 'tags' | reject: 'name'\n  if empty_h != words\n  echo empty_h\n  endif\n%}"
+    1  message_mismatch | filters: map,plus,uniq
+       e.g. "{{ '0x1F' | plus: 100 | uniq: 'price' | map: 'id' }}"
+    1  message_mismatch | tags: include,liquid
+       e.g. '{%- liquid\n  assign x = nums[n].first\n  echo forloop\n  if "tab\there" contains "&amp;&lt;" and n[1.5][n].size == \'2025-03-15T14:30:00Z\' or forloop.last <> empty_h.name.last\n  echo (-2..1000)\n  endif\n%}{% include s with words.c[1].length %}'
+    1  output_mismatch | filters: date,escape_once
+       e.g. "{{ 100.0 | escape_once | date: '%10A|%-10b|' }}"
+    1  render_error->ok | tags: if
+       e.g. '{% if nums[n].id > empty and "nil" <> y %}{% endif %}'
+    1  output_mismatch | filters: capitalize,date
+       e.g. "{{ arr | capitalize | date: '%G-W%V' }}"
+    1  output_mismatch | filters: at_least,times
+       e.g. '{%- liquid\n  assign x = e | at_least: 0\n  echo "straße" | times: -2.5\n  if -99999999999999999999 <> \' 42 \'\n  echo b[-1][0]\n  endif\n%}'
+    1  output_mismatch | filters: default
+       e.g. "{%- liquid\n  assign x = y   | default: '<p>Hi & bye</p>', allow_false: true\n  if nums.size <> blank\n  echo products[n]\n  endif\n%}"
+    1  output_mismatch | filters: abs,sort_natural
+       e.g. "{% echo true | abs | sort_natural: 'n' %}"
+    1  output_mismatch | filters: round,uniq
+       e.g. "{{ blank | round  | uniq: 'name' }}"
+    1  message_mismatch | filters: compact,minus
+       e.g. "{{- words[n] | minus: 1 | compact: 'available' }}"
+    1  message_mismatch | filters: sort,truncatewords
+       e.g. "{% assign s = s.last.size | sort: 'missing'  | truncatewords: m.first %}"
+    1  ok->render_error | filters: compact,sort_natural
+       e.g. "{% liquid\n  assign x = big[-1][0].id | compact: 'name'\n  echo (arr.size..'3') | sort_natural: 'price' \n  if p.id.last\n  echo words[m]\n  endif\n%}"
+    1  render_error->ok | tags: liquid
+       e.g. '{%- liquid\n  assign x = nums[n].size \n%}'
+    1  message_mismatch | filters: modulo,uniq
+       e.g. "{% liquid\n  assign x = 2  | uniq: 'name'\n  echo b.size | modulo: t %}"
+    1  ok->render_error | filters: at_most,uniq
+       e.g. '{%- echo "tab\there" | at_most: "1700000000" | uniq: \'name\' %}'
+    1  message_mismatch | filters: concat,sort
+       e.g. '{%- liquid\n  assign x = words[0].size | concat: arr  | sort: -99999999999999999999\n  if z == false or \'\' <> 9007199254740993 or item["a"] < h.name\n  echo \'0x1F\'\n  endif\n-%}'
+    1  output_mismatch | filters: has,uniq
+       e.g. "{{ empty | has: 'tags' | uniq: 'name' -}}"
+    1  output_mismatch | filters: ceil,sort
+       e.g. "{{ forloop[n] | ceil  | sort: 'id' }}"
+    1  output_mismatch | filters: at_least,remove_first
+       e.g. '{% liquid\n  assign x = "Zm9v_-Y"  | remove_first: \'ź\'\n  echo -0.0 | at_least: \'&amp;&lt;\' %}'
+    1  output_mismatch | filters: ceil,uniq
+       e.g. "{{ p  | ceil | uniq: 'name'  }}"
+    1  message_mismatch | filters: find_index,uniq
+       e.g. "{%- assign s = 100 | uniq: 'available' | find_index: 'missing' %}"
+    1  output_mismatch | tags: tablerow,unless
+       e.g. '{% unless products[n].price[1] != i %}{%- tablerow x in products %}{% endtablerow %}{% endunless %}'
+    1  output_mismatch | filters: compact,times
+       e.g. '{% liquid\n  assign x = 1.0   | compact: \'missing\'\n  echo x[n] | times: -2.5  \n  if t.size["a"] == f\n  echo 3\n  endif\n%}'
+    1  message_mismatch | tags: render,unless
+       e.g. "{% unless nums[n].c <= item.name or m.size.name -%}{%- render 'missing' with 2.5 as thing %}{% endunless %}"
+    1  message_mismatch | filters: truncate,uniq
+       e.g. '{% liquid\n  assign x = " "\n  echo 9007199254740993 | uniq: \'id\'   | truncate: 0.5\n  if \'école\'\n  echo z.c.title["a"]\n  endif\n%}'
+    1  ok->render_error | filters: times,uniq
+       e.g. "{% assign s = h.c.price.first | times: 'Hello World' | uniq: 'title'  %}"
+    1  message_mismatch | filters: sort_natural,sum
+       e.g. "{% assign s = 255 | sort_natural: 'n' | sum: 'missing' %}"
+    1  message_mismatch | tags: case,include
+       e.g. "{% case date.available[m] %}{% when empty_arr[n].first %}{% include 'missing', a: 2, b: 2 -%}{% endcase %}"
+    1  output_mismatch | filters: prepend
+       e.g. '{% liquid\n  assign x = z.first   | prepend: "ÉTÉ"\n  echo big.size\n  if e.size.first\n  echo \'12\'\n  endif\n-%}'
+    1  message_mismatch | filters: where
+       e.g. "{{ (n..'3') | where: 'name', 99.999 }}"
+    1  output_mismatch | tags: unless
+       e.g. '{% unless nums != products[n] %}{{- false }}{% endunless %}'
+    1  message_mismatch | filters: concat,uniq
+       e.g. "{%- echo 42 | uniq: 'title' %}{{ m.tags | concat: products   }}"
+    1  output_mismatch | filters: plus
+       e.g. '{%- echo words.first[-1] | plus: big.size -%}'
+    1  message_mismatch | filters: abs,find_index,sort_natural
+       e.g. "{{ false | abs | sort_natural: 'n' | find_index: 'title' -}}"
+    1  ok->render_error | filters: round,sort_natural
+       e.g. "{% echo m.size.price  | round | sort_natural: 'title' %}"
+    1  output_mismatch | filters: minus,split,uniq
+       e.g. "{% liquid\n  assign x = 0 | split: 0\n  echo h | minus: b | uniq: 'available'\n  if b.n\n  echo empty_h.tags\n  endif\n%}"
+    1  ok->render_error | filters: ceil,uniq
+       e.g. "{{ s | ceil | uniq: 'title' -}}"
+    1  message_mismatch | filters: at_most,sort,truncatewords
+       e.g. '{{- e | at_most: m.available.size | sort: \'price\' }}{% liquid\n  assign x = y[1][\'name\'].c   | truncatewords: 1\n  if "" > 9007199254740993\n  echo big.first\n  endif\n%}'
+    1  ok->render_error | filters: last,sort
+       e.g. "{% echo (-2..1.5) | last | sort: 'missing'  %}"
+    1  message_mismatch | filters: concat,sort_natural
+       e.g. "{{- 0 | sort_natural: 'price' }}{% echo 42 | concat: arr, 'école'  %}"
+    1  output_mismatch | filters: concat,size,sort_natural
+       e.g. "{% liquid\n  assign x = z[-1].first | concat: s\n  echo m.last[-1][0] | size | sort_natural: '<p>Hi & bye</p>' %}"
+    1  message_mismatch | filters: divided_by,floor,reject,sort
+       e.g. "{{ nil | floor | sort: 'price' }}{% assign s = 'Zm9vYmFy'  | divided_by: 1 | reject: 'missing' %}"
+    1  output_mismatch | filters: at_least,sort_natural
+       e.g. "{% echo s | at_least: 100 | sort_natural: 'title' %}"
+    1  output_mismatch | filters: append,base64_decode
+       e.g. "é{% liquid\n  assign x = big \n  echo 'nil' | append: 'hello' | base64_decode\n  if x >= big\n  echo big\n  endif\n%}"
+    1  message_mismatch | filters: at_least,reject,uniq
+       e.g. '{% assign arr = "&amp;&lt;" | at_least: nil | uniq: \'title\' | reject: \'available\', b[-1].length  -%}'
+    1  output_mismatch | filters: truncate
+       e.g. '{{- h | truncate: big.size -}}'
+    1  ok->render_error | filters: minus,sort_natural
+       e.g. "{{- e | minus: '2' | sort_natural: 'name' }}"
+    1  output_mismatch | filters: at_least,sort
+       e.g. '{{ i | at_least: 3 | sort: -99999999999999999999 -}}'
+    1  message_mismatch | filters: modulo,size,uniq
+       e.g. '{{ arr.last.index.available | size | uniq: \'missing\'  }}{% liquid\n  assign x = 0.1 | modulo: (1.5..n)\n  echo h["a"].title[99] \n-%}'
+    1  output_mismatch | filters: modulo,sort
+       e.g. "{{ date.last  | modulo: 10  | sort: 'n' }}"
+    1  output_mismatch | filters: floor,uniq
+       e.g. '{{ "2024-02-29"  | floor | uniq: \'n\' }}'
+    1  output_mismatch | filters: sort_natural,sum
+       e.g. "{{ missing.id | sum | sort_natural: 'id' }}"
+    1  message_mismatch | filters: date,sort_natural
+       e.g. "{{ m | sort_natural: 'name'   -}}{{ h.tags[1] | date: '%-d/%-m/%Y', '1e3' }}"
+    1  message_mismatch | filters: modulo,sort_natural,times
+       e.g. "{{ i.price | times: -1 | sort_natural: 'id'   -}}{{ y.size | modulo: nil  -}}"
+    1  message_mismatch | filters: divided_by,modulo,sort_natural
+       e.g. '{{ "2025-03-15T14:30:0Z" | modulo: 3 | sort_natural: \'price\' | divided_by: 0 }}'
+    1  output_mismatch | tags: include
+       e.g. "{% include 'card' with false as thing -%}"
+    1  message_mismatch | filters: base64_decode,replace_first
+       e.g. "{{ words[n].available | replace_first: empty_h.n, '1e3' | base64_decode  }}"
+    1  message_mismatch | filters: truncatewords,uniq
+       e.g. "{{ 1000 | uniq: 'available'  | truncatewords: nil, '&amp;&lt;' }}"
+    1  message_mismatch | filters: has,round
+       e.g. "{%- liquid\n  assign x = 'nil' \n  echo h[1] | round: -1 | has: 'missing', words[n] \n  if z[-1].size\n  echo (1.5..-2)\n  endif\n%}"
+    1  output_mismatch | filters: plus,sort_natural
+       e.g. "{% echo t | plus: x | sort_natural: 'missing' %}"
+    1  message_mismatch | filters: floor,slice,uniq
+       e.g. "{% liquid\n  assign x = 99.999   | floor | uniq: 'tags'\n  if ('3'..'3')\n  echo 0.1\n  endif\n%}{% liquid\n  assign x = x.size.n | slice: 'a b  c'  \n  if 0.1 < nil or 100.0 <= 1\n  echo n.last.first[0]\n  endif\n%}"
+    1  message_mismatch | filters: at_most,truncate,uniq
+       e.g. '{% liquid\n  assign x = "true"  | at_most: 100\n  echo n | uniq: \'title\' | truncate: n.available, 1.0\n  if 2 >= words.last[-1].index\n  echo big[0]\n  endif\n%}'
+    1  ok->render_error | filters: sort_natural,times
+       e.g. "{% echo n.a['name'] | times: ' ' | sort_natural: 'tags'  %}"
+    1  ok->render_error | filters: slice
+       e.g. '{{ z | slice: 100, b }}'
+    1  output_mismatch | tags: render
+       e.g. "{% render 'card' with false as thing %}"
+    1  message_mismatch | filters: ceil,truncate,uniq
+       e.g. "{% liquid\n  assign x = 'March 5, 2021 10:00' | ceil | uniq: 'available' | truncate: -2.5\n  echo products \n  if item[m]\n  echo m\n  endif\n%}"
+    1  render_error->ok | tags: echo
+       e.g. "{% echo words[n]['name'].d %}"
+    1  render_error->ok | filters: base64_url_safe_decode,replace_last
+       e.g. "{{ 'Zm9v_-Y' | base64_url_safe_decode | replace_last: 'emoji 🎉👍', '  padded  ' }}"
+    1  message_mismatch | filters: base64_decode,sort_natural
+       e.g. "{{ 255 | sort_natural: 'n' | base64_decode -}}"
+    1  output_mismatch | filters: sum,uniq
+       e.g. "{{ 'x' | sum: 'price' | uniq: 'available' }}"
+    1  ok->render_error | filters: round
+       e.g. '{{ h.name | round: arr[1]   }}'
+    1  output_mismatch | filters: round
+       e.g. "{{ -0.0 | round: '2' }}"
+    1  message_mismatch | filters: reject
+       e.g. "{{ arr[n][99].a }}{{ (-10..'3') | reject: 'missing', z[-1].a }}"
+    1  output_mismatch | filters: date,prepend
+       e.g. '{{ products | prepend: "a b  c" | date: \'%y%m%d\' -}}'
+    1  message_mismatch | filters: plus,sort,times,where
+       e.g. "{% assign x = words.last | plus: i | sort: 'missing' %}{{ blank | times: 0  | where: 'tags', p.first  }}"
+    1  render_error->ok | filters: base64_url_safe_decode,prepend
+       e.g. "{{- missing | prepend: '日本語テキスト'   }}{%- liquid\n  assign x = i[n] \n  echo 9007199254740993 | base64_url_safe_decode\n  if i.last != 7 or true\n  echo nil\n  endif\n%}"
+    1  render_error->ok | tags: render
+       e.g. "{% render 'self', a: nums[n][1.5], b: 2 -%}"
+    1  output_mismatch | filters: base64_decode,default
+       e.g. "{%- liquid\n  assign x = blank  | default: nums[99].first\n  echo 9007199254740993 | base64_decode \n  if i[99].a contains 'line1\\nline2\r\\nline3'\n  echo i[-1]\n  endif\n%}"
+    1  output_mismatch | filters: minus,sort_natural
+       e.g. "{% echo date[0]  | minus: '2' | sort_natural: 'tags'  %}"
+    1  ok->render_error | filters: abs,sort_natural
+       e.g. "{% liquid\n  assign x = p  | abs | sort_natural: 'available'\n  if 3\n  echo blank\n  endif\n%}"
+    1  message_mismatch | filters: size,sort
+       e.g. "{%- liquid\n  assign x = '  padded  ' | size | sort: 'available'\n  echo null \n  if h.size >= null\n  echo empty_h.last.name\n  endif\n%}{% include s, a: arr[m], b: 2 %}"
+    1  render_error->ok | tags: assign
+       e.g. '{% assign x = words[n].last.first  %}'
+    1  ok->render_error | filters: minus,sort
+       e.g. "{% liquid\n  assign x = big | minus: 'Zm9v_-Y' | sort: 'tags' %}"
+    1  output_mismatch | filters: minus,sort
+       e.g. "{{ empty | minus: 3 | sort: 'tags' -}}"
+    1  output_mismatch | filters: floor,sort
+       e.g. "{{ z | floor | sort: 'title' }}"
+    1  ok->render_error | filters: divided_by,sort_natural
+       e.g. "{{ blank  | divided_by: 1000  | sort_natural: 'ź' }}"
+    1  render_error->ok | filters: base64_decode,prepend
+       e.g. "{% assign arr = 18446744073709551616  | base64_decode | prepend: 'straße'  -%}"
+    1  message_mismatch | filters: base64_decode,size,sort
+       e.g. '{%- liquid\n  assign x = h.index | size | sort: \'missing\' | base64_decode\n  echo "nil"  %}'
+    1  ok->render_error | filters: at_least,uniq
+       e.g. "{{- words[n] | at_least: 10 | uniq: 'n' }}"
+    1  ok->render_error | filters: sort_natural,sum
+       e.g. '{{ "-3" | sum: \'title\' | sort_natural: \'n\'  }}'
+    1  output_mismatch | filters: append
+       e.g. "{% liquid\n  assign x = 'straße' | append: '1e3'\n  echo (x..n) \n  if 'line1\\nline2\r\\nline3' >= 2 and ' ' or empty_h <> m\n  echo -0.0\n  endif\n-%}"
+== c: 72 minimized cases, 48 clusters
+    7  output_mismatch | tags: -
+       e.g. '{{- (n..m) }}'
+    7  output_mismatch | tags: cycle
+       e.g. "{% cycle ('3'..n) %}"
+    4  output_mismatch | tags: echo
+       e.g. '{% echo (x..n) %}'
+    3  output_mismatch | filters: modulo
+       e.g. '{{ -0.0  | modulo: -2.5   }}'
+    3  render_error->ok | tags: case
+       e.g. "{% case nums[n].last['name'] %}{% when e %}{% endcase %}"
+    2  message_mismatch | filters: round
+       e.g. '{{ 1000 | round: 9007199254740993  -}}'
+    2  render_error->ok | tags: include
+       e.g. "{% include 'list', a: words[n], b: 2 %}"
+    2  output_mismatch | filters: date,escape_once
+       e.g. "{{ 100.0 | escape_once | date: '%10A|%-10b|' }}"
+    2  message_mismatch | filters: find
+       e.g. "{% echo (n..'3') | find: 'tags' %}"
+    2  render_error->ok | tags: -
+       e.g. '{{- arr[n] }}'
+    1  render_error->ok | filters: remove
+       e.g. '{% assign y = "true"   | remove: empty_arr[n][1].last %}'
+    1  output_mismatch | filters: date,remove_last
+       e.g. "{% echo m | remove_last: '&amp;&lt;'   | date: '%B %e, %Y at %l:%M %p' -%}"
+    1  message_mismatch | tags: include,liquid
+       e.g. '{%- liquid\n  assign x = nums[n].first\n  echo forloop\n  if "tab\there" contains "&amp;&lt;" and n[1.5][n].size == \'2025-03-15T14:30:00Z\' or forloop.last <> empty_h.name.last\n  echo (-2..1000)\n  endif\n%}{% include s with words.c[1].length %}'
+    1  output_mismatch | tags: liquid
+       e.g. "{% liquid\n  assign x = missing[0]   \n  if true <> b.size.missing\n  echo ('3'..n)\n  endif\n%}"
+    1  render_error->ok | tags: if
+       e.g. '{% if nums[n].id > empty and "nil" <> y %}{% endif %}'
+    1  output_mismatch | filters: capitalize,date
+       e.g. "{{ arr | capitalize | date: '%G-W%V' }}"
+    1  output_mismatch | filters: default
+       e.g. "{%- liquid\n  assign x = y   | default: '<p>Hi & bye</p>', allow_false: true\n  if nums.size <> blank\n  echo products[n]\n  endif\n%}"
+    1  message_mismatch | filters: compact,minus
+       e.g. "{{- words[n] | minus: 1 | compact: 'available' }}"
+    1  render_error->ok | tags: liquid
+       e.g. '{%- liquid\n  assign x = nums[n].size \n%}'
+    1  message_mismatch | filters: concat,sort
+       e.g. '{%- liquid\n  assign x = words[0].size | concat: arr  | sort: -99999999999999999999\n  if z == false or \'\' <> 9007199254740993 or item["a"] < h.name\n  echo \'0x1F\'\n  endif\n-%}'
+    1  output_mismatch | tags: tablerow,unless
+       e.g. '{% unless products[n].price[1] != i %}{%- tablerow x in products %}{% endtablerow %}{% endunless %}'
+    1  message_mismatch | tags: render,unless
+       e.g. "{% unless nums[n].c <= item.name or m.size.name -%}{%- render 'missing' with 2.5 as thing %}{% endunless %}"
+    1  message_mismatch | tags: case,include
+       e.g. "{% case date.available[m] %}{% when empty_arr[n].first %}{% include 'missing', a: 2, b: 2 -%}{% endcase %}"
+    1  message_mismatch | filters: where
+       e.g. "{{ (n..'3') | where: 'name', 99.999 }}"
+    1  output_mismatch | tags: unless
+       e.g. '{% unless nums != products[n] %}{{- false }}{% endunless %}'
+    1  output_mismatch | filters: at_least
+       e.g. '{% liquid\n  assign x = t.last.first  \n  echo (1.5..-2) | at_least: 10\n  if m[99].c < arr.first[n][1.5] or f[1][0] <> b\n  echo (n..-2)\n  endif\n%}'
+    1  output_mismatch | filters: date,find
+       e.g. "{{ 'the quick brown fox jumps over the lazy dog' | find: 'title', f.c.last }}{{ t | date: '%G-W%V'  }}"
+    1  ok->render_error | filters: base64_decode,url_decode
+       e.g. '{% assign y = 1000 | base64_decode | url_decode %}'
+    1  output_mismatch | filters: append,base64_decode
+       e.g. "é{% liquid\n  assign x = big \n  echo 'nil' | append: 'hello' | base64_decode\n  if x >= big\n  echo big\n  endif\n%}"
+    1  message_mismatch | filters: base64_url_safe_decode,date,h,slice
+       e.g. '{% assign arr = 100 | h %}{% liquid\n  assign x = date | date: \'%s\' | base64_url_safe_decode\n  echo h.title.n[n] | slice: n[n].id[1.5], empty_h[99].name.first\n  if 100 != y\n  echo "Zm9vYmFy"\n  endif\n%}'
+    1  output_mismatch | filters: date
+       e.g. '{% decrement c -%}{{- "abc123" | date: \'%D %F %T\' }}'
+    1  output_mismatch | filters: date,default
+       e.g. "{% liquid\n  assign x = date.first.size  | default: p[1.5], allow_false: false\n  echo date | date: '%-d/%-m/%Y'\n  if (arr.size..arr.size) and 100 == i and 1000 <> nums['name']\n  echo '12'\n  endif\n%}"
+    1  render_error->ok | filters: divided_by,modulo
+       e.g. '{% echo 0.1 | divided_by: blank | modulo: "March 5, 2021 10:00"  %}'
+    1  output_mismatch | filters: base64_url_safe_decode
+       e.g. '{{ 18446744073709551616  | base64_url_safe_decode }}'
+    1  output_mismatch | tags: include
+       e.g. "{% include 'card' with false as thing -%}"
+    1  message_mismatch | filters: base64_decode,replace_first
+       e.g. "{{ words[n].available | replace_first: empty_h.n, '1e3' | base64_decode  }}"
+    1  message_mismatch | filters: has,round
+       e.g. "{%- liquid\n  assign x = 'nil' \n  echo h[1] | round: -1 | has: 'missing', words[n] \n  if z[-1].size\n  echo (1.5..-2)\n  endif\n%}"
+    1  output_mismatch | tags: render
+       e.g. "{% render 'card' with false as thing %}"
+    1  render_error->ok | tags: echo
+       e.g. "{% echo words[n]['name'].d %}"
+    1  render_error->ok | filters: base64_url_safe_decode,replace_last
+       e.g. "{{ 'Zm9v_-Y' | base64_url_safe_decode | replace_last: 'emoji 🎉👍', '  padded  ' }}"
+    1  message_mismatch | filters: reject
+       e.g. "{{ arr[n][99].a }}{{ (-10..'3') | reject: 'missing', z[-1].a }}"
+    1  output_mismatch | filters: date,prepend
+       e.g. '{{ products | prepend: "a b  c" | date: \'%y%m%d\' -}}'
+    1  render_error->ok | filters: base64_url_safe_decode,prepend
+       e.g. "{{- missing | prepend: '日本語テキスト'   }}{%- liquid\n  assign x = i[n] \n  echo 9007199254740993 | base64_url_safe_decode\n  if i.last != 7 or true\n  echo nil\n  endif\n%}"
+    1  render_error->ok | tags: render
+       e.g. "{% render 'self', a: nums[n][1.5], b: 2 -%}"
+    1  output_mismatch | filters: date,h,uniq
+       e.g. '{% liquid\n  assign x = (n..42) | h | uniq: \'id\'\n  echo date | date: \'%-d/%-m/%Y\'\n  if 2147483647 <= item\n  echo "İstanbul"\n  endif\n%}'
+    1  render_error->ok | tags: assign
+       e.g. '{% assign x = words[n].last.first  %}'
+    1  render_error->ok | filters: base64_decode,prepend
+       e.g. "{% assign arr = 18446744073709551616  | base64_decode | prepend: 'straße'  -%}"
+    1  output_mismatch | filters: append
+       e.g. "{% liquid\n  assign x = 'straße' | append: '1e3'\n  echo (x..n) \n  if 'line1\\nline2\r\\nline3' >= 2 and ' ' or empty_h <> m\n  echo -0.0\n  endif\n-%}"
