@@ -168,8 +168,8 @@ Testing beyond the spec suites:
   `gensyntax.rb` (random broken markup, comparing parse errors). Across
   about 200,000 generated cases (including 8,000 in raised-error mode) the
   only remaining differences are the known ones listed under limitations
-  (bignum timestamps, a few `Date._parse` heuristics on garbage strings,
-  binary-string encodings).
+  (a few `Date._parse` heuristics on garbage strings and binary-string
+  encodings).
 * Large-input checks: a 1M-element array, a 10 MB string and a 200k-key hash
   render in tens of milliseconds per filter; every operation is linear or
   n log n.
@@ -227,9 +227,7 @@ range iteration, partial caching).
   length), slash and dot dates, month names, ctime/RFC 2822 forms, numeric
   zones and common zone abbreviations, and the bare digit-run forms. Exotic
   inputs can parse differently. Years beyond ±10^11 are rejected.
-* Integers wider than 2048 bits degrade to floats. Unix timestamps beyond
-  64 bits (e.g. a bignum passed to `date`) are not converted; the input is
-  returned unchanged where Ruby would format a far-future time.
+* Integers wider than 2048 bits degrade to floats.
 * Decimal strings keep at most 100 significant digits and quotients are
   computed to 40 digits before conversion to a float.
 * Allocation failure aborts the process (out-of-memory is not recoverable);

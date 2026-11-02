@@ -54,12 +54,14 @@ typedef struct tm_parts {
     int32_t off;
     bool utc;
     int64_t epoch;
+    int64_t day_offset;
 } tm_parts;
 
 static void breakdown(const lq_time *t, tm_parts *p) {
     int64_t local = t->sec + t->off;
-    int64_t days = floor_div(local, 86400);
-    int64_t secs = local - days * 86400;
+    int64_t days0 = floor_div(local, 86400);
+    int64_t secs = local - days0 * 86400;
+    int64_t days = days0 + t->day_offset;
     civil_from_days(days, &p->year, &p->mon, &p->mday);
     p->hour = (int)(secs / 3600);
     p->min = (int)(secs / 60 % 60);
@@ -72,6 +74,7 @@ static void breakdown(const lq_time *t, tm_parts *p) {
     p->off = t->off;
     p->utc = t->utc;
     p->epoch = t->sec;
+    p->day_offset = t->day_offset;
 }
 
 /* ------------------------------------------------------------------ */
@@ -530,6 +533,21 @@ bool lq_to_date(lq_ctx *ctx, lq_value v, lq_time *t) {
         t->sec = v.u.i;
         t->utc = true;
         return true;
+    case LQ_BIGINT: {
+        /* Time.at(bignum): split into whole days and seconds of day */
+        lq_value q, r;
+        lq_int_divmod(v, lq_int(86400), &q, &r);
+        bool ok = q.type == LQ_INT && r.type == LQ_INT && q.u.i < INT64_MAX / 4 && q.u.i > INT64_MIN / 4;
+        if (ok) {
+            memset(t, 0, sizeof *t);
+            t->sec = r.u.i;
+            t->day_offset = q.u.i;
+            t->utc = true;
+        }
+        lq_release(q);
+        lq_release(r);
+        return ok;
+    }
     case LQ_STR: {
         const char *s = v.u.s->data;
         size_t n = v.u.s->len;
@@ -767,7 +785,21 @@ static void strftime_rec(lq_buf *b, const char *f, size_t fn, const tm_parts *p,
             put_num(b, ((iy % 100) + 100) % 100, 2, '0', &o);
             break;
         }
-        case 's': put_num(b, p->epoch, 1, '0', &o); break;
+        case 's':
+            if (p->day_offset) {
+                /* epoch = day_offset * 86400 + epoch, as a big integer */
+                lq_value d = lq_int_mul(lq_int(p->day_offset), lq_int(86400));
+                lq_value e = lq_int_add(d, lq_int(p->epoch), false);
+                lq_buf t;
+                lq_buf_init(&t);
+                lq_to_s(&t, e, NULL);
+                lq_buf_putc(&t, 0);
+                put_text(b, t.p, &o, false);
+                lq_buf_free(&t);
+                lq_release(d);
+                lq_release(e);
+            } else put_num(b, p->epoch, 1, '0', &o);
+            break;
         case 'n': put_text(b, "\n", &o, false); break;
         case 't': put_text(b, "\t", &o, false); break;
         case '%': put_text(b, "%", &o, false); break;

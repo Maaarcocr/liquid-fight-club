@@ -334,7 +334,8 @@ void lq_num_free(lq_num *n);
 /* ------------------------------------------------------------------ */
 
 typedef struct lq_time {
-    int64_t sec;   /* seconds since epoch (UTC) */
+    int64_t sec;   /* seconds since epoch (UTC), plus day_offset days */
+    int64_t day_offset; /* whole days beyond `sec` (huge Unix timestamps) */
     int64_t nsec;  /* fractional nanoseconds */
     int32_t off;   /* UTC offset in seconds */
     bool utc;      /* zone is "UTC" */
